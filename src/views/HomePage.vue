@@ -90,6 +90,14 @@
               <td>⭐⭐⭐⭐⭐</td>
             </tr>
             <tr>
+              <td><strong>vue3-print-nb</strong></td>
+              <td>⭐⭐⭐⭐</td>
+              <td>⭐⭐⭐⭐</td>
+              <td>⭐⭐</td>
+              <td>15KB</td>
+              <td>⭐⭐⭐⭐⭐</td>
+            </tr>
+            <tr>
               <td><strong>jsPDF</strong></td>
               <td>⭐⭐⭐⭐</td>
               <td>⭐⭐⭐</td>
@@ -111,6 +119,14 @@
               <td>⭐⭐</td>
               <td>⭐⭐⭐</td>
               <td>~180KB</td>
+              <td>⭐⭐⭐⭐</td>
+            </tr>
+            <tr>
+              <td><strong>html2pdf.js</strong></td>
+              <td>⭐⭐⭐⭐</td>
+              <td>⭐⭐</td>
+              <td>⭐⭐⭐</td>
+              <td>~330KB</td>
               <td>⭐⭐⭐⭐</td>
             </tr>
             <tr>
@@ -144,22 +160,34 @@
           <p>适用：文章、订单、简单报表</p>
         </div>
         <div class="recommendation-card">
-          <h3>📄 复杂PDF生成</h3>
-          <p><strong>推荐：pdfmake</strong></p>
-          <p>优势：API友好、支持复杂布局</p>
+          <h3>⚡ 轻量级快速打印</h3>
+          <p><strong>推荐：print-html-element / Print.js</strong></p>
+          <p>优势：超轻量、极速、简单</p>
+          <p>适用：快速打印、对体积敏感项目</p>
+        </div>
+        <div class="recommendation-card">
+          <h3>💚 Vue项目集成</h3>
+          <p><strong>推荐：vue3-print-nb</strong></p>
+          <p>优势：Vue指令、开箱即用、API简单</p>
+          <p>适用：Vue 3项目的快速打印需求</p>
+        </div>
+        <div class="recommendation-card">
+          <h3>📝 复杂PDF生成</h3>
+          <p><strong>推荐：pdfmake / jsPDF</strong></p>
+          <p>优势：API友好、支持复杂布局、矢量输出</p>
           <p>适用：发票、合同、正式文档</p>
         </div>
         <div class="recommendation-card">
-          <h3>🎨 所见即所得</h3>
-          <p><strong>推荐：html2canvas + jsPDF</strong></p>
-          <p>优势：样式完美还原</p>
-          <p>适用：图表、可视化、复杂样式</p>
+          <h3>📚 PDF编辑操作</h3>
+          <p><strong>推荐：PDF-LIB</strong></p>
+          <p>优势：可编辑现有PDF、合并、表单填充</p>
+          <p>适用：PDF修改、批量处理、文档合并</p>
         </div>
         <div class="recommendation-card">
-          <h3>🏢 企业级应用</h3>
-          <p><strong>推荐：Lodop（商业）</strong></p>
-          <p>优势：精确控制、支持特殊打印机</p>
-          <p>适用：ERP、财务、票据</p>
+          <h3>🎨 所见即所得</h3>
+          <p><strong>推荐：html2pdf.js / html2canvas</strong></p>
+          <p>优势：样式完美还原、一站式方案</p>
+          <p>适用：图表、可视化、复杂样式</p>
         </div>
       </div>
     </section>
