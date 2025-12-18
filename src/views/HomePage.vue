@@ -23,12 +23,13 @@
     </nav>
 
     <section class="summary">
-      <h2>📊 调研总览</h2>
+      <h2>📊 调研总览 - 共计10+种方案</h2>
       <div class="summary-grid">
         <div class="summary-card">
-          <h3>轻量级方案</h3>
+          <h3>超轻量级方案</h3>
           <ul>
-            <li><strong>Print.js</strong> - 简单易用，10KB</li>
+            <li><strong>print-html-element</strong> - 仅5KB！</li>
+            <li><strong>Print.js</strong> - 简单易用，18KB</li>
             <li><strong>vue3-print-nb</strong> - Vue生态集成</li>
           </ul>
         </div>
@@ -37,6 +38,7 @@
           <ul>
             <li><strong>jsPDF</strong> - 功能强大，矢量图形</li>
             <li><strong>pdfmake</strong> - 声明式API，易用</li>
+            <li><strong>PDF-LIB</strong> - 现代化，可编辑PDF</li>
           </ul>
         </div>
         <div class="summary-card">
@@ -110,6 +112,22 @@
               <td>⭐⭐⭐</td>
               <td>~180KB</td>
               <td>⭐⭐⭐⭐</td>
+            </tr>
+            <tr>
+              <td><strong>print-html-element</strong></td>
+              <td>⭐⭐⭐⭐⭐</td>
+              <td>⭐⭐⭐⭐⭐</td>
+              <td>⭐⭐</td>
+              <td>5KB</td>
+              <td>⭐⭐⭐⭐⭐</td>
+            </tr>
+            <tr>
+              <td><strong>PDF-LIB</strong></td>
+              <td>⭐⭐⭐⭐</td>
+              <td>⭐⭐⭐</td>
+              <td>⭐⭐⭐⭐⭐</td>
+              <td>~200KB</td>
+              <td>⭐⭐⭐</td>
             </tr>
           </tbody>
         </table>
@@ -198,6 +216,20 @@ const demos = [
     title: 'html2pdf.js',
     description: '集成方案，HTML直接转PDF',
     tags: ['一站式', 'HTML转PDF', '便捷'],
+  },
+  {
+    path: '/pdf-lib',
+    icon: '📚',
+    title: 'PDF-LIB',
+    description: '现代化PDF操作库，支持编辑',
+    tags: ['PDF编辑', '合并', '表单'],
+  },
+  {
+    path: '/print-html-element',
+    icon: '🎯',
+    title: 'print-html-element',
+    description: '超轻量级DOM元素打印（5KB）',
+    tags: ['轻量', '简单', '快速'],
   },
   {
     path: '/performance',

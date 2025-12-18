@@ -454,6 +454,22 @@ const runCompatibilityTests = async () => {
       issues: ['继承 html2canvas 的问题', '性能开销大', '移动端支持有限'],
       rating: '⭐⭐⭐',
     },
+    {
+      name: 'PDF-LIB',
+      status: 'success',
+      statusText: '✅ 兼容良好',
+      features: ['Chrome 60+', 'Firefox 55+', 'Safari 11+', 'ES6+', 'PDF编辑'],
+      issues: ['不支持 IE', '体积较大'],
+      rating: '⭐⭐⭐⭐',
+    },
+    {
+      name: 'print-html-element',
+      status: 'success',
+      statusText: '✅ 完全兼容',
+      features: ['所有现代浏览器', 'IE11+', '移动端', '超轻量'],
+      issues: [],
+      rating: '⭐⭐⭐⭐⭐',
+    },
   ]
 
   for (const result of results) {

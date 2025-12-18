@@ -58,6 +58,16 @@ const router = createRouter({
       name: 'pagination',
       component: () => import('../views/Pagination.vue'),
     },
+    {
+      path: '/pdf-lib',
+      name: 'pdf-lib',
+      component: () => import('../views/PDFLIB.vue'),
+    },
+    {
+      path: '/print-html-element',
+      name: 'print-html-element',
+      component: () => import('../views/PrintHtmlElement.vue'),
+    },
   ],
 })
 

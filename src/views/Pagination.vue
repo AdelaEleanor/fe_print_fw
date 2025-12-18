@@ -50,6 +50,27 @@
             <li>⚠️ 准确性依赖内容</li>
           </ul>
         </div>
+
+        <div class="info-section">
+          <h3>PDF-LIB 分页</h3>
+          <p class="rating">⭐⭐⭐⭐⭐</p>
+          <ul>
+            <li>✅ 完全可控</li>
+            <li>✅ addPage() 方法</li>
+            <li>✅ PDF编辑能力</li>
+            <li>✅ 页面操作</li>
+          </ul>
+        </div>
+
+        <div class="info-section">
+          <h3>其他方案</h3>
+          <p class="rating">⭐⭐⭐</p>
+          <ul>
+            <li>⚠️ Print.js - 依赖CSS</li>
+            <li>⚠️ vue3-print-nb - 依赖CSS</li>
+            <li>⚠️ print-html-element - 依赖浏览器</li>
+          </ul>
+        </div>
       </aside>
 
       <main class="demo-panel">
@@ -363,6 +384,38 @@ tfoot {
                   <td>⭐⭐⭐⭐</td>
                   <td>⭐⭐⭐</td>
                   <td>⭐⭐⭐</td>
+                </tr>
+                <tr>
+                  <td><strong>PDF-LIB</strong></td>
+                  <td>⭐⭐⭐⭐⭐</td>
+                  <td>⭐⭐⭐⭐⭐</td>
+                  <td>⭐⭐⭐⭐</td>
+                  <td>⭐⭐⭐⭐</td>
+                  <td>⭐⭐⭐⭐⭐</td>
+                </tr>
+                <tr>
+                  <td><strong>vue3-print-nb</strong></td>
+                  <td>⭐⭐⭐</td>
+                  <td>⭐⭐⭐⭐</td>
+                  <td>⭐⭐</td>
+                  <td>⭐⭐⭐</td>
+                  <td>⭐⭐⭐</td>
+                </tr>
+                <tr>
+                  <td><strong>Print.js</strong></td>
+                  <td>⭐⭐⭐</td>
+                  <td>⭐⭐⭐⭐</td>
+                  <td>⭐⭐</td>
+                  <td>⭐⭐⭐</td>
+                  <td>⭐⭐⭐</td>
+                </tr>
+                <tr>
+                  <td><strong>print-html-element</strong></td>
+                  <td>⭐⭐</td>
+                  <td>⭐⭐⭐⭐</td>
+                  <td>⭐⭐</td>
+                  <td>⭐⭐⭐</td>
+                  <td>⭐⭐</td>
                 </tr>
               </tbody>
             </table>

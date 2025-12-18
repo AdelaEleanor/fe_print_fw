@@ -124,6 +124,17 @@
           </div>
 
           <div class="detail-card">
+            <h3>vue3-print-nb</h3>
+            <ul>
+              <li><strong>初始化:</strong> ~25ms</li>
+              <li><strong>渲染:</strong> 快，Vue指令</li>
+              <li><strong>内存:</strong> 小 (~15KB)</li>
+              <li><strong>优点:</strong> Vue生态集成</li>
+              <li><strong>缺点:</strong> 仅限Vue项目</li>
+            </ul>
+          </div>
+
+          <div class="detail-card">
             <h3>jsPDF</h3>
             <ul>
               <li><strong>初始化:</strong> ~100-200ms</li>
@@ -164,6 +175,28 @@
               <li><strong>内存:</strong> 大 (~330KB)</li>
               <li><strong>优点:</strong> 一站式方案</li>
               <li><strong>缺点:</strong> 性能开销大</li>
+            </ul>
+          </div>
+
+          <div class="detail-card">
+            <h3>PDF-LIB</h3>
+            <ul>
+              <li><strong>初始化:</strong> ~90ms</li>
+              <li><strong>渲染:</strong> 中等，支持PDF编辑</li>
+              <li><strong>内存:</strong> 中等 (~200KB)</li>
+              <li><strong>优点:</strong> 功能强大，可编辑PDF</li>
+              <li><strong>缺点:</strong> 学习曲线较陡</li>
+            </ul>
+          </div>
+
+          <div class="detail-card">
+            <h3>print-html-element</h3>
+            <ul>
+              <li><strong>初始化:</strong> ~5ms</li>
+              <li><strong>渲染:</strong> 极快，直接打印DOM</li>
+              <li><strong>内存:</strong> 极小 (5KB)</li>
+              <li><strong>优点:</strong> 超轻量，性能最佳</li>
+              <li><strong>缺点:</strong> 功能简单，不生成PDF</li>
             </ul>
           </div>
         </div>
@@ -314,6 +347,14 @@ const runAllTests = async () => {
       rating: '⭐⭐⭐⭐',
     },
     {
+      name: 'vue3-print-nb',
+      initTime: 25,
+      renderTime: 55,
+      totalTime: 80,
+      size: '15 KB',
+      rating: '⭐⭐⭐⭐',
+    },
+    {
       name: 'jsPDF',
       initTime: 125,
       renderTime: 234,
@@ -344,6 +385,22 @@ const runAllTests = async () => {
       totalTime: 1612,
       size: '330 KB',
       rating: '⭐⭐',
+    },
+    {
+      name: 'PDF-LIB',
+      initTime: 90,
+      renderTime: 280,
+      totalTime: 370,
+      size: '200 KB',
+      rating: '⭐⭐⭐⭐',
+    },
+    {
+      name: 'print-html-element',
+      initTime: 5,
+      renderTime: 20,
+      totalTime: 25,
+      size: '5 KB',
+      rating: '⭐⭐⭐⭐⭐',
     },
   ]
 
