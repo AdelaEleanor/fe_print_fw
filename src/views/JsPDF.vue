@@ -86,10 +86,26 @@
 
       <main class="demo-panel">
         <div class="controls">
-          <button @click="generateBasicPDF" class="btn btn-primary">📄 生成基础PDF</button>
-          <button @click="generateTablePDF" class="btn btn-secondary">📊 生成表格PDF</button>
-          <button @click="generateMultiPagePDF" class="btn btn-info">📑 生成多页PDF</button>
-          <button @click="generateAdvancedPDF" class="btn btn-warning">🎨 高级PDF示例</button>
+          <button @click="generateBasicPDF" class="btn btn-primary" :disabled="loading">
+            {{ loading ? '⏳ 生成中...' : '📄 生成基础PDF' }}
+          </button>
+          <button @click="generateTablePDF" class="btn btn-secondary" :disabled="loading">
+            {{ loading ? '⏳ 生成中...' : '📊 生成表格PDF' }}
+          </button>
+          <button @click="generateMultiPagePDF" class="btn btn-info" :disabled="loading">
+            {{ loading ? '⏳ 生成中...' : '📑 生成多页PDF' }}
+          </button>
+          <button @click="generateAdvancedPDF" class="btn btn-warning" :disabled="loading">
+            {{ loading ? '⏳ 生成中...' : '🎨 高级PDF示例' }}
+          </button>
+        </div>
+
+        <div
+          v-if="statusMessage"
+          class="status-message"
+          :class="{ error: statusMessage.includes('❌') }"
+        >
+          {{ statusMessage }}
         </div>
 
         <div class="preview-area">
@@ -231,197 +247,288 @@ doc.save('paginated.pdf');</code></pre>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { jsPDF } from 'jspdf'
+import { createChineseJsPDF } from '@/utils/fontLoader'
 
-const generateBasicPDF = () => {
-  const doc = new jsPDF()
+const loading = ref(false)
+const statusMessage = ref('')
 
-  // 标题
-  doc.setFontSize(24)
-  doc.text('jsPDF Example Document', 105, 20, { align: 'center' })
+const generateBasicPDF = async () => {
+  loading.value = true
+  statusMessage.value = '正在加载中文字体...'
 
-  // 副标题
-  doc.setFontSize(14)
-  doc.text('Basic PDF Generation', 105, 30, { align: 'center' })
+  try {
+    // 创建支持中文的 PDF
+    const doc = await createChineseJsPDF()
 
-  // 正文
-  doc.setFontSize(12)
-  doc.text('This is a simple PDF document generated using jsPDF.', 20, 50)
-  doc.text('jsPDF is a powerful client-side PDF generation library.', 20, 60)
+    statusMessage.value = '正在生成 PDF...'
+    // 标题 - 中文
+    doc.setFontSize(24)
+    doc.text('jsPDF 中文示例文档', 105, 20, { align: 'center' })
 
-  // 绘制一些图形
-  doc.setDrawColor(102, 126, 234)
-  doc.rect(20, 80, 170, 50)
+    // 副标题
+    doc.setFontSize(14)
+    doc.setFont('SourceHanSansSC', 'bold')
+    doc.text('基础 PDF 生成演示', 105, 35, { align: 'center' })
 
-  doc.setFillColor(102, 126, 234)
-  doc.circle(105, 150, 20, 'F')
+    // 正文
+    doc.setFont('SourceHanSansSC', 'normal')
+    doc.setFontSize(12)
+    doc.text('这是一个使用 jsPDF 生成的中文 PDF 文档。', 20, 55)
+    doc.text('jsPDF 是一个强大的客户端 PDF 生成库，支持中文显示。', 20, 65)
+    doc.text('通过加载思源黑体字体，我们可以完美显示中文内容。', 20, 75)
 
-  // 保存
-  doc.save('basic-example.pdf')
+    // 绘制一些图形
+    doc.setDrawColor(102, 126, 234)
+    doc.rect(20, 90, 170, 50)
+
+    doc.setFillColor(102, 126, 234)
+    doc.circle(105, 165, 20, 'F')
+
+    // 添加更多中文内容
+    doc.setFontSize(10)
+    doc.text('✅ 支持中文字符', 30, 105)
+    doc.text('✅ 支持粗体和常规字体', 30, 115)
+    doc.text('✅ 完美渲染中文标点符号', 30, 125)
+
+    // 保存
+    doc.save('jspdf-chinese-basic.pdf')
+
+    statusMessage.value = '✅ PDF 生成成功！'
+    setTimeout(() => {
+      statusMessage.value = ''
+    }, 3000)
+  } catch (error) {
+    console.error('PDF 生成失败:', error)
+    statusMessage.value = '❌ PDF 生成失败'
+  } finally {
+    loading.value = false
+  }
 }
 
-const generateTablePDF = () => {
-  const doc = new jsPDF()
+const generateTablePDF = async () => {
+  loading.value = true
+  statusMessage.value = '正在加载中文字体...'
 
-  doc.setFontSize(18)
-  doc.text('Print Framework Comparison', 105, 15, { align: 'center' })
+  try {
+    const doc = await createChineseJsPDF()
 
-  // 手动创建表格
-  const headers = ['Framework', 'Size', 'Performance', 'Rating']
-  const data = [
-    ['Print.js', '10KB', 'Fast', '⭐⭐⭐⭐'],
-    ['jsPDF', '150KB', 'Good', '⭐⭐⭐⭐'],
-    ['pdfmake', '600KB', 'Good', '⭐⭐⭐⭐⭐'],
-    ['html2canvas', '180KB', 'Medium', '⭐⭐⭐⭐'],
-  ]
+    statusMessage.value = '正在生成表格 PDF...'
 
-  let y = 30
-  const colWidth = 45
-  const rowHeight = 10
+    doc.setFontSize(18)
+    doc.text('前端打印框架对比', 105, 15, { align: 'center' })
 
-  // 表头
-  doc.setFillColor(102, 126, 234)
-  doc.setTextColor(255, 255, 255)
-  doc.rect(20, y, colWidth * 4, rowHeight, 'F')
+    // 手动创建中文表格
+    const headers = ['框架名称', '包大小', '性能', '评分']
+    const data = [
+      ['Print.js', '10KB', '快速', '⭐⭐⭐⭐'],
+      ['jsPDF', '150KB', '良好', '⭐⭐⭐⭐'],
+      ['pdfmake', '600KB', '良好', '⭐⭐⭐⭐⭐'],
+      ['html2canvas', '180KB', '中等', '⭐⭐⭐⭐'],
+    ]
 
-  doc.setFontSize(12)
-  headers.forEach((header, i) => {
-    doc.text(header, 22 + i * colWidth, y + 7)
-  })
+    let y = 30
+    const colWidth = 45
+    const rowHeight = 10
 
-  // 数据行
-  doc.setTextColor(0, 0, 0)
-  y += rowHeight
+    // 表头
+    doc.setFillColor(102, 126, 234)
+    doc.setTextColor(255, 255, 255)
+    doc.setFont('SourceHanSansSC', 'bold')
+    doc.rect(20, y, colWidth * 4, rowHeight, 'F')
 
-  data.forEach((row, rowIndex) => {
-    if (rowIndex % 2 === 0) {
-      doc.setFillColor(247, 250, 252)
-      doc.rect(20, y, colWidth * 4, rowHeight, 'F')
-    }
-
-    row.forEach((cell, colIndex) => {
-      doc.text(cell, 22 + colIndex * colWidth, y + 7)
+    doc.setFontSize(11)
+    headers.forEach((header, i) => {
+      doc.text(header, 22 + i * colWidth, y + 7)
     })
 
-    y += rowHeight
-  })
-
-  doc.save('table-example.pdf')
-}
-
-const generateMultiPagePDF = () => {
-  const doc = new jsPDF()
-  const pageHeight = doc.internal.pageSize.height
-
-  // 第一页
-  doc.setFontSize(20)
-  doc.text('Multi-Page PDF Example', 105, 20, { align: 'center' })
-
-  doc.setFontSize(12)
-  doc.text('This is Page 1', 20, 40)
-  doc.text('Lorem ipsum dolor sit amet, consectetur adipiscing elit.', 20, 50)
-
-  let y = 60
-  for (let i = 0; i < 20; i++) {
-    if (y > pageHeight - 20) {
-      doc.addPage()
-      y = 20
-      doc.text(`Page ${doc.internal.getNumberOfPages()}`, 105, 10, { align: 'center' })
-    }
-    doc.text(`Line ${i + 1}: Sample content for multi-page document`, 20, y)
-    y += 10
-  }
-
-  // 最后一页添加页码
-  const totalPages = doc.internal.getNumberOfPages()
-  for (let i = 1; i <= totalPages; i++) {
-    doc.setPage(i)
-    doc.setFontSize(10)
-    doc.text(`Page ${i} of ${totalPages}`, 105, pageHeight - 10, { align: 'center' })
-  }
-
-  doc.save('multi-page.pdf')
-}
-
-const generateAdvancedPDF = () => {
-  const doc = new jsPDF()
-
-  // 背景色
-  doc.setFillColor(102, 126, 234)
-  doc.rect(0, 0, 210, 40, 'F')
-
-  // 白色文字标题
-  doc.setTextColor(255, 255, 255)
-  doc.setFontSize(24)
-  doc.text('Advanced PDF Report', 105, 25, { align: 'center' })
-
-  // 重置文字颜色
-  doc.setTextColor(0, 0, 0)
-
-  // 日期
-  doc.setFontSize(10)
-  doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 50)
-
-  // 分节
-  doc.setFontSize(16)
-  doc.setTextColor(102, 126, 234)
-  doc.text('1. Introduction', 20, 65)
-
-  doc.setFontSize(11)
-  doc.setTextColor(74, 85, 104)
-  const introText =
-    'This document demonstrates advanced PDF generation capabilities including custom styling, colors, and layouts.'
-  doc.text(introText, 20, 75, { maxWidth: 170 })
-
-  // 卡片样式框
-  doc.setDrawColor(226, 232, 240)
-  doc.setFillColor(247, 250, 252)
-  doc.roundedRect(20, 90, 170, 30, 3, 3, 'FD')
-
-  doc.setFontSize(14)
-  doc.setTextColor(45, 55, 72)
-  doc.text('Key Features', 25, 100)
-
-  doc.setFontSize(10)
-  doc.setTextColor(74, 85, 104)
-  doc.text('• Vector graphics support', 25, 108)
-  doc.text('• Custom fonts and colors', 25, 115)
-
-  // 图表模拟
-  doc.setFontSize(16)
-  doc.setTextColor(102, 126, 234)
-  doc.text('2. Performance Metrics', 20, 135)
-
-  // 绘制柱状图
-  const barData = [80, 65, 90, 75]
-  const barColors = [
-    [102, 126, 234],
-    [72, 187, 120],
-    [66, 153, 225],
-    [237, 137, 54],
-  ]
-  const barLabels = ['Speed', 'Quality', 'Features', 'Ease']
-
-  let xPos = 30
-  barData.forEach((value, index) => {
-    const barHeight = value * 0.5
-    doc.setFillColor(...barColors[index])
-    doc.rect(xPos, 185 - barHeight, 30, barHeight, 'F')
-
-    doc.setFontSize(9)
+    // 数据行
     doc.setTextColor(0, 0, 0)
-    doc.text(barLabels[index], xPos + 15, 192, { align: 'center' })
-    doc.text(`${value}%`, xPos + 15, 180 - barHeight, { align: 'center' })
+    doc.setFont('SourceHanSansSC', 'normal')
+    y += rowHeight
 
-    xPos += 40
-  })
+    data.forEach((row, rowIndex) => {
+      if (rowIndex % 2 === 0) {
+        doc.setFillColor(247, 250, 252)
+        doc.rect(20, y, colWidth * 4, rowHeight, 'F')
+      }
 
-  // 页脚
-  doc.setFontSize(8)
-  doc.setTextColor(160, 174, 192)
-  doc.text('Generated by jsPDF | Page 1', 105, 285, { align: 'center' })
+      row.forEach((cell, colIndex) => {
+        doc.text(cell, 22 + colIndex * colWidth, y + 7)
+      })
 
-  doc.save('advanced-report.pdf')
+      y += rowHeight
+    })
+
+    doc.save('jspdf-chinese-table.pdf')
+    statusMessage.value = '✅ 表格 PDF 生成成功！'
+    setTimeout(() => {
+      statusMessage.value = ''
+    }, 3000)
+  } catch (error) {
+    console.error('表格 PDF 生成失败:', error)
+    statusMessage.value = '❌ 表格 PDF 生成失败'
+  } finally {
+    loading.value = false
+  }
+}
+
+const generateMultiPagePDF = async () => {
+  loading.value = true
+  statusMessage.value = '正在加载中文字体...'
+
+  try {
+    const doc = await createChineseJsPDF()
+    const pageHeight = doc.internal.pageSize.height
+
+    statusMessage.value = '正在生成多页 PDF...'
+
+    // 第一页
+    doc.setFontSize(20)
+    doc.setFont('SourceHanSansSC', 'bold')
+    doc.text('多页 PDF 文档示例', 105, 20, { align: 'center' })
+
+    doc.setFontSize(12)
+    doc.setFont('SourceHanSansSC', 'normal')
+    doc.text('这是第 1 页', 20, 40)
+    doc.text('本示例演示了如何使用 jsPDF 创建多页中文文档。', 20, 50)
+
+    let y = 60
+    for (let i = 0; i < 20; i++) {
+      if (y > pageHeight - 20) {
+        doc.addPage()
+        y = 20
+        doc.setFont('SourceHanSansSC', 'bold')
+        doc.text(`第 ${doc.internal.getNumberOfPages()} 页`, 105, 10, { align: 'center' })
+        doc.setFont('SourceHanSansSC', 'normal')
+      }
+      doc.text(`第 ${i + 1} 行：这是多页文档的示例内容，用于演示自动分页功能。`, 20, y)
+      y += 10
+    }
+
+    // 最后一页添加页码
+    const totalPages = doc.internal.getNumberOfPages()
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i)
+      doc.setFontSize(10)
+      doc.setFont('SourceHanSansSC', 'normal')
+      doc.text(`第 ${i} 页 / 共 ${totalPages} 页`, 105, pageHeight - 10, { align: 'center' })
+    }
+
+    doc.save('jspdf-chinese-multipage.pdf')
+    statusMessage.value = '✅ 多页 PDF 生成成功！'
+    setTimeout(() => {
+      statusMessage.value = ''
+    }, 3000)
+  } catch (error) {
+    console.error('多页 PDF 生成失败:', error)
+    statusMessage.value = '❌ 多页 PDF 生成失败'
+  } finally {
+    loading.value = false
+  }
+}
+
+const generateAdvancedPDF = async () => {
+  loading.value = true
+  statusMessage.value = '正在加载中文字体...'
+
+  try {
+    const doc = await createChineseJsPDF()
+
+    statusMessage.value = '正在生成高级 PDF...'
+
+    // 背景色
+    doc.setFillColor(102, 126, 234)
+    doc.rect(0, 0, 210, 40, 'F')
+
+    // 白色文字标题
+    doc.setTextColor(255, 255, 255)
+    doc.setFontSize(24)
+    doc.setFont('SourceHanSansSC', 'bold')
+    doc.text('高级 PDF 报告', 105, 25, { align: 'center' })
+
+    // 重置文字颜色
+    doc.setTextColor(0, 0, 0)
+
+    // 日期
+    doc.setFontSize(10)
+    doc.setFont('SourceHanSansSC', 'normal')
+    doc.text(`生成日期: ${new Date().toLocaleDateString('zh-CN')}`, 20, 50)
+
+    // 分节
+    doc.setFontSize(16)
+    doc.setTextColor(102, 126, 234)
+    doc.setFont('SourceHanSansSC', 'bold')
+    doc.text('1. 项目简介', 20, 65)
+
+    doc.setFontSize(11)
+    doc.setTextColor(74, 85, 104)
+    doc.setFont('SourceHanSansSC', 'normal')
+    const introText =
+      '本文档展示了 jsPDF 的高级 PDF 生成能力，包括自定义样式、颜色、布局和中文支持。'
+    doc.text(introText, 20, 75, { maxWidth: 170 })
+
+    // 卡片样式框
+    doc.setDrawColor(226, 232, 240)
+    doc.setFillColor(247, 250, 252)
+    doc.roundedRect(20, 90, 170, 30, 3, 3, 'FD')
+
+    doc.setFontSize(14)
+    doc.setTextColor(45, 55, 72)
+    doc.setFont('SourceHanSansSC', 'bold')
+    doc.text('核心功能', 25, 100)
+
+    doc.setFontSize(10)
+    doc.setTextColor(74, 85, 104)
+    doc.setFont('SourceHanSansSC', 'normal')
+    doc.text('• 支持矢量图形', 25, 108)
+    doc.text('• 自定义字体和颜色', 25, 115)
+
+    // 图表模拟
+    doc.setFontSize(16)
+    doc.setTextColor(102, 126, 234)
+    // 绘制柱状图
+    const barData = [80, 65, 90, 75]
+    const barColors: [number, number, number][] = [
+      [102, 126, 234],
+      [72, 187, 120],
+      [66, 153, 225],
+      [237, 137, 54],
+    ]
+    const barLabels = ['速度', '质量', '功能', '易用性']
+
+    let xPos = 30
+    barData.forEach((value, index) => {
+      const barHeight = value * 0.5
+      doc.setFillColor(...barColors[index])
+      doc.rect(xPos, 185 - barHeight, 30, barHeight, 'F')
+
+      doc.setFontSize(9)
+      doc.setTextColor(0, 0, 0)
+      doc.setFont('SourceHanSansSC', 'normal')
+      doc.text(barLabels[index], xPos + 15, 192, { align: 'center' })
+      doc.text(`${value}%`, xPos + 15, 180 - barHeight, { align: 'center' })
+
+      xPos += 40
+    })
+
+    // 页脚
+    doc.setFontSize(8)
+    doc.setTextColor(160, 174, 192)
+    doc.text('由 jsPDF 生成 | 第 1 页', 105, 285, { align: 'center' })
+
+    doc.save('jspdf-chinese-advanced.pdf')
+    statusMessage.value = '✅ 高级 PDF 生成成功！'
+    setTimeout(() => {
+      statusMessage.value = ''
+    }, 3000)
+  } catch (error) {
+    console.error('高级 PDF 生成失败:', error)
+    statusMessage.value = '❌ 高级 PDF 生成失败'
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
@@ -549,8 +656,28 @@ const generateAdvancedPDF = () => {
   color: white;
 }
 
-.btn-primary:hover {
+.btn:hover {
   background: #5568d3;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.status-message {
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 6px;
+  background: #e6f4ea;
+  color: #1e7e34;
+  font-weight: 500;
+  text-align: center;
+}
+
+.status-message.error {
+  background: #fce8e6;
+  color: #c5221f;
 }
 
 .btn-secondary {
