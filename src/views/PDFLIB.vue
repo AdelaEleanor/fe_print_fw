@@ -414,17 +414,730 @@ download(pdfBytes, 'complex-doc.pdf');</code></pre>
             </div>
           </div>
         </div>
+
+        <!-- ==================== 基础示例区域 ==================== -->
+        <div class="examples-section">
+          <h3 class="section-title">📘 创建与编辑示例</h3>
+
+          <div class="example-tabs">
+            <button
+              v-for="(example, index) in examples"
+              :key="index"
+              :class="['tab-button', { active: currentExample === index }]"
+              @click="currentExample = index"
+            >
+              {{ example.name }}
+            </button>
+          </div>
+
+          <!-- 示例1: 创建空白PDF -->
+          <div v-if="currentExample === 0" class="example-content">
+            <h4>1. 创建空白PDF</h4>
+            <p>使用PDFDocument.create()创建空白文档并添加页面。</p>
+            <div class="demo-box">
+              <div class="config-controls">
+                <label>
+                  页面宽度:
+                  <input type="number" v-model="pageWidth" min="200" max="1000" />
+                </label>
+                <label>
+                  页面高度:
+                  <input type="number" v-model="pageHeight" min="200" max="1200" />
+                </label>
+                <label>
+                  页数:
+                  <input type="number" v-model="pageCount" min="1" max="10" />
+                </label>
+              </div>
+              <div class="preview-box">
+                <div class="page-preview" :style="pagePreviewStyle">
+                  <span>{{ pageWidth }} × {{ pageHeight }}</span>
+                </div>
+                <p>将创建 {{ pageCount }} 页空白PDF</p>
+              </div>
+              <button @click="example1Generate" class="btn btn-primary">创建空白PDF</button>
+            </div>
+            <div class="code-display">
+              <pre v-pre><code>import { PDFDocument } from 'pdf-lib';
+
+const pdfDoc = await PDFDocument.create();
+
+// 添加页面，参数为 [宽度, 高度]
+const page = pdfDoc.addPage([600, 800]);
+
+const pdfBytes = await pdfDoc.save();
+download(pdfBytes, 'blank.pdf');</code></pre>
+            </div>
+          </div>
+
+          <!-- 示例2: 添加文本 -->
+          <div v-if="currentExample === 1" class="example-content">
+            <h4>2. 添加文本</h4>
+            <p>使用drawText方法在PDF中绘制文本。</p>
+            <div class="demo-box">
+              <div class="config-controls">
+                <label>
+                  文本内容:
+                  <input type="text" v-model="textContent" placeholder="Hello PDF-LIB" />
+                </label>
+                <label>
+                  字体大小:
+                  <input type="number" v-model="textSize" min="8" max="72" />
+                </label>
+                <label>
+                  文本颜色:
+                  <input type="color" v-model="textColor" />
+                </label>
+              </div>
+              <div
+                class="preview-box text-preview"
+                :style="{ color: textColor, fontSize: textSize + 'px' }"
+              >
+                {{ textContent || 'Hello PDF-LIB' }}
+              </div>
+              <button @click="example2Generate" class="btn btn-primary">生成文本PDF</button>
+            </div>
+            <div class="code-display">
+              <pre v-pre><code>import { PDFDocument, rgb } from 'pdf-lib';
+
+const pdfDoc = await PDFDocument.create();
+const page = pdfDoc.addPage([600, 400]);
+
+page.drawText('Hello PDF-LIB', {
+  x: 50,
+  y: 350,
+  size: 30,
+  color: rgb(0, 0.53, 0.71), // RGB值范围0-1
+});
+
+const pdfBytes = await pdfDoc.save();</code></pre>
+            </div>
+          </div>
+
+          <!-- 示例3: 绘制图形 -->
+          <div v-if="currentExample === 2" class="example-content">
+            <h4>3. 绘制图形</h4>
+            <p>绘制矩形、圆形、线条等基本图形。</p>
+            <div class="demo-box">
+              <div class="config-controls">
+                <label>
+                  图形类型:
+                  <select v-model="shapeType">
+                    <option value="rectangle">矩形</option>
+                    <option value="circle">圆形</option>
+                    <option value="line">线条</option>
+                  </select>
+                </label>
+                <label>
+                  边框颜色:
+                  <input type="color" v-model="borderColor" />
+                </label>
+                <label>
+                  填充颜色:
+                  <input type="color" v-model="fillColor" />
+                </label>
+              </div>
+              <div class="preview-box shape-preview">
+                <svg width="200" height="150" viewBox="0 0 200 150">
+                  <rect
+                    v-if="shapeType === 'rectangle'"
+                    x="30"
+                    y="25"
+                    width="140"
+                    height="100"
+                    :stroke="borderColor"
+                    :fill="fillColor"
+                    stroke-width="2"
+                  />
+                  <circle
+                    v-if="shapeType === 'circle'"
+                    cx="100"
+                    cy="75"
+                    r="50"
+                    :stroke="borderColor"
+                    :fill="fillColor"
+                    stroke-width="2"
+                  />
+                  <line
+                    v-if="shapeType === 'line'"
+                    x1="30"
+                    y1="25"
+                    x2="170"
+                    y2="125"
+                    :stroke="borderColor"
+                    stroke-width="3"
+                  />
+                </svg>
+              </div>
+              <button @click="example3Generate" class="btn btn-primary">生成图形PDF</button>
+            </div>
+            <div class="code-display">
+              <pre v-pre><code>import { PDFDocument, rgb } from 'pdf-lib';
+
+const page = pdfDoc.addPage();
+
+// 绘制矩形
+page.drawRectangle({
+  x: 50, y: 500,
+  width: 200, height: 100,
+  borderColor: rgb(0, 0, 0),
+  color: rgb(0.9, 0.9, 0.9),
+  borderWidth: 2,
+});
+
+// 绘制圆形
+page.drawCircle({
+  x: 400, y: 550,
+  size: 50,
+  borderColor: rgb(0, 0.5, 0),
+  borderWidth: 2,
+});
+
+// 绘制线条
+page.drawLine({
+  start: { x: 50, y: 300 },
+  end: { x: 550, y: 300 },
+  thickness: 2,
+  color: rgb(0, 0, 1),
+});</code></pre>
+            </div>
+          </div>
+
+          <!-- 示例4: 使用标准字体 -->
+          <div v-if="currentExample === 3" class="example-content">
+            <h4>4. 使用标准字体</h4>
+            <p>PDF-LIB支持14种PDF标准字体，无需额外嵌入。</p>
+            <div class="demo-box">
+              <div class="config-controls">
+                <label>
+                  选择字体:
+                  <select v-model="selectedFont">
+                    <option v-for="font in standardFonts" :key="font" :value="font">
+                      {{ font }}
+                    </option>
+                  </select>
+                </label>
+              </div>
+              <div class="preview-box">
+                <div class="font-list">
+                  <div
+                    v-for="font in standardFonts"
+                    :key="font"
+                    :class="['font-item', { active: selectedFont === font }]"
+                  >
+                    {{ font }}
+                  </div>
+                </div>
+              </div>
+              <button @click="example4Generate" class="btn btn-primary">生成字体示例PDF</button>
+            </div>
+            <div class="code-display">
+              <pre v-pre><code>import { PDFDocument, StandardFonts } from 'pdf-lib';
+
+const pdfDoc = await PDFDocument.create();
+
+// 嵌入标准字体
+const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
+const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+const timesRoman = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+const courier = await pdfDoc.embedFont(StandardFonts.Courier);
+
+const page = pdfDoc.addPage();
+page.drawText('Helvetica Font', {
+  x: 50, y: 700,
+  font: helvetica,
+  size: 20,
+});</code></pre>
+            </div>
+          </div>
+
+          <!-- 示例5: 页面旋转 -->
+          <div v-if="currentExample === 4" class="example-content">
+            <h4>5. 页面旋转与尺寸</h4>
+            <p>获取和设置页面旋转角度和尺寸。</p>
+            <div class="demo-box">
+              <div class="config-controls">
+                <label>
+                  旋转角度:
+                  <select v-model="rotationAngle">
+                    <option :value="0">0°</option>
+                    <option :value="90">90°</option>
+                    <option :value="180">180°</option>
+                    <option :value="270">270°</option>
+                  </select>
+                </label>
+              </div>
+              <div class="preview-box">
+                <div class="rotation-preview" :style="{ transform: `rotate(${rotationAngle}deg)` }">
+                  <div class="page-indicator">
+                    <span>↑ 顶部</span>
+                  </div>
+                </div>
+              </div>
+              <button @click="example5Generate" class="btn btn-primary">生成旋转页面PDF</button>
+            </div>
+            <div class="code-display">
+              <pre v-pre><code>import { PDFDocument, degrees } from 'pdf-lib';
+
+const pdfDoc = await PDFDocument.create();
+const page = pdfDoc.addPage([600, 800]);
+
+// 设置页面旋转
+page.setRotation(degrees(90));
+
+// 获取页面尺寸
+const { width, height } = page.getSize();
+console.log(`Page size: ${width} x ${height}`);
+
+// 设置新尺寸
+page.setSize(800, 600);</code></pre>
+            </div>
+          </div>
+
+          <!-- 示例6: 元数据设置 -->
+          <div v-if="currentExample === 5" class="example-content">
+            <h4>6. 文档元数据</h4>
+            <p>设置PDF的标题、作者、主题等元数据信息。</p>
+            <div class="demo-box">
+              <div class="config-controls metadata-form">
+                <label>
+                  标题:
+                  <input type="text" v-model="docTitle" placeholder="文档标题" />
+                </label>
+                <label>
+                  作者:
+                  <input type="text" v-model="docAuthor" placeholder="作者名" />
+                </label>
+                <label>
+                  主题:
+                  <input type="text" v-model="docSubject" placeholder="文档主题" />
+                </label>
+                <label>
+                  关键词:
+                  <input type="text" v-model="docKeywords" placeholder="关键词1, 关键词2" />
+                </label>
+              </div>
+              <div class="preview-box metadata-preview">
+                <h5>文档属性预览</h5>
+                <p><strong>标题:</strong> {{ docTitle || '(未设置)' }}</p>
+                <p><strong>作者:</strong> {{ docAuthor || '(未设置)' }}</p>
+                <p><strong>主题:</strong> {{ docSubject || '(未设置)' }}</p>
+                <p><strong>关键词:</strong> {{ docKeywords || '(未设置)' }}</p>
+              </div>
+              <button @click="example6Generate" class="btn btn-primary">生成带元数据PDF</button>
+            </div>
+            <div class="code-display">
+              <pre v-pre><code>const pdfDoc = await PDFDocument.create();
+
+// 设置元数据
+pdfDoc.setTitle('My Document Title');
+pdfDoc.setAuthor('Author Name');
+pdfDoc.setSubject('Document Subject');
+pdfDoc.setKeywords(['pdf', 'lib', 'example']);
+pdfDoc.setProducer('PDF-LIB Demo');
+pdfDoc.setCreator('Vue.js Application');
+pdfDoc.setCreationDate(new Date());
+pdfDoc.setModificationDate(new Date());</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== 高级示例区域 ==================== -->
+        <div class="advanced-section">
+          <h3 class="section-title">📕 合并/表单/水印示例</h3>
+
+          <div class="example-tabs">
+            <button
+              v-for="(example, index) in advancedExamples"
+              :key="index"
+              :class="['tab-button advanced', { active: currentAdvanced === index }]"
+              @click="currentAdvanced = index"
+            >
+              {{ example.name }}
+            </button>
+          </div>
+
+          <!-- 高级示例1: PDF合并 -->
+          <div v-if="currentAdvanced === 0" class="example-content">
+            <h4>1. PDF合并</h4>
+            <p>将多个PDF文档合并为一个。</p>
+            <div class="demo-box">
+              <div class="merge-preview">
+                <div class="pdf-thumb">PDF 1</div>
+                <div class="merge-arrow">+</div>
+                <div class="pdf-thumb">PDF 2</div>
+                <div class="merge-arrow">+</div>
+                <div class="pdf-thumb">PDF 3</div>
+                <div class="merge-arrow">=</div>
+                <div class="pdf-thumb merged">合并PDF</div>
+              </div>
+              <button @click="advanced1Generate" class="btn btn-advanced">执行合并</button>
+            </div>
+            <div class="code-display">
+              <pre v-pre><code>import { PDFDocument } from 'pdf-lib';
+
+const mergedPdf = await PDFDocument.create();
+
+// 加载源PDF
+const pdf1 = await PDFDocument.load(pdf1Bytes);
+const pdf2 = await PDFDocument.load(pdf2Bytes);
+
+// 复制页面到新文档
+const pages1 = await mergedPdf.copyPages(pdf1, pdf1.getPageIndices());
+const pages2 = await mergedPdf.copyPages(pdf2, pdf2.getPageIndices());
+
+// 添加页面
+pages1.forEach(page =&gt; mergedPdf.addPage(page));
+pages2.forEach(page =&gt; mergedPdf.addPage(page));
+
+const mergedBytes = await mergedPdf.save();</code></pre>
+            </div>
+          </div>
+
+          <!-- 高级示例2: PDF拆分 -->
+          <div v-if="currentAdvanced === 1" class="example-content">
+            <h4>2. PDF拆分</h4>
+            <p>从PDF中提取指定页面。</p>
+            <div class="demo-box">
+              <div class="config-controls">
+                <label>
+                  起始页:
+                  <input type="number" v-model="splitStart" min="1" max="5" />
+                </label>
+                <label>
+                  结束页:
+                  <input type="number" v-model="splitEnd" min="1" max="5" />
+                </label>
+              </div>
+              <div class="preview-box">
+                <div class="page-range-preview">
+                  <div
+                    v-for="i in 5"
+                    :key="i"
+                    :class="['page-box', { selected: i >= splitStart && i <= splitEnd }]"
+                  >
+                    {{ i }}
+                  </div>
+                </div>
+                <p>将提取第 {{ splitStart }} - {{ splitEnd }} 页</p>
+              </div>
+              <button @click="advanced2Generate" class="btn btn-advanced">拆分PDF</button>
+            </div>
+            <div class="code-display">
+              <pre v-pre><code>// 从源PDF提取指定页面
+const sourcePdf = await PDFDocument.load(sourceBytes);
+const newPdf = await PDFDocument.create();
+
+// 获取要提取的页面索引 (0-based)
+const pageIndices = [0, 1, 2]; // 提取第1-3页
+
+// 复制指定页面
+const copiedPages = await newPdf.copyPages(sourcePdf, pageIndices);
+
+// 添加到新文档
+copiedPages.forEach(page =&gt; newPdf.addPage(page));
+
+const splitBytes = await newPdf.save();</code></pre>
+            </div>
+          </div>
+
+          <!-- 高级示例3: 表单创建 -->
+          <div v-if="currentAdvanced === 2" class="example-content">
+            <h4>3. 创建表单</h4>
+            <p>创建可填写的PDF表单字段。</p>
+            <div class="demo-box">
+              <div class="form-preview">
+                <div class="form-field">
+                  <label>姓名:</label>
+                  <input type="text" v-model="formName" placeholder="输入姓名" />
+                </div>
+                <div class="form-field">
+                  <label>邮箱:</label>
+                  <input type="email" v-model="formEmail" placeholder="输入邮箱" />
+                </div>
+                <div class="form-field checkbox-field">
+                  <input type="checkbox" v-model="formAgree" />
+                  <label>同意条款</label>
+                </div>
+              </div>
+              <button @click="advanced3Generate" class="btn btn-advanced">生成表单PDF</button>
+            </div>
+            <div class="code-display">
+              <pre v-pre><code>const pdfDoc = await PDFDocument.create();
+const page = pdfDoc.addPage();
+const form = pdfDoc.getForm();
+
+// 创建文本字段
+const nameField = form.createTextField('name');
+nameField.setText('默认值');
+nameField.addToPage(page, { x: 100, y: 700, width: 200, height: 25 });
+
+// 创建复选框
+const checkbox = form.createCheckBox('agree');
+checkbox.addToPage(page, { x: 100, y: 650, width: 20, height: 20 });
+
+// 创建下拉框
+const dropdown = form.createDropdown('options');
+dropdown.addOptions(['选项1', '选项2', '选项3']);
+dropdown.addToPage(page, { x: 100, y: 600, width: 150, height: 25 });</code></pre>
+            </div>
+          </div>
+
+          <!-- 高级示例4: 添加水印 -->
+          <div v-if="currentAdvanced === 3" class="example-content">
+            <h4>4. 添加水印</h4>
+            <p>在每页添加半透明文字水印。</p>
+            <div class="demo-box">
+              <div class="config-controls">
+                <label>
+                  水印文字:
+                  <input type="text" v-model="watermarkText" placeholder="CONFIDENTIAL" />
+                </label>
+                <label>
+                  透明度:
+                  <input type="number" v-model="watermarkOpacity" min="0.1" max="0.5" step="0.1" />
+                </label>
+                <label>
+                  旋转角度:
+                  <input type="number" v-model="watermarkAngle" min="-90" max="0" />
+                </label>
+              </div>
+              <div class="preview-box watermark-preview">
+                <div
+                  class="watermark-text"
+                  :style="{ opacity: watermarkOpacity, transform: `rotate(${watermarkAngle}deg)` }"
+                >
+                  {{ watermarkText || 'CONFIDENTIAL' }}
+                </div>
+              </div>
+              <button @click="advanced4Generate" class="btn btn-advanced">生成带水印PDF</button>
+            </div>
+            <div class="code-display">
+              <pre v-pre><code>import { degrees } from 'pdf-lib';
+
+const pages = pdfDoc.getPages();
+
+pages.forEach(page =&gt; {
+  const { width, height } = page.getSize();
+
+  page.drawText('CONFIDENTIAL', {
+    x: width / 2 - 100,
+    y: height / 2,
+    size: 60,
+    color: rgb(0.9, 0.1, 0.1),
+    opacity: 0.2,
+    rotate: degrees(-45),
+  });
+});</code></pre>
+            </div>
+          </div>
+
+          <!-- 高级示例5: 嵌入图片 -->
+          <div v-if="currentAdvanced === 4" class="example-content">
+            <h4>5. 嵌入图片</h4>
+            <p>在PDF中嵌入PNG或JPG图片。</p>
+            <div class="demo-box">
+              <div class="config-controls">
+                <label>
+                  图片宽度:
+                  <input type="number" v-model="imageWidth" min="50" max="500" />
+                </label>
+                <label>
+                  图片高度:
+                  <input type="number" v-model="imageHeight" min="50" max="500" />
+                </label>
+                <label>
+                  透明度:
+                  <input type="number" v-model="imageOpacity" min="0.1" max="1" step="0.1" />
+                </label>
+              </div>
+              <div class="preview-box">
+                <div
+                  class="image-placeholder"
+                  :style="{
+                    width: imageWidth + 'px',
+                    height: imageHeight + 'px',
+                    opacity: imageOpacity,
+                  }"
+                >
+                  示例图片
+                </div>
+              </div>
+              <button @click="advanced5Generate" class="btn btn-advanced">生成图片PDF</button>
+            </div>
+            <div class="code-display">
+              <pre v-pre><code>// 嵌入PNG
+const pngBytes = await fetch('image.png').then(r =&gt; r.arrayBuffer());
+const pngImage = await pdfDoc.embedPng(pngBytes);
+
+// 嵌入JPG
+const jpgBytes = await fetch('photo.jpg').then(r =&gt; r.arrayBuffer());
+const jpgImage = await pdfDoc.embedJpg(jpgBytes);
+
+// 绘制图片
+page.drawImage(pngImage, {
+  x: 50,
+  y: 500,
+  width: 200,
+  height: 150,
+  opacity: 0.8,
+});</code></pre>
+            </div>
+          </div>
+
+          <!-- 高级示例6: 复制页面 -->
+          <div v-if="currentAdvanced === 5" class="example-content">
+            <h4>6. 复制与插入页面</h4>
+            <p>复制页面并插入到指定位置。</p>
+            <div class="demo-box">
+              <div class="config-controls">
+                <label>
+                  复制次数:
+                  <input type="number" v-model="copyCount" min="1" max="5" />
+                </label>
+                <label>
+                  插入位置:
+                  <select v-model="insertPosition">
+                    <option value="start">开头</option>
+                    <option value="end">末尾</option>
+                  </select>
+                </label>
+              </div>
+              <div class="preview-box">
+                <div class="copy-preview">
+                  <div class="source-page">源页面</div>
+                  <div class="arrow">→</div>
+                  <div class="copies">
+                    <div v-for="i in copyCount" :key="i" class="copy-page">副本 {{ i }}</div>
+                  </div>
+                </div>
+              </div>
+              <button @click="advanced6Generate" class="btn btn-advanced">执行复制</button>
+            </div>
+            <div class="code-display">
+              <pre v-pre><code>// 复制页面
+const [copiedPage] = await pdfDoc.copyPages(sourcePdf, [0]);
+
+// 在指定位置插入
+pdfDoc.insertPage(0, copiedPage); // 插入到开头
+
+// 或添加到末尾
+pdfDoc.addPage(copiedPage);
+
+// 移除页面
+pdfDoc.removePage(2); // 移除第3页
+
+// 获取页面数量
+const pageCount = pdfDoc.getPageCount();</code></pre>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from 'vue'
 import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib'
+
+// ==================== 基础示例状态 ====================
+const currentExample = ref(0)
+const examples = [
+  { name: '创建空白' },
+  { name: '添加文本' },
+  { name: '绘制图形' },
+  { name: '标准字体' },
+  { name: '页面旋转' },
+  { name: '元数据' },
+]
+
+// 示例1: 创建空白PDF
+const pageWidth = ref(600)
+const pageHeight = ref(800)
+const pageCount = ref(1)
+
+// 示例2: 添加文本
+const textContent = ref('Hello PDF-LIB')
+const textSize = ref(30)
+const textColor = ref('#0087b5')
+
+// 示例3: 绘制图形
+const shapeType = ref<'rectangle' | 'circle' | 'line'>('rectangle')
+const borderColor = ref('#000000')
+const fillColor = ref('#e6e6e6')
+
+// 示例4: 标准字体
+const standardFonts = [
+  'Helvetica',
+  'HelveticaBold',
+  'HelveticaOblique',
+  'HelveticaBoldOblique',
+  'TimesRoman',
+  'TimesRomanBold',
+  'TimesRomanItalic',
+  'TimesRomanBoldItalic',
+  'Courier',
+  'CourierBold',
+  'CourierOblique',
+  'CourierBoldOblique',
+  'Symbol',
+  'ZapfDingbats',
+]
+const selectedFont = ref('Helvetica')
+
+// 示例5: 页面旋转
+const rotationAngle = ref(0)
+
+// 示例6: 元数据
+const docTitle = ref('My Document')
+const docAuthor = ref('Author Name')
+const docSubject = ref('Document Subject')
+const docKeywords = ref('pdf, lib, example')
+
+// ==================== 高级示例状态 ====================
+const currentAdvanced = ref(0)
+const advancedExamples = [
+  { name: 'PDF合并' },
+  { name: 'PDF拆分' },
+  { name: '创建表单' },
+  { name: '添加水印' },
+  { name: '嵌入图片' },
+  { name: '复制页面' },
+]
+
+// 高级示例2: PDF拆分
+const splitStart = ref(1)
+const splitEnd = ref(3)
+
+// 高级示例3: 表单
+const formName = ref('')
+const formEmail = ref('')
+const formAgree = ref(false)
+
+// 高级示例4: 水印
+const watermarkText = ref('CONFIDENTIAL')
+const watermarkOpacity = ref(0.2)
+const watermarkAngle = ref(-45)
+
+// 高级示例5: 图片
+const imageWidth = ref(200)
+const imageHeight = ref(150)
+const imageOpacity = ref(1)
+
+// 高级示例6: 复制页面
+const copyCount = ref(2)
+const insertPosition = ref<'start' | 'end'>('end')
+
+// 计算属性
+const pagePreviewStyle = computed(() => ({
+  width: `${pageWidth.value * 0.15}px`,
+  height: `${pageHeight.value * 0.15}px`,
+}))
 
 // 辅助函数：下载PDF
 const download = (pdfBytes: Uint8Array, fileName: string) => {
-  const blob = new Blob([pdfBytes], { type: 'application/pdf' })
+  const blob = new Blob([pdfBytes as unknown as ArrayBuffer], { type: 'application/pdf' })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
@@ -433,14 +1146,348 @@ const download = (pdfBytes: Uint8Array, fileName: string) => {
   URL.revokeObjectURL(url)
 }
 
+// 辅助函数：颜色转换
+const hexToRgb = (hex: string) => {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  return result
+    ? {
+        r: parseInt(result[1] ?? '0', 16) / 255,
+        g: parseInt(result[2] ?? '0', 16) / 255,
+        b: parseInt(result[3] ?? '0', 16) / 255,
+      }
+    : { r: 0, g: 0, b: 0 }
+}
+
+// ==================== 基础示例函数 ====================
+const example1Generate = async () => {
+  const pdfDoc = await PDFDocument.create()
+
+  for (let i = 0; i < pageCount.value; i++) {
+    const page = pdfDoc.addPage([pageWidth.value, pageHeight.value])
+    page.drawText(`Page ${i + 1}`, {
+      x: 50,
+      y: pageHeight.value - 50,
+      size: 20,
+    })
+  }
+
+  const pdfBytes = await pdfDoc.save()
+  download(pdfBytes, 'blank-pages.pdf')
+}
+
+const example2Generate = async () => {
+  const pdfDoc = await PDFDocument.create()
+  const page = pdfDoc.addPage([600, 400])
+  const { r, g, b } = hexToRgb(textColor.value)
+
+  page.drawText(textContent.value || 'Hello PDF-LIB', {
+    x: 50,
+    y: 350,
+    size: textSize.value,
+    color: rgb(r, g, b),
+  })
+
+  const pdfBytes = await pdfDoc.save()
+  download(pdfBytes, 'text.pdf')
+}
+
+const example3Generate = async () => {
+  const pdfDoc = await PDFDocument.create()
+  const page = pdfDoc.addPage([600, 400])
+  const border = hexToRgb(borderColor.value)
+  const fill = hexToRgb(fillColor.value)
+
+  if (shapeType.value === 'rectangle') {
+    page.drawRectangle({
+      x: 100,
+      y: 100,
+      width: 400,
+      height: 200,
+      borderColor: rgb(border.r, border.g, border.b),
+      color: rgb(fill.r, fill.g, fill.b),
+      borderWidth: 2,
+    })
+  } else if (shapeType.value === 'circle') {
+    page.drawCircle({
+      x: 300,
+      y: 200,
+      size: 100,
+      borderColor: rgb(border.r, border.g, border.b),
+      color: rgb(fill.r, fill.g, fill.b),
+      borderWidth: 2,
+    })
+  } else if (shapeType.value === 'line') {
+    page.drawLine({
+      start: { x: 50, y: 50 },
+      end: { x: 550, y: 350 },
+      thickness: 3,
+      color: rgb(border.r, border.g, border.b),
+    })
+  }
+
+  const pdfBytes = await pdfDoc.save()
+  download(pdfBytes, 'shapes.pdf')
+}
+
+const example4Generate = async () => {
+  const pdfDoc = await PDFDocument.create()
+  const page = pdfDoc.addPage([600, 800])
+
+  let yPos = 750
+  for (const fontName of standardFonts.slice(0, 8)) {
+    const fontKey = fontName as keyof typeof StandardFonts
+    const font = await pdfDoc.embedFont(StandardFonts[fontKey])
+    page.drawText(`${fontName}: The quick brown fox`, {
+      x: 50,
+      y: yPos,
+      size: 16,
+      font,
+    })
+    yPos -= 40
+  }
+
+  const pdfBytes = await pdfDoc.save()
+  download(pdfBytes, 'fonts.pdf')
+}
+
+const example5Generate = async () => {
+  const pdfDoc = await PDFDocument.create()
+  const page = pdfDoc.addPage([600, 800])
+
+  page.setRotation(degrees(rotationAngle.value))
+
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
+  page.drawText('This page is rotated!', {
+    x: 200,
+    y: 400,
+    size: 24,
+    font,
+  })
+
+  page.drawText(`Rotation: ${rotationAngle.value} degrees`, {
+    x: 200,
+    y: 360,
+    size: 16,
+    font,
+  })
+
+  const pdfBytes = await pdfDoc.save()
+  download(pdfBytes, 'rotated.pdf')
+}
+
+const example6Generate = async () => {
+  const pdfDoc = await PDFDocument.create()
+  const page = pdfDoc.addPage([600, 400])
+
+  // 设置元数据
+  pdfDoc.setTitle(docTitle.value || 'Untitled')
+  pdfDoc.setAuthor(docAuthor.value || 'Unknown')
+  pdfDoc.setSubject(docSubject.value || '')
+  pdfDoc.setKeywords(docKeywords.value.split(',').map((k) => k.trim()))
+  pdfDoc.setProducer('PDF-LIB Demo')
+  pdfDoc.setCreator('Vue.js Application')
+  pdfDoc.setCreationDate(new Date())
+  pdfDoc.setModificationDate(new Date())
+
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
+  page.drawText('Document with Metadata', {
+    x: 50,
+    y: 350,
+    size: 24,
+    font,
+  })
+  page.drawText(`Title: ${docTitle.value}`, { x: 50, y: 300, size: 14, font })
+  page.drawText(`Author: ${docAuthor.value}`, { x: 50, y: 275, size: 14, font })
+  page.drawText(`Subject: ${docSubject.value}`, { x: 50, y: 250, size: 14, font })
+
+  const pdfBytes = await pdfDoc.save()
+  download(pdfBytes, 'metadata.pdf')
+}
+
+// ==================== 高级示例函数 ====================
+const advanced1Generate = async () => {
+  // 创建三个PDF
+  const pdfs = []
+  for (let i = 1; i <= 3; i++) {
+    const doc = await PDFDocument.create()
+    const page = doc.addPage([600, 400])
+    const font = await doc.embedFont(StandardFonts.Helvetica)
+    page.drawText(`PDF Document ${i}`, {
+      x: 50,
+      y: 350,
+      size: 30,
+      font,
+      color: rgb(i * 0.2, 0.3, 0.7),
+    })
+    pdfs.push(await doc.save())
+  }
+
+  // 合并
+  const mergedPdf = await PDFDocument.create()
+  for (const pdfBytes of pdfs) {
+    const pdf = await PDFDocument.load(pdfBytes)
+    const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices())
+    copiedPages.forEach((page) => mergedPdf.addPage(page))
+  }
+
+  const mergedBytes = await mergedPdf.save()
+  download(mergedBytes, 'merged.pdf')
+}
+
+const advanced2Generate = async () => {
+  // 创建一个5页的PDF
+  const sourcePdf = await PDFDocument.create()
+  const font = await sourcePdf.embedFont(StandardFonts.Helvetica)
+
+  for (let i = 1; i <= 5; i++) {
+    const page = sourcePdf.addPage([600, 400])
+    page.drawText(`Page ${i}`, { x: 250, y: 200, size: 48, font })
+  }
+  const sourceBytes = await sourcePdf.save()
+
+  // 拆分
+  const loadedPdf = await PDFDocument.load(sourceBytes)
+  const newPdf = await PDFDocument.create()
+
+  const startIdx = splitStart.value - 1
+  const endIdx = splitEnd.value - 1
+  const indices = []
+  for (let i = startIdx; i <= endIdx && i < 5; i++) {
+    indices.push(i)
+  }
+
+  const copiedPages = await newPdf.copyPages(loadedPdf, indices)
+  copiedPages.forEach((page) => newPdf.addPage(page))
+
+  const splitBytes = await newPdf.save()
+  download(splitBytes, 'split.pdf')
+}
+
+const advanced3Generate = async () => {
+  const pdfDoc = await PDFDocument.create()
+  const page = pdfDoc.addPage([600, 800])
+  const form = pdfDoc.getForm()
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
+
+  page.drawText('User Information Form', {
+    x: 180,
+    y: 750,
+    size: 24,
+    font,
+  })
+
+  // 姓名字段
+  page.drawText('Name:', { x: 50, y: 680, size: 14, font })
+  const nameField = form.createTextField('name')
+  nameField.setText(formName.value || '')
+  nameField.addToPage(page, { x: 150, y: 670, width: 200, height: 25 })
+
+  // 邮箱字段
+  page.drawText('Email:', { x: 50, y: 630, size: 14, font })
+  const emailField = form.createTextField('email')
+  emailField.setText(formEmail.value || '')
+  emailField.addToPage(page, { x: 150, y: 620, width: 200, height: 25 })
+
+  // 复选框
+  const checkbox = form.createCheckBox('agree')
+  checkbox.addToPage(page, { x: 50, y: 570, width: 20, height: 20 })
+  if (formAgree.value) checkbox.check()
+  page.drawText('I agree to terms', { x: 80, y: 575, size: 12, font })
+
+  const pdfBytes = await pdfDoc.save()
+  download(pdfBytes, 'form.pdf')
+}
+
+const advanced4Generate = async () => {
+  const pdfDoc = await PDFDocument.create()
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
+
+  // 创建两页内容
+  for (let i = 1; i <= 2; i++) {
+    const page = pdfDoc.addPage([600, 800])
+    page.drawText(`Page ${i} Content`, { x: 50, y: 750, size: 20, font })
+  }
+
+  // 添加水印
+  const pages = pdfDoc.getPages()
+  pages.forEach((page) => {
+    const { width, height } = page.getSize()
+    page.drawText(watermarkText.value || 'CONFIDENTIAL', {
+      x: width / 2 - 100,
+      y: height / 2,
+      size: 60,
+      font,
+      color: rgb(0.9, 0.1, 0.1),
+      opacity: watermarkOpacity.value,
+      rotate: degrees(watermarkAngle.value),
+    })
+  })
+
+  const pdfBytes = await pdfDoc.save()
+  download(pdfBytes, 'watermarked.pdf')
+}
+
+const advanced5Generate = async () => {
+  const pdfDoc = await PDFDocument.create()
+  const page = pdfDoc.addPage([600, 800])
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
+
+  page.drawText('Image Embedding Example', { x: 50, y: 750, size: 24, font })
+
+  // 创建示例PNG (1x1透明像素)
+  const pngDataUrl =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
+  const pngBytes = await fetch(pngDataUrl).then((res) => res.arrayBuffer())
+  const pngImage = await pdfDoc.embedPng(pngBytes)
+
+  // 绘制多个图片
+  for (let i = 0; i < 3; i++) {
+    page.drawImage(pngImage, {
+      x: 50 + i * (imageWidth.value + 20),
+      y: 500,
+      width: imageWidth.value,
+      height: imageHeight.value,
+      opacity: imageOpacity.value - i * 0.2,
+    })
+  }
+
+  page.drawText('(Images with different opacity)', { x: 50, y: 450, size: 12, font })
+
+  const pdfBytes = await pdfDoc.save()
+  download(pdfBytes, 'images.pdf')
+}
+
+const advanced6Generate = async () => {
+  // 创建源PDF
+  const sourcePdf = await PDFDocument.create()
+  const sourceFont = await sourcePdf.embedFont(StandardFonts.Helvetica)
+  const sourcePage = sourcePdf.addPage([600, 400])
+  sourcePage.drawText('Original Page', { x: 200, y: 200, size: 30, font: sourceFont })
+  const sourceBytes = await sourcePdf.save()
+
+  // 复制页面
+  const pdfDoc = await PDFDocument.create()
+  const loaded = await PDFDocument.load(sourceBytes)
+
+  for (let i = 0; i < copyCount.value; i++) {
+    const [copiedPage] = await pdfDoc.copyPages(loaded, [0])
+    if (insertPosition.value === 'start') {
+      pdfDoc.insertPage(i, copiedPage)
+    } else {
+      pdfDoc.addPage(copiedPage)
+    }
+  }
+
+  const pdfBytes = await pdfDoc.save()
+  download(pdfBytes, 'copied-pages.pdf')
+}
+
+// ==================== 原有快捷功能 ====================
 const createBasicPDF = async () => {
   const pdfDoc = await PDFDocument.create()
   const page = pdfDoc.addPage([600, 400])
 
   const { width, height } = page.getSize()
-
-  // Note: PDF-LIB default fonts don't support Chinese
-  // Use StandardFonts or embed custom fonts for Chinese
 
   page.drawText('Hello, PDF-LIB!', {
     x: 50,
@@ -456,7 +1503,6 @@ const createBasicPDF = async () => {
     color: rgb(0.2, 0.2, 0.2),
   })
 
-  // Draw a rectangle
   page.drawRectangle({
     x: 50,
     y: height - 250,
@@ -478,7 +1524,6 @@ const createBasicPDF = async () => {
 }
 
 const modifyExistingPDF = async () => {
-  // Create an original PDF first
   const existingPdf = await PDFDocument.create()
   const page = existingPdf.addPage([600, 400])
   page.drawText('Original PDF Document', {
@@ -489,7 +1534,6 @@ const modifyExistingPDF = async () => {
   })
   const existingPdfBytes = await existingPdf.save()
 
-  // Load and modify
   const pdfDoc = await PDFDocument.load(existingPdfBytes)
   const pages = pdfDoc.getPages()
   const firstPage = pages[0]
@@ -515,7 +1559,6 @@ const modifyExistingPDF = async () => {
 }
 
 const mergePDFs = async () => {
-  // Create two PDFs
   const pdf1 = await PDFDocument.create()
   const page1 = pdf1.addPage([600, 400])
   page1.drawText('First PDF Document', {
@@ -536,7 +1579,6 @@ const mergePDFs = async () => {
   })
   const pdf2Bytes = await pdf2.save()
 
-  // 合并
   const mergedPdf = await PDFDocument.create()
 
   const pdfA = await PDFDocument.load(pdf1Bytes)
@@ -556,13 +1598,12 @@ const embedImages = async () => {
   const pdfDoc = await PDFDocument.create()
   const page = pdfDoc.addPage([600, 800])
 
-  // 创建简单的PNG数据（1x1透明像素）
   const pngDataUrl =
     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
   const pngBytes = await fetch(pngDataUrl).then((res) => res.arrayBuffer())
   const pngImage = await pdfDoc.embedPng(pngBytes)
 
-  const { width, height } = page.getSize()
+  const { height } = page.getSize()
 
   page.drawText('Image Embedding Example', {
     x: 50,
@@ -571,7 +1612,6 @@ const embedImages = async () => {
     color: rgb(0, 0, 0),
   })
 
-  // Draw multiple images with different opacity
   for (let i = 0; i < 3; i++) {
     page.drawImage(pngImage, {
       x: 50 + i * 150,
@@ -594,18 +1634,15 @@ const embedImages = async () => {
 }
 
 const addWatermark = async () => {
-  // 创建一个示例PDF
   const pdfDoc = await PDFDocument.create()
   const page1 = pdfDoc.addPage([600, 800])
   const page2 = pdfDoc.addPage([600, 800])
 
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
 
-  // Add content
   page1.drawText('Page 1 Content', { x: 50, y: 750, size: 20, font })
   page2.drawText('Page 2 Content', { x: 50, y: 750, size: 20, font })
 
-  // Add watermark to each page
   const pages = pdfDoc.getPages()
   pages.forEach((page) => {
     const { width, height } = page.getSize()
@@ -636,14 +1673,12 @@ const addWatermark = async () => {
 }
 
 const fillForm = async () => {
-  // 创建包含表单的PDF
   const pdfDoc = await PDFDocument.create()
   const page = pdfDoc.addPage([600, 800])
   const form = pdfDoc.getForm()
 
   const { height } = page.getSize()
 
-  // Title
   page.drawText('User Information Form', {
     x: 50,
     y: height - 50,
@@ -651,7 +1686,6 @@ const fillForm = async () => {
     color: rgb(0, 0, 0),
   })
 
-  // Create text fields
   const nameField = form.createTextField('name')
   nameField.setText('John Doe')
   nameField.addToPage(page, { x: 150, y: height - 120, width: 200, height: 25 })
@@ -664,7 +1698,6 @@ const fillForm = async () => {
 
   page.drawText('Email:', { x: 50, y: height - 160, size: 14 })
 
-  // Create checkbox
   const agreeCheckBox = form.createCheckBox('agree')
   agreeCheckBox.check()
   agreeCheckBox.addToPage(page, { x: 50, y: height - 220, width: 20, height: 20 })
@@ -687,7 +1720,6 @@ const createComplexDoc = async () => {
   const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman)
   const helveticaBoldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
 
-  // 封面页
   const coverPage = pdfDoc.addPage([600, 800])
   const { width: coverWidth, height: coverHeight } = coverPage.getSize()
 
@@ -715,9 +1747,8 @@ const createComplexDoc = async () => {
     color: rgb(0.5, 0.5, 0.5),
   })
 
-  // Content page
   const contentPage = pdfDoc.addPage([600, 800])
-  const { width: contentWidth, height: contentHeight } = contentPage.getSize()
+  const { height: contentHeight } = contentPage.getSize()
 
   contentPage.drawText('Chapter 1: Overview', {
     x: 50,
@@ -748,7 +1779,6 @@ const createComplexDoc = async () => {
     yPosition -= 25
   })
 
-  // Chapter 2
   contentPage.drawText('Chapter 2: Technology Selection', {
     x: 50,
     y: yPosition - 30,
@@ -1117,6 +2147,421 @@ const createComplexDoc = async () => {
   font-size: 14px;
   line-height: 1.6;
   margin: 0;
+}
+
+/* ==================== 基础示例样式 ==================== */
+.examples-section {
+  margin-top: 40px;
+  padding: 25px;
+  background: #f0fff4;
+  border-radius: 12px;
+  border: 1px solid #9ae6b4;
+}
+
+.section-title {
+  color: #276749;
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+}
+
+.example-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #9ae6b4;
+}
+
+.tab-button {
+  padding: 8px 16px;
+  border: 1px solid #9ae6b4;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.tab-button:hover {
+  background: #c6f6d5;
+}
+
+.tab-button.active {
+  background: #48bb78;
+  color: white;
+  border-color: #48bb78;
+}
+
+.tab-button.advanced {
+  border-color: #feb2b2;
+}
+
+.tab-button.advanced:hover {
+  background: #fed7d7;
+}
+
+.tab-button.advanced.active {
+  background: #f56565;
+  border-color: #f56565;
+}
+
+.example-content {
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.example-content h4 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.example-content > p {
+  color: #718096;
+  margin-bottom: 15px;
+}
+
+.demo-box {
+  margin: 15px 0;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px dashed #cbd5e0;
+}
+
+.preview-box {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.config-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.config-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 14px;
+  color: #4a5568;
+}
+
+.config-controls input,
+.config-controls select {
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  min-width: 120px;
+}
+
+.code-display {
+  margin-top: 15px;
+}
+
+.code-display pre {
+  background: #2d3748;
+  color: #e2e8f0;
+  padding: 15px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.btn-advanced {
+  background: #f56565;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-advanced:hover {
+  background: #e53e3e;
+  transform: translateY(-2px);
+}
+
+/* ==================== 高级示例样式 ==================== */
+.advanced-section {
+  margin-top: 40px;
+  padding: 25px;
+  background: #fff5f5;
+  border-radius: 12px;
+  border: 1px solid #feb2b2;
+}
+
+.advanced-section .section-title {
+  color: #c53030;
+}
+
+/* 页面预览 */
+.page-preview {
+  background: #f7fafc;
+  border: 2px solid #667eea;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  font-size: 12px;
+  color: #718096;
+}
+
+/* 文本预览 */
+.text-preview {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+}
+
+/* 图形预览 */
+.shape-preview {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
+
+/* 字体列表 */
+.font-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.font-item {
+  padding: 4px 10px;
+  background: #f7fafc;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.font-item.active {
+  background: #667eea;
+  color: white;
+}
+
+/* 旋转预览 */
+.rotation-preview {
+  width: 100px;
+  height: 140px;
+  background: #f7fafc;
+  border: 2px solid #667eea;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 10px;
+  transition: transform 0.3s ease;
+}
+
+.page-indicator span {
+  font-size: 12px;
+  color: #667eea;
+}
+
+/* 元数据表单 */
+.metadata-form {
+  flex-direction: column;
+}
+
+.metadata-form label {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.metadata-form input {
+  flex: 1;
+}
+
+.metadata-preview h5 {
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.metadata-preview p {
+  margin: 5px 0;
+  font-size: 14px;
+  text-align: left;
+}
+
+/* 合并预览 */
+.merge-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pdf-thumb {
+  width: 60px;
+  height: 80px;
+  background: #f7fafc;
+  border: 2px solid #667eea;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  border-radius: 4px;
+}
+
+.pdf-thumb.merged {
+  width: 80px;
+  background: #c6f6d5;
+  border-color: #48bb78;
+}
+
+.merge-arrow {
+  font-size: 20px;
+  color: #718096;
+}
+
+/* 页面范围预览 */
+.page-range-preview {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.page-box {
+  width: 40px;
+  height: 50px;
+  background: #f7fafc;
+  border: 2px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.page-box.selected {
+  background: #c6f6d5;
+  border-color: #48bb78;
+}
+
+/* 表单预览 */
+.form-preview {
+  padding: 15px;
+  background: #f7fafc;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+
+.form-field {
+  margin-bottom: 15px;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.form-field input[type='text'],
+.form-field input[type='email'] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkbox-field label {
+  margin-bottom: 0;
+}
+
+/* 水印预览 */
+.watermark-preview {
+  position: relative;
+  height: 150px;
+  overflow: hidden;
+}
+
+.watermark-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  font-size: 32px;
+  font-weight: bold;
+  color: #f56565;
+  white-space: nowrap;
+}
+
+/* 图片占位符 */
+.image-placeholder {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* 复制预览 */
+.copy-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.source-page {
+  width: 60px;
+  height: 80px;
+  background: #667eea;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  border-radius: 4px;
+}
+
+.copies {
+  display: flex;
+  gap: 10px;
+}
+
+.copy-page {
+  width: 50px;
+  height: 70px;
+  background: #c6f6d5;
+  border: 2px solid #48bb78;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  border-radius: 4px;
+}
+
+.arrow {
+  font-size: 24px;
+  color: #718096;
 }
 
 @media (max-width: 1024px) {

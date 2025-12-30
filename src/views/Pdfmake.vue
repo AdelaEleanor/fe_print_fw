@@ -86,6 +86,728 @@
       </aside>
 
       <main class="demo-panel">
+        <!-- 基础功能演示 -->
+        <div class="examples-section">
+          <h2 class="section-title">📚 基础功能演示</h2>
+
+          <div class="example-tabs">
+            <button
+              v-for="(example, index) in examples"
+              :key="index"
+              :class="['tab-button', { active: currentExample === index }]"
+              @click="currentExample = index"
+            >
+              {{ example }}
+            </button>
+          </div>
+
+          <div class="example-content">
+            <!-- 示例1: 创建基础文档 -->
+            <div v-if="currentExample === 0">
+              <h3>示例 1: 创建基础文档</h3>
+              <p>使用pdfmake的声明式API创建简单的PDF文档，包含文本和基础样式。</p>
+
+              <div class="controls">
+                <button @click="example1Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '📄 生成基础PDF' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>import pdfMake from 'pdfmake/build/pdfmake'
+
+const docDefinition = {
+  content: [
+    'Hello World!',
+    '这是使用 pdfmake 生成的 PDF 文档',
+    '生成时间: ' + new Date().toLocaleDateString('zh-CN')
+  ]
+}
+
+pdfMake.createPdf(docDefinition).download('basic.pdf')</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <div class="preview-box">
+                  <p><strong>预览内容:</strong></p>
+                  <p>Hello World!</p>
+                  <p>这是使用 pdfmake 生成的 PDF 文档</p>
+                  <p>生成时间: {{ currentDate }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 示例2: 文本样式 -->
+            <div v-else-if="currentExample === 1">
+              <h3>示例 2: 文本样式</h3>
+              <p>使用styles定义可复用的样式，并应用到不同的文本元素上。</p>
+
+              <div class="controls">
+                <button @click="example2Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '🎨 生成样式PDF' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const docDefinition = {
+  content: [
+    { text: '标题文本', style: 'header' },
+    { text: '副标题', style: 'subheader' },
+    { text: '普通正文内容', fontSize: 12 },
+    { text: '加粗文本', bold: true },
+    { text: '斜体文本', italics: true },
+    { text: '彩色文本', color: '#667eea' },
+    { text: '带背景色的文本', background: '#fef3c7' }
+  ],
+  styles: {
+    header: { fontSize: 22, bold: true, color: '#667eea' },
+    subheader: { fontSize: 16, bold: true, margin: [0, 10, 0, 5] }
+  }
+}</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <div class="preview-box">
+                  <p style="font-size: 1.5rem; font-weight: bold; color: #667eea">标题文本</p>
+                  <p style="font-size: 1.2rem; font-weight: bold">副标题</p>
+                  <p>普通正文内容</p>
+                  <p style="font-weight: bold">加粗文本</p>
+                  <p style="font-style: italic">斜体文本</p>
+                  <p style="color: #667eea">彩色文本</p>
+                  <p style="background: #fef3c7; display: inline-block; padding: 0.25rem">
+                    带背景色的文本
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 示例3: 列表 -->
+            <div v-else-if="currentExample === 2">
+              <h3>示例 3: 列表</h3>
+              <p>pdfmake支持有序列表(ol)和无序列表(ul)，可以嵌套使用。</p>
+
+              <div class="controls">
+                <button @click="example3Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '📋 生成列表PDF' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const docDefinition = {
+  content: [
+    { text: '无序列表', style: 'header' },
+    {
+      ul: [
+        '第一项',
+        '第二项',
+        '第三项'
+      ]
+    },
+    { text: '有序列表', style: 'header', margin: [0, 15, 0, 5] },
+    {
+      ol: [
+        '步骤一',
+        '步骤二',
+        '步骤三'
+      ]
+    }
+  ]
+}</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <div class="preview-box">
+                  <p style="font-weight: bold; margin-bottom: 0.5rem">无序列表</p>
+                  <ul style="margin-left: 1.5rem">
+                    <li>第一项</li>
+                    <li>第二项</li>
+                    <li>第三项</li>
+                  </ul>
+                  <p style="font-weight: bold; margin: 1rem 0 0.5rem 0">有序列表</p>
+                  <ol style="margin-left: 1.5rem">
+                    <li>步骤一</li>
+                    <li>步骤二</li>
+                    <li>步骤三</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+
+            <!-- 示例4: 多列布局 -->
+            <div v-else-if="currentExample === 3">
+              <h3>示例 4: 多列布局</h3>
+              <p>使用columns创建多列布局，支持灵活的宽度设置。</p>
+
+              <div class="controls">
+                <button @click="example4Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '📐 生成多列PDF' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const docDefinition = {
+  content: [
+    { text: '两列布局', style: 'header' },
+    {
+      columns: [
+        { width: '50%', text: '左侧列内容\n这是左侧的内容区域' },
+        { width: '50%', text: '右侧列内容\n这是右侧的内容区域' }
+      ]
+    },
+    { text: '三列布局', style: 'header', margin: [0, 20, 0, 5] },
+    {
+      columns: [
+        { width: '*', text: '列1' },
+        { width: '*', text: '列2' },
+        { width: '*', text: '列3' }
+      ],
+      columnGap: 10
+    }
+  ]
+}</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <div class="preview-box">
+                  <p style="font-weight: bold; margin-bottom: 0.5rem">两列布局</p>
+                  <div style="display: flex; gap: 1rem; margin-bottom: 1rem">
+                    <div style="flex: 1; background: #f7fafc; padding: 0.75rem; border-radius: 4px">
+                      <p>左侧列内容</p>
+                      <p>这是左侧的内容区域</p>
+                    </div>
+                    <div style="flex: 1; background: #f7fafc; padding: 0.75rem; border-radius: 4px">
+                      <p>右侧列内容</p>
+                      <p>这是右侧的内容区域</p>
+                    </div>
+                  </div>
+                  <p style="font-weight: bold; margin-bottom: 0.5rem">三列布局</p>
+                  <div style="display: flex; gap: 0.5rem">
+                    <div
+                      style="
+                        flex: 1;
+                        background: #e2e8f0;
+                        padding: 0.5rem;
+                        text-align: center;
+                        border-radius: 4px;
+                      "
+                    >
+                      列1
+                    </div>
+                    <div
+                      style="
+                        flex: 1;
+                        background: #e2e8f0;
+                        padding: 0.5rem;
+                        text-align: center;
+                        border-radius: 4px;
+                      "
+                    >
+                      列2
+                    </div>
+                    <div
+                      style="
+                        flex: 1;
+                        background: #e2e8f0;
+                        padding: 0.5rem;
+                        text-align: center;
+                        border-radius: 4px;
+                      "
+                    >
+                      列3
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 示例5: 页眉页脚 -->
+            <div v-else-if="currentExample === 4">
+              <h3>示例 5: 页眉和页脚</h3>
+              <p>为每一页添加页眉和页脚，支持动态页码显示。</p>
+
+              <div class="controls">
+                <button @click="example5Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '📄 生成带页眉页脚PDF' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const docDefinition = {
+  header: {
+    text: '公司机密文件',
+    alignment: 'center',
+    margin: [0, 10, 0, 0]
+  },
+  footer: (currentPage, pageCount) => ({
+    text: `第 ${currentPage} / ${pageCount} 页`,
+    alignment: 'center',
+    margin: [0, 0, 0, 10]
+  }),
+  content: [
+    { text: '文档内容', style: 'header' },
+    { text: '这是文档的主体内容...' }
+  ]
+}</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <div class="preview-box" style="position: relative">
+                  <div style="border: 1px solid #e2e8f0; padding: 1rem">
+                    <p
+                      style="
+                        text-align: center;
+                        color: #718096;
+                        font-size: 0.9rem;
+                        border-bottom: 1px solid #e2e8f0;
+                        padding-bottom: 0.5rem;
+                      "
+                    >
+                      公司机密文件
+                    </p>
+                    <div style="min-height: 100px; padding: 1rem 0">
+                      <p style="font-weight: bold">文档内容</p>
+                      <p>这是文档的主体内容...</p>
+                    </div>
+                    <p
+                      style="
+                        text-align: center;
+                        color: #718096;
+                        font-size: 0.9rem;
+                        border-top: 1px solid #e2e8f0;
+                        padding-top: 0.5rem;
+                      "
+                    >
+                      第 1 / 1 页
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 示例6: 分页控制 -->
+            <div v-else-if="currentExample === 5">
+              <h3>示例 6: 分页控制</h3>
+              <p>使用pageBreak控制强制分页，或pageBreakBefore进行条件分页。</p>
+
+              <div class="controls">
+                <button @click="example6Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '📑 生成多页PDF' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const docDefinition = {
+  content: [
+    { text: '第一页内容', style: 'header' },
+    { text: '这是第一页的内容...' },
+    { text: '第二页内容', style: 'header', pageBreak: 'before' },
+    { text: '这是第二页的内容...' },
+    { text: '第三页内容', style: 'header', pageBreak: 'before' },
+    { text: '这是第三页的内容...' }
+  ]
+}</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <div class="preview-box">
+                  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap">
+                    <div
+                      style="
+                        width: 120px;
+                        border: 1px solid #e2e8f0;
+                        padding: 0.5rem;
+                        border-radius: 4px;
+                      "
+                    >
+                      <p style="font-size: 0.8rem; font-weight: bold">第一页</p>
+                      <p style="font-size: 0.75rem; color: #718096">第一页内容...</p>
+                    </div>
+                    <div
+                      style="
+                        width: 120px;
+                        border: 1px solid #e2e8f0;
+                        padding: 0.5rem;
+                        border-radius: 4px;
+                      "
+                    >
+                      <p style="font-size: 0.8rem; font-weight: bold">第二页</p>
+                      <p style="font-size: 0.75rem; color: #718096">第二页内容...</p>
+                    </div>
+                    <div
+                      style="
+                        width: 120px;
+                        border: 1px solid #e2e8f0;
+                        padding: 0.5rem;
+                        border-radius: 4px;
+                      "
+                    >
+                      <p style="font-size: 0.8rem; font-weight: bold">第三页</p>
+                      <p style="font-size: 0.75rem; color: #718096">第三页内容...</p>
+                    </div>
+                  </div>
+                  <p class="note">pageBreak: 'before' 会在元素前强制分页</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 高级功能演示 -->
+        <div class="advanced-section">
+          <h2 class="section-title">🚀 高级功能演示</h2>
+
+          <div class="example-tabs">
+            <button
+              v-for="(example, index) in advancedExamples"
+              :key="index"
+              :class="['tab-button', { active: currentAdvanced === index }]"
+              @click="currentAdvanced = index"
+            >
+              {{ example }}
+            </button>
+          </div>
+
+          <div class="example-content">
+            <!-- 高级1: 表格 -->
+            <div v-if="currentAdvanced === 0">
+              <h3>高级 1: 表格生成</h3>
+              <p>pdfmake的表格功能非常强大，支持表头、合并单元格、边框样式等。</p>
+
+              <div class="controls">
+                <button @click="advanced1Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '📊 生成表格PDF' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const docDefinition = {
+  content: [
+    {
+      table: {
+        headerRows: 1,
+        widths: ['*', 'auto', 100, '*'],
+        body: [
+          [
+            { text: '姓名', style: 'tableHeader' },
+            { text: '部门', style: 'tableHeader' },
+            { text: '职位', style: 'tableHeader' },
+            { text: '工资', style: 'tableHeader' }
+          ],
+          ['张三', '技术部', '前端工程师', '¥15,000'],
+          ['李四', '产品部', '产品经理', '¥18,000']
+        ]
+      },
+      layout: 'lightHorizontalLines'
+    }
+  ]
+}</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <h4>📋 表格数据预览:</h4>
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>姓名</th>
+                      <th>部门</th>
+                      <th>职位</th>
+                      <th>工资</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="i in 5" :key="i">
+                      <td>员工{{ i }}</td>
+                      <td>{{ ['技术部', '产品部', '设计部', '运营部', '市场部'][i - 1] }}</td>
+                      <td>{{ ['工程师', '产品经理', '设计师', '运营专员', '市场专员'][i - 1] }}</td>
+                      <td>¥{{ (12000 + i * 1000).toLocaleString() }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 高级2: 图片嵌入 -->
+            <div v-else-if="currentAdvanced === 1">
+              <h3>高级 2: 图片嵌入</h3>
+              <p>支持Base64图片、URL图片和SVG图片的嵌入，可以控制尺寸和对齐方式。</p>
+
+              <div class="controls">
+                <button @click="advanced2Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '🖼️ 生成图片PDF' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const docDefinition = {
+  content: [
+    { text: 'PDF中的图片', style: 'header' },
+    {
+      image: 'data:image/png;base64,...',
+      width: 200,
+      height: 150
+    },
+    // 或者使用图片对齐
+    {
+      image: 'data:image/png;base64,...',
+      width: 150,
+      alignment: 'center'
+    },
+    // 圆角图片效果 (使用SVG)
+    {
+      svg: '&lt;svg&gt;...&lt;/svg&gt;',
+      width: 100
+    }
+  ]
+}</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <div class="preview-box">
+                  <p><strong>图片预览:</strong></p>
+                  <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center">
+                    <div
+                      style="
+                        width: 150px;
+                        height: 100px;
+                        background: linear-gradient(135deg, #667eea, #764ba2);
+                        border-radius: 8px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                      "
+                    >
+                      示例图片
+                    </div>
+                    <p class="note">实际PDF中会嵌入Base64格式的图片数据</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 高级3: 水印和背景 -->
+            <div v-else-if="currentAdvanced === 2">
+              <h3>高级 3: 水印和背景</h3>
+              <p>为整个文档添加背景水印，支持文字水印和图片水印。</p>
+
+              <div class="controls">
+                <button @click="advanced3Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '💧 生成带水印PDF' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const docDefinition = {
+  background: (currentPage, pageSize) => ({
+    text: '机密文件',
+    color: '#cccccc',
+    opacity: 0.3,
+    bold: true,
+    fontSize: 60,
+    alignment: 'center',
+    margin: [0, pageSize.height / 2 - 30]
+  }),
+  content: [
+    { text: '带水印的文档', style: 'header' },
+    { text: '这是文档内容...' }
+  ]
+}</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <div class="preview-box" style="position: relative; min-height: 150px">
+                  <div
+                    style="
+                      position: absolute;
+                      top: 50%;
+                      left: 50%;
+                      transform: translate(-50%, -50%) rotate(-30deg);
+                      font-size: 2.5rem;
+                      color: rgba(200, 200, 200, 0.4);
+                      pointer-events: none;
+                      white-space: nowrap;
+                    "
+                  >
+                    机密文件
+                  </div>
+                  <p style="position: relative; z-index: 1"><strong>带水印的文档</strong></p>
+                  <p style="position: relative; z-index: 1">这是文档内容，水印显示在背景中...</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 高级4: 复杂表格 -->
+            <div v-else-if="currentAdvanced === 3">
+              <h3>高级 4: 复杂表格布局</h3>
+              <p>支持单元格合并、嵌套表格、自定义边框等高级表格功能。</p>
+
+              <div class="controls">
+                <button @click="advanced4Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '📋 生成复杂表格PDF' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const docDefinition = {
+  content: [
+    {
+      table: {
+        body: [
+          // 合并列
+          [{ text: '合并两列', colSpan: 2 }, {}, '第三列'],
+          // 合并行
+          [{ text: '合并两行', rowSpan: 2 }, 'B1', 'C1'],
+          [{}, 'B2', 'C2']
+        ]
+      }
+    }
+  ]
+}</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <div class="preview-box">
+                  <table class="data-table" style="width: 100%">
+                    <tr>
+                      <td colspan="2" style="text-align: center; background: #f0f0f0">合并两列</td>
+                      <td>第三列</td>
+                    </tr>
+                    <tr>
+                      <td rowspan="2" style="text-align: center; background: #f0f0f0">合并两行</td>
+                      <td>B1</td>
+                      <td>C1</td>
+                    </tr>
+                    <tr>
+                      <td>B2</td>
+                      <td>C2</td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- 高级5: 链接和书签 -->
+            <div v-else-if="currentAdvanced === 4">
+              <h3>高级 5: 链接和目录</h3>
+              <p>添加可点击的超链接和文档内部跳转链接，支持自动生成目录。</p>
+
+              <div class="controls">
+                <button @click="advanced5Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '🔗 生成带链接PDF' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const docDefinition = {
+  content: [
+    // 外部链接
+    {
+      text: '访问 pdfmake 官网',
+      link: 'https://pdfmake.github.io/docs/',
+      color: 'blue',
+      decoration: 'underline'
+    },
+    // 内部链接 (跳转到锚点)
+    {
+      text: '跳转到第二章',
+      linkToDestination: 'chapter2'
+    },
+    // 定义锚点
+    { text: '第二章', id: 'chapter2', pageBreak: 'before' }
+  ]
+}</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <div class="preview-box">
+                  <p>
+                    <a href="#" style="color: #667eea; text-decoration: underline"
+                      >访问 pdfmake 官网</a
+                    >
+                    (外部链接)
+                  </p>
+                  <p>
+                    <a href="#" style="color: #667eea; text-decoration: underline">跳转到第二章</a>
+                    (内部链接)
+                  </p>
+                  <p class="note">PDF中的链接可以点击跳转</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 高级6: 完整报告 -->
+            <div v-else-if="currentAdvanced === 5">
+              <h3>高级 6: 完整报告生成</h3>
+              <p>综合运用所有功能，生成包含封面、目录、正文、表格的完整报告。</p>
+
+              <div class="controls">
+                <button @click="advanced6Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '📈 生成完整报告' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const docDefinition = {
+  info: {
+    title: '年度报告',
+    author: '公司名称',
+    subject: '2024年度工作总结'
+  },
+  header: (currentPage, pageCount) =&gt; ({...}),
+  footer: (currentPage, pageCount) =&gt; ({...}),
+  content: [
+    // 封面
+    { text: '2024年度报告', style: 'title' },
+    // 目录
+    { toc: { title: { text: '目录', style: 'header' } } },
+    // 正文章节
+    { text: '第一章 概述', style: 'header', tocItem: true },
+    // 数据表格
+    { table: {...} },
+    // 图表区域
+    { image: '...' }
+  ]
+}</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <div class="preview-box">
+                  <p
+                    style="font-size: 1.5rem; font-weight: bold; text-align: center; color: #667eea"
+                  >
+                    2024年度报告
+                  </p>
+                  <div
+                    style="margin-top: 1rem; padding: 1rem; background: #f7fafc; border-radius: 4px"
+                  >
+                    <p style="font-weight: bold">目录</p>
+                    <p>1. 概述 ................ 2</p>
+                    <p>2. 业绩总结 ............ 3</p>
+                    <p>3. 数据分析 ............ 5</p>
+                    <p>4. 未来规划 ............ 8</p>
+                  </div>
+                  <p class="note">完整报告包含：封面、目录、正文、表格、图表等</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 保留原有快捷按钮 -->
+        <div class="divider"></div>
+
         <div class="controls">
           <button @click="generateSimplePDF" class="btn btn-primary" :disabled="loading">
             {{ loading ? '⏳ 生成中...' : '📄 生成简单PDF' }}
@@ -300,6 +1022,11 @@ import { configurePdfMakeChinese, getChinesePdfMakeStyles } from '@/utils/fontLo
 const loading = ref(false)
 const statusMessage = ref('')
 const fontsReady = ref(false)
+const currentExample = ref(0)
+const currentDate = ref(new Date().toLocaleDateString('zh-CN'))
+
+// 示例标签
+const examples = ['基础文档', '文本样式', '列表', '多列布局', '页眉页脚', '分页控制']
 
 // 在组件挂载时配置中文字体
 onMounted(async () => {
@@ -311,6 +1038,796 @@ onMounted(async () => {
     console.error('❌ pdfmake 字体配置失败:', error)
   }
 })
+
+// ==================== 基础功能示例函数 ====================
+
+// 示例1: 创建基础文档
+const example1Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成PDF...'
+
+  try {
+    if (!fontsReady.value) {
+      await configurePdfMakeChinese()
+      fontsReady.value = true
+    }
+
+    const chineseStyles = getChinesePdfMakeStyles()
+
+    const docDefinition: any = {
+      content: [
+        'Hello World!',
+        '这是使用 pdfmake 生成的 PDF 文档',
+        '生成时间: ' + currentDate.value,
+      ],
+      ...chineseStyles,
+    }
+
+    pdfMake.createPdf(docDefinition).download('pdfmake-basic.pdf')
+    statusMessage.value = '✅ PDF生成成功！'
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    statusMessage.value = '❌ PDF生成失败: ' + error
+  } finally {
+    loading.value = false
+  }
+}
+
+// 示例2: 文本样式
+const example2Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成PDF...'
+
+  try {
+    if (!fontsReady.value) {
+      await configurePdfMakeChinese()
+      fontsReady.value = true
+    }
+
+    const chineseStyles = getChinesePdfMakeStyles()
+
+    const docDefinition: any = {
+      content: [
+        { text: '标题文本', style: 'header' },
+        { text: '副标题', style: 'subheader' },
+        { text: '普通正文内容', fontSize: 12, margin: [0, 5, 0, 5] },
+        { text: '加粗文本', bold: true, margin: [0, 5, 0, 5] },
+        { text: '斜体文本', italics: true, margin: [0, 5, 0, 5] },
+        { text: '彩色文本', color: '#667eea', margin: [0, 5, 0, 5] },
+        { text: '带背景色的文本', background: '#fef3c7', margin: [0, 5, 0, 5] },
+        { text: '大号文本', fontSize: 18, margin: [0, 5, 0, 5] },
+        { text: '小号文本', fontSize: 8, margin: [0, 5, 0, 5] },
+      ],
+      styles: {
+        ...chineseStyles.styles,
+        header: { fontSize: 22, bold: true, color: '#667eea', margin: [0, 0, 0, 10] },
+        subheader: { fontSize: 16, bold: true, margin: [0, 10, 0, 5] },
+      },
+      defaultStyle: chineseStyles.defaultStyle,
+    }
+
+    pdfMake.createPdf(docDefinition).download('pdfmake-styles.pdf')
+    statusMessage.value = '✅ PDF生成成功！'
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    statusMessage.value = '❌ PDF生成失败: ' + error
+  } finally {
+    loading.value = false
+  }
+}
+
+// 示例3: 列表
+const example3Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成PDF...'
+
+  try {
+    if (!fontsReady.value) {
+      await configurePdfMakeChinese()
+      fontsReady.value = true
+    }
+
+    const chineseStyles = getChinesePdfMakeStyles()
+
+    const docDefinition: any = {
+      content: [
+        { text: '列表演示', style: 'header' },
+        { text: '无序列表:', style: 'subheader' },
+        {
+          ul: [
+            '第一项 - 这是无序列表的第一项',
+            '第二项 - 这是无序列表的第二项',
+            '第三项 - 这是无序列表的第三项',
+          ],
+        },
+        { text: '有序列表:', style: 'subheader', margin: [0, 15, 0, 5] },
+        {
+          ol: ['步骤一 - 准备工作', '步骤二 - 执行任务', '步骤三 - 验收结果'],
+        },
+        { text: '嵌套列表:', style: 'subheader', margin: [0, 15, 0, 5] },
+        {
+          ul: [
+            '主项目一',
+            {
+              ul: ['子项目 1.1', '子项目 1.2'],
+            },
+            '主项目二',
+            '主项目三',
+          ],
+        },
+      ],
+      styles: {
+        ...chineseStyles.styles,
+        header: { fontSize: 18, bold: true, margin: [0, 0, 0, 10] },
+        subheader: { fontSize: 14, bold: true, margin: [0, 10, 0, 5] },
+      },
+      defaultStyle: chineseStyles.defaultStyle,
+    }
+
+    pdfMake.createPdf(docDefinition).download('pdfmake-lists.pdf')
+    statusMessage.value = '✅ PDF生成成功！'
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    statusMessage.value = '❌ PDF生成失败: ' + error
+  } finally {
+    loading.value = false
+  }
+}
+
+// 示例4: 多列布局
+const example4Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成PDF...'
+
+  try {
+    if (!fontsReady.value) {
+      await configurePdfMakeChinese()
+      fontsReady.value = true
+    }
+
+    const chineseStyles = getChinesePdfMakeStyles()
+
+    const docDefinition: any = {
+      content: [
+        { text: '多列布局演示', style: 'header' },
+        { text: '两列布局:', style: 'subheader' },
+        {
+          columns: [
+            {
+              width: '50%',
+              text: '左侧列内容\n\n这是左侧列的详细内容，可以包含多行文本。pdfmake的多列布局非常灵活。',
+            },
+            {
+              width: '50%',
+              text: '右侧列内容\n\n这是右侧列的详细内容，与左侧列并排显示。',
+            },
+          ],
+          columnGap: 20,
+        },
+        { text: '三列布局:', style: 'subheader', margin: [0, 20, 0, 5] },
+        {
+          columns: [
+            { width: '*', text: '第一列\n自适应宽度', fillColor: '#f0f0f0' },
+            { width: '*', text: '第二列\n自适应宽度', fillColor: '#e0e0e0' },
+            { width: '*', text: '第三列\n自适应宽度', fillColor: '#d0d0d0' },
+          ],
+          columnGap: 10,
+        },
+        { text: '混合宽度:', style: 'subheader', margin: [0, 20, 0, 5] },
+        {
+          columns: [
+            { width: 100, text: '固定100px' },
+            { width: '*', text: '自适应宽度' },
+            { width: 'auto', text: '自动' },
+          ],
+          columnGap: 10,
+        },
+      ],
+      styles: {
+        ...chineseStyles.styles,
+        header: { fontSize: 18, bold: true, margin: [0, 0, 0, 10] },
+        subheader: { fontSize: 14, bold: true, margin: [0, 10, 0, 5] },
+      },
+      defaultStyle: chineseStyles.defaultStyle,
+    }
+
+    pdfMake.createPdf(docDefinition).download('pdfmake-columns.pdf')
+    statusMessage.value = '✅ PDF生成成功！'
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    statusMessage.value = '❌ PDF生成失败: ' + error
+  } finally {
+    loading.value = false
+  }
+}
+
+// 示例5: 页眉页脚
+const example5Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成PDF...'
+
+  try {
+    if (!fontsReady.value) {
+      await configurePdfMakeChinese()
+      fontsReady.value = true
+    }
+
+    const chineseStyles = getChinesePdfMakeStyles()
+
+    const docDefinition: any = {
+      header: {
+        text: '公司机密文件',
+        alignment: 'center',
+        margin: [0, 10, 0, 0],
+        fontSize: 10,
+        color: '#718096',
+      },
+      footer: (currentPage: number, pageCount: number) => ({
+        text: `第 ${currentPage} / ${pageCount} 页 | 生成日期: ${currentDate.value}`,
+        alignment: 'center',
+        margin: [0, 0, 0, 10],
+        fontSize: 9,
+        color: '#718096',
+      }),
+      content: [
+        { text: '带页眉页脚的文档', style: 'header' },
+        { text: '这是文档的主体内容。页眉和页脚会自动出现在每一页上。' },
+        { text: '\n' },
+        { text: '页眉通常用于显示文档标题、公司名称或机密标识。' },
+        { text: '\n' },
+        { text: '页脚通常用于显示页码、日期或版权信息。' },
+      ],
+      styles: {
+        ...chineseStyles.styles,
+        header: { fontSize: 18, bold: true, margin: [0, 0, 0, 15] },
+      },
+      defaultStyle: chineseStyles.defaultStyle,
+    }
+
+    pdfMake.createPdf(docDefinition).download('pdfmake-header-footer.pdf')
+    statusMessage.value = '✅ PDF生成成功！'
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    statusMessage.value = '❌ PDF生成失败: ' + error
+  } finally {
+    loading.value = false
+  }
+}
+
+// 示例6: 分页控制
+const example6Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成PDF...'
+
+  try {
+    if (!fontsReady.value) {
+      await configurePdfMakeChinese()
+      fontsReady.value = true
+    }
+
+    const chineseStyles = getChinesePdfMakeStyles()
+
+    const docDefinition: any = {
+      content: [
+        { text: '第一页内容', style: 'header' },
+        { text: '这是第一页的内容。' },
+        { text: '可以添加更多内容...' },
+        { text: '\n\n' },
+        { text: '第一页的结束。' },
+        { text: '第二页内容', style: 'header', pageBreak: 'before' },
+        { text: '这是第二页的内容。通过 pageBreak: "before" 强制在此元素前分页。' },
+        { text: '\n\n' },
+        { text: '第二页继续...' },
+        { text: '第三页内容', style: 'header', pageBreak: 'before' },
+        { text: '这是第三页的内容。' },
+        { text: '\n' },
+        { text: '分页控制说明:', bold: true, margin: [0, 10, 0, 5] },
+        {
+          ul: [
+            'pageBreak: "before" - 在元素前分页',
+            'pageBreak: "after" - 在元素后分页',
+            '自动分页 - 内容超出页面时自动分页',
+          ],
+        },
+      ],
+      footer: (currentPage: number, pageCount: number) => ({
+        text: `第 ${currentPage} / ${pageCount} 页`,
+        alignment: 'center',
+        margin: [0, 0, 0, 10],
+      }),
+      styles: {
+        ...chineseStyles.styles,
+        header: { fontSize: 18, bold: true, margin: [0, 0, 0, 10], color: '#667eea' },
+      },
+      defaultStyle: chineseStyles.defaultStyle,
+    }
+
+    pdfMake.createPdf(docDefinition).download('pdfmake-pagination.pdf')
+    statusMessage.value = '✅ PDF生成成功！'
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    statusMessage.value = '❌ PDF生成失败: ' + error
+  } finally {
+    loading.value = false
+  }
+}
+
+// ==================== 高级功能示例 ====================
+
+const currentAdvanced = ref(0)
+const advancedExamples = ['表格', '图片嵌入', '水印背景', '复杂表格', '链接目录', '完整报告']
+
+// 示例图片 (SVG格式)
+const sampleImage =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='150'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23764ba2;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad)' width='200' height='150'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='18' fill='white' text-anchor='middle' dominant-baseline='middle'%3Epdfmake%3C/text%3E%3C/svg%3E"
+
+// 高级1: 表格生成
+const advanced1Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成表格PDF...'
+
+  try {
+    if (!fontsReady.value) {
+      await configurePdfMakeChinese()
+      fontsReady.value = true
+    }
+
+    const chineseStyles = getChinesePdfMakeStyles()
+
+    const docDefinition: any = {
+      content: [
+        { text: '员工信息表', style: 'header' },
+        { text: '使用pdfmake生成的专业表格', style: 'subheader' },
+        {
+          table: {
+            headerRows: 1,
+            widths: ['*', 'auto', 'auto', 'auto'],
+            body: [
+              [
+                { text: '姓名', style: 'tableHeader', fillColor: '#667eea', color: 'white' },
+                { text: '部门', style: 'tableHeader', fillColor: '#667eea', color: 'white' },
+                { text: '职位', style: 'tableHeader', fillColor: '#667eea', color: 'white' },
+                { text: '工资', style: 'tableHeader', fillColor: '#667eea', color: 'white' },
+              ],
+              ['张三', '技术部', '前端工程师', '¥15,000'],
+              ['李四', '产品部', '产品经理', '¥18,000'],
+              ['王五', '设计部', 'UI设计师', '¥14,000'],
+              ['赵六', '运营部', '运营专员', '¥13,000'],
+              ['孙七', '市场部', '市场专员', '¥13,500'],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 1,
+            vLineWidth: () => 1,
+            hLineColor: () => '#e2e8f0',
+            vLineColor: () => '#e2e8f0',
+          },
+        },
+      ],
+      styles: {
+        ...chineseStyles.styles,
+        header: { fontSize: 18, bold: true, margin: [0, 0, 0, 10] },
+        subheader: { fontSize: 12, margin: [0, 0, 0, 15], color: '#718096' },
+        tableHeader: { bold: true, fontSize: 11 },
+      },
+      defaultStyle: chineseStyles.defaultStyle,
+    }
+
+    pdfMake.createPdf(docDefinition).download('pdfmake-table.pdf')
+    statusMessage.value = '✅ 表格PDF生成成功！'
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    statusMessage.value = '❌ PDF生成失败: ' + error
+  } finally {
+    loading.value = false
+  }
+}
+
+// 高级2: 图片嵌入
+const advanced2Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成图片PDF...'
+
+  try {
+    if (!fontsReady.value) {
+      await configurePdfMakeChinese()
+      fontsReady.value = true
+    }
+
+    const chineseStyles = getChinesePdfMakeStyles()
+
+    const docDefinition: any = {
+      content: [
+        { text: 'PDF中的图片', style: 'header' },
+        { text: '支持多种图片格式和对齐方式', style: 'subheader' },
+        { text: '图片居左:', margin: [0, 10, 0, 5] },
+        {
+          image: sampleImage,
+          width: 150,
+          alignment: 'left',
+        },
+        { text: '图片居中:', margin: [0, 20, 0, 5] },
+        {
+          image: sampleImage,
+          width: 150,
+          alignment: 'center',
+        },
+        { text: '图片居右:', margin: [0, 20, 0, 5] },
+        {
+          image: sampleImage,
+          width: 150,
+          alignment: 'right',
+        },
+        { text: '\n说明:', bold: true, margin: [0, 20, 0, 5] },
+        {
+          ul: [
+            '支持 PNG、JPEG、SVG 等格式',
+            '使用 Base64 编码嵌入图片',
+            '可以设置宽度、高度、对齐方式',
+            '支持图片链接功能',
+          ],
+        },
+      ],
+      styles: {
+        ...chineseStyles.styles,
+        header: { fontSize: 18, bold: true, margin: [0, 0, 0, 10] },
+        subheader: { fontSize: 12, margin: [0, 0, 0, 15], color: '#718096' },
+      },
+      defaultStyle: chineseStyles.defaultStyle,
+    }
+
+    pdfMake.createPdf(docDefinition).download('pdfmake-images.pdf')
+    statusMessage.value = '✅ 图片PDF生成成功！'
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    statusMessage.value = '❌ PDF生成失败: ' + error
+  } finally {
+    loading.value = false
+  }
+}
+
+// 高级3: 水印和背景
+const advanced3Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成带水印PDF...'
+
+  try {
+    if (!fontsReady.value) {
+      await configurePdfMakeChinese()
+      fontsReady.value = true
+    }
+
+    const chineseStyles = getChinesePdfMakeStyles()
+
+    const docDefinition: any = {
+      background: (currentPage: number, pageSize: { width: number; height: number }) => [
+        {
+          text: '机密文件',
+          color: '#cccccc',
+          opacity: 0.2,
+          bold: true,
+          fontSize: 50,
+          absolutePosition: { x: pageSize.width / 2 - 100, y: pageSize.height / 2 - 25 },
+          angle: -30,
+        },
+      ],
+      content: [
+        { text: '带水印的机密文档', style: 'header' },
+        { text: '此文档包含背景水印，用于标识文档的机密性。', margin: [0, 0, 0, 15] },
+        { text: '水印的用途:', bold: true, margin: [0, 10, 0, 5] },
+        {
+          ul: [
+            '标识文档的机密级别',
+            '防止未经授权的复制和分发',
+            '标记文档状态（如：草稿、审核中等）',
+            '增强品牌识别度',
+          ],
+        },
+        { text: '\n' },
+        { text: '水印配置选项:', bold: true, margin: [0, 10, 0, 5] },
+        {
+          ul: [
+            'text: 水印文字内容',
+            'color: 水印颜色',
+            'opacity: 透明度 (0-1)',
+            'fontSize: 字体大小',
+            'angle: 旋转角度',
+          ],
+        },
+      ],
+      styles: {
+        ...chineseStyles.styles,
+        header: { fontSize: 18, bold: true, margin: [0, 0, 0, 10] },
+      },
+      defaultStyle: chineseStyles.defaultStyle,
+    }
+
+    pdfMake.createPdf(docDefinition).download('pdfmake-watermark.pdf')
+    statusMessage.value = '✅ 水印PDF生成成功！'
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    statusMessage.value = '❌ PDF生成失败: ' + error
+  } finally {
+    loading.value = false
+  }
+}
+
+// 高级4: 复杂表格布局
+const advanced4Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成复杂表格PDF...'
+
+  try {
+    if (!fontsReady.value) {
+      await configurePdfMakeChinese()
+      fontsReady.value = true
+    }
+
+    const chineseStyles = getChinesePdfMakeStyles()
+
+    const docDefinition: any = {
+      content: [
+        { text: '复杂表格布局演示', style: 'header' },
+        { text: '单元格合并示例:', bold: true, margin: [0, 15, 0, 10] },
+        {
+          table: {
+            widths: ['*', '*', '*'],
+            body: [
+              [
+                {
+                  text: '合并两列 (colSpan: 2)',
+                  colSpan: 2,
+                  fillColor: '#e2e8f0',
+                  alignment: 'center',
+                },
+                {},
+                { text: '第三列' },
+              ],
+              [
+                {
+                  text: '合并两行\n(rowSpan: 2)',
+                  rowSpan: 2,
+                  fillColor: '#e2e8f0',
+                  alignment: 'center',
+                },
+                { text: 'B1' },
+                { text: 'C1' },
+              ],
+              [{}, { text: 'B2' }, { text: 'C2' }],
+            ],
+          },
+        },
+        { text: '嵌套内容:', bold: true, margin: [0, 20, 0, 10] },
+        {
+          table: {
+            widths: ['auto', '*'],
+            body: [
+              [
+                { text: '项目', bold: true, fillColor: '#667eea', color: 'white' },
+                { text: '详情', bold: true, fillColor: '#667eea', color: 'white' },
+              ],
+              [
+                '列表项',
+                {
+                  ul: ['子项目 1', '子项目 2', '子项目 3'],
+                },
+              ],
+              [
+                '嵌套表格',
+                {
+                  table: {
+                    body: [
+                      ['A', 'B'],
+                      ['C', 'D'],
+                    ],
+                  },
+                },
+              ],
+            ],
+          },
+        },
+      ],
+      styles: {
+        ...chineseStyles.styles,
+        header: { fontSize: 18, bold: true, margin: [0, 0, 0, 10] },
+      },
+      defaultStyle: chineseStyles.defaultStyle,
+    }
+
+    pdfMake.createPdf(docDefinition).download('pdfmake-complex-table.pdf')
+    statusMessage.value = '✅ 复杂表格PDF生成成功！'
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    statusMessage.value = '❌ PDF生成失败: ' + error
+  } finally {
+    loading.value = false
+  }
+}
+
+// 高级5: 链接和目录
+const advanced5Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成带链接PDF...'
+
+  try {
+    if (!fontsReady.value) {
+      await configurePdfMakeChinese()
+      fontsReady.value = true
+    }
+
+    const chineseStyles = getChinesePdfMakeStyles()
+
+    const docDefinition: any = {
+      content: [
+        { text: 'PDF链接演示', style: 'header' },
+        { text: '外部链接:', bold: true, margin: [0, 15, 0, 5] },
+        {
+          text: '访问 pdfmake 官方文档',
+          link: 'https://pdfmake.github.io/docs/',
+          color: '#667eea',
+          decoration: 'underline',
+          margin: [0, 0, 0, 10],
+        },
+        {
+          text: '访问 GitHub 仓库',
+          link: 'https://github.com/bpampuch/pdfmake',
+          color: '#667eea',
+          decoration: 'underline',
+          margin: [0, 0, 0, 15],
+        },
+        { text: '内部链接:', bold: true, margin: [0, 10, 0, 5] },
+        {
+          text: '跳转到第二章',
+          linkToDestination: 'chapter2',
+          color: '#667eea',
+          decoration: 'underline',
+          margin: [0, 0, 0, 20],
+        },
+        { text: '第一章 - 概述', style: 'chapter' },
+        {
+          text: '这是第一章的内容。pdfmake 支持创建包含链接的 PDF 文档，可以链接到外部网址或文档内部的其他位置。',
+        },
+        { text: '第二章 - 详细说明', style: 'chapter', id: 'chapter2', pageBreak: 'before' },
+        { text: '这是第二章的内容。您可以通过点击第一页的链接跳转到这里。' },
+        { text: '\n' },
+        { text: '链接类型:', bold: true, margin: [0, 10, 0, 5] },
+        {
+          ul: [
+            'link: 外部 URL 链接',
+            'linkToDestination: 内部锚点链接',
+            'linkToPage: 跳转到指定页码',
+          ],
+        },
+      ],
+      styles: {
+        ...chineseStyles.styles,
+        header: { fontSize: 18, bold: true, margin: [0, 0, 0, 10] },
+        chapter: { fontSize: 16, bold: true, margin: [0, 20, 0, 10], color: '#2d3748' },
+      },
+      defaultStyle: chineseStyles.defaultStyle,
+    }
+
+    pdfMake.createPdf(docDefinition).download('pdfmake-links.pdf')
+    statusMessage.value = '✅ 带链接PDF生成成功！'
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    statusMessage.value = '❌ PDF生成失败: ' + error
+  } finally {
+    loading.value = false
+  }
+}
+
+// 高级6: 完整报告生成
+const advanced6Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成完整报告...'
+
+  try {
+    if (!fontsReady.value) {
+      await configurePdfMakeChinese()
+      fontsReady.value = true
+    }
+
+    const chineseStyles = getChinesePdfMakeStyles()
+
+    const docDefinition: any = {
+      info: {
+        title: '2024年度工作报告',
+        author: '示例公司',
+        subject: '年度工作总结与规划',
+      },
+      header: (currentPage: number, pageCount: number) => {
+        if (currentPage === 1) return null
+        return {
+          text: '2024年度工作报告',
+          alignment: 'center',
+          margin: [40, 20, 40, 0],
+          fontSize: 9,
+          color: '#718096',
+        }
+      },
+      footer: (currentPage: number, pageCount: number) => ({
+        text: `第 ${currentPage} / ${pageCount} 页`,
+        alignment: 'center',
+        margin: [0, 10, 0, 0],
+        fontSize: 9,
+        color: '#718096',
+      }),
+      content: [
+        // 封面
+        { text: '\n\n\n\n\n' },
+        { text: '2024年度工作报告', style: 'title', alignment: 'center' },
+        { text: '\n' },
+        { text: '示例公司', style: 'subtitle', alignment: 'center' },
+        { text: currentDate.value, alignment: 'center', margin: [0, 20, 0, 0], color: '#718096' },
+        // 目录页
+        { text: '目录', style: 'tocTitle', pageBreak: 'before' },
+        {
+          toc: {
+            numberStyle: { bold: true },
+          },
+        },
+        // 第一章
+        { text: '第一章 年度概述', style: 'chapter', tocItem: true, pageBreak: 'before' },
+        {
+          text: '2024年是公司发展的重要一年。在全体员工的共同努力下，我们取得了显著的成绩。',
+          margin: [0, 10, 0, 10],
+        },
+        // 第二章
+        { text: '第二章 业绩数据', style: 'chapter', tocItem: true, pageBreak: 'before' },
+        { text: '季度业绩表:', bold: true, margin: [0, 10, 0, 10] },
+        {
+          table: {
+            headerRows: 1,
+            widths: ['*', 'auto', 'auto', 'auto'],
+            body: [
+              [
+                { text: '季度', fillColor: '#667eea', color: 'white', bold: true },
+                { text: '收入', fillColor: '#667eea', color: 'white', bold: true },
+                { text: '支出', fillColor: '#667eea', color: 'white', bold: true },
+                { text: '利润', fillColor: '#667eea', color: 'white', bold: true },
+              ],
+              ['Q1', '¥120万', '¥80万', '¥40万'],
+              ['Q2', '¥150万', '¥90万', '¥60万'],
+              ['Q3', '¥180万', '¥100万', '¥80万'],
+              ['Q4', '¥200万', '¥110万', '¥90万'],
+              [
+                { text: '合计', bold: true },
+                { text: '¥650万', bold: true },
+                { text: '¥380万', bold: true },
+                { text: '¥270万', bold: true },
+              ],
+            ],
+          },
+        },
+        // 第三章
+        { text: '第三章 未来规划', style: 'chapter', tocItem: true, pageBreak: 'before' },
+        { text: '2025年重点工作:', bold: true, margin: [0, 10, 0, 10] },
+        {
+          ol: ['持续优化产品质量', '拓展海外市场', '加强团队建设', '推进数字化转型'],
+        },
+      ],
+      styles: {
+        ...chineseStyles.styles,
+        title: { fontSize: 28, bold: true, color: '#667eea' },
+        subtitle: { fontSize: 16, color: '#4a5568' },
+        tocTitle: { fontSize: 18, bold: true, margin: [0, 0, 0, 20] },
+        chapter: { fontSize: 18, bold: true, margin: [0, 20, 0, 10], color: '#2d3748' },
+      },
+      defaultStyle: chineseStyles.defaultStyle,
+    }
+
+    pdfMake.createPdf(docDefinition).download('pdfmake-report.pdf')
+    statusMessage.value = '✅ 完整报告生成成功！'
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    statusMessage.value = '❌ PDF生成失败: ' + error
+  } finally {
+    loading.value = false
+  }
+}
+
+// ==================== 原有快捷功能 ====================
 
 const generateSimplePDF = async () => {
   if (!fontsReady.value) {
@@ -534,8 +2051,8 @@ const generateComplexPDF = async () => {
           bold: true,
           margin: [0, 0, 0, 5],
         },
+        ...chineseStyles.styles,
       },
-      ...chineseStyles,
     }
 
     pdfMake.createPdf(docDefinition).download('pdfmake-chinese-complex.pdf')
@@ -709,12 +2226,8 @@ const generateReportPDF = async () => {
           bold: true,
           margin: [0, 10, 0, 8],
         },
-        tableHeader: {
-          bold: true,
-          color: 'white',
-        },
+        ...chineseStyles.styles,
       },
-      ...chineseStyles,
     }
 
     pdfMake.createPdf(docDefinition).download('前端打印完整调研报告.pdf')
@@ -966,5 +2479,156 @@ const generateReportPDF = async () => {
   font-family: 'Courier New', monospace;
   font-size: 0.9rem;
   line-height: 1.6;
+}
+
+/* 示例展示区域样式 */
+.examples-section {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  color: #667eea;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #667eea;
+}
+
+.example-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.tab-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.tab-button:hover {
+  background: #f7fafc;
+  border-color: #667eea;
+}
+
+.tab-button.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.example-content {
+  background: #f7fafc;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.example-content h3 {
+  color: #2d3748;
+  margin-bottom: 0.75rem;
+}
+
+.example-content p {
+  color: #4a5568;
+  margin-bottom: 1rem;
+}
+
+.code-display {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.code-display h4 {
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.code-display pre {
+  background: #2d3748;
+  color: #e2e8f0;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.demo-content {
+  margin-top: 1rem;
+}
+
+.demo-content h4 {
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.preview-box {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 1.5rem;
+}
+
+.preview-box p {
+  margin: 0.5rem 0;
+}
+
+.preview-box .note {
+  color: #718096;
+  font-size: 0.9rem;
+  font-style: italic;
+  margin-top: 1rem;
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+  margin: 2rem 0;
+}
+
+/* 高级功能区域样式 */
+.advanced-section {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.data-table th,
+.data-table td {
+  border: 1px solid #e2e8f0;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.data-table th {
+  background: #667eea;
+  color: white;
+  font-weight: 600;
+}
+
+.data-table tr:nth-child(even) {
+  background: #f7fafc;
 }
 </style>

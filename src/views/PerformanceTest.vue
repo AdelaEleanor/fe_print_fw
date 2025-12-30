@@ -1799,7 +1799,7 @@ const getBarColor = (time: number) => {
 const getSizeBarWidth = (sizeStr: string) => {
   // 从字符串中提取数字（KB 或 MB）
   const match = sizeStr.match(/(\d+(?:\.\d+)?)\s*(KB|MB|GB)/i)
-  if (!match) return 0
+  if (!match || !match[1] || !match[2]) return 0
 
   let sizeInKB = parseFloat(match[1])
   const unit = match[2].toUpperCase()
@@ -1811,7 +1811,7 @@ const getSizeBarWidth = (sizeStr: string) => {
   // 找出最大值用于计算百分比
   const allSizes = testResults.value.map((r) => {
     const m = r.size.match(/(\d+(?:\.\d+)?)\s*(KB|MB|GB)/i)
-    if (!m) return 0
+    if (!m || !m[1] || !m[2]) return 0
     let size = parseFloat(m[1])
     const u = m[2].toUpperCase()
     if (u === 'MB') size *= 1024
@@ -1825,7 +1825,7 @@ const getSizeBarWidth = (sizeStr: string) => {
 
 const getSizeBarColor = (sizeStr: string) => {
   const match = sizeStr.match(/(\d+(?:\.\d+)?)\s*(KB|MB|GB)/i)
-  if (!match) return '#cbd5e0'
+  if (!match || !match[1] || !match[2]) return '#cbd5e0'
 
   let sizeInKB = parseFloat(match[1])
   const unit = match[2].toUpperCase()

@@ -85,6 +85,650 @@
       </aside>
 
       <main class="demo-panel">
+        <h2 class="section-title">📝 基础PDF生成</h2>
+
+        <!-- 示例选择标签 -->
+        <div class="example-tabs">
+          <button
+            v-for="(example, index) in examples"
+            :key="index"
+            :class="['tab-button', { active: currentExample === index }]"
+            @click="currentExample = index"
+          >
+            {{ example }}
+          </button>
+        </div>
+
+        <!-- 示例内容区 -->
+        <div class="example-content">
+          <!-- 示例1: 创建基础PDF -->
+          <div v-if="currentExample === 0">
+            <h3>示例 1: 创建基础PDF文档</h3>
+            <p>最简单的PDF生成方式，创建一个包含文本的PDF文档。</p>
+
+            <div class="controls">
+              <button @click="example1Generate" class="btn btn-primary" :disabled="loading">
+                {{ loading ? '⏳ 生成中...' : '📄 生成基础PDF' }}
+              </button>
+            </div>
+
+            <div class="code-display">
+              <h4>代码示例:</h4>
+              <pre><code>import { jsPDF } from 'jspdf'
+
+const doc = new jsPDF()
+
+// 添加文本
+doc.text('Hello World!', 10, 10)
+doc.text('这是使用 jsPDF 生成的 PDF 文档', 10, 20)
+
+// 保存PDF
+doc.save('basic.pdf')</code></pre>
+            </div>
+
+            <div class="demo-content">
+              <h4>📋 PDF内容预览:</h4>
+              <div class="preview-box">
+                <p><strong>标题:</strong> Hello World!</p>
+                <p><strong>内容:</strong> 这是使用 jsPDF 生成的 PDF 文档</p>
+                <p><strong>生成时间:</strong> {{ currentDate }}</p>
+                <p class="note">点击按钮将生成并下载PDF文件</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 示例2: 文本样式 -->
+          <div v-else-if="currentExample === 1">
+            <h3>示例 2: 文本样式和格式</h3>
+            <p>设置字体大小、样式、颜色等属性，创建格式丰富的PDF。</p>
+
+            <div class="controls">
+              <button @click="example2Generate" class="btn btn-primary" :disabled="loading">
+                {{ loading ? '⏳ 生成中...' : '🎨 生成样式PDF' }}
+              </button>
+            </div>
+
+            <div class="code-display">
+              <h4>代码示例:</h4>
+              <pre><code>const doc = new jsPDF()
+
+// 设置字体大小和样式
+doc.setFontSize(24)
+doc.setFont('helvetica', 'bold')
+doc.text('PDF标题', 10, 20)
+
+// 设置颜色
+doc.setTextColor(102, 126, 234)
+doc.setFontSize(16)
+doc.text('带颜色的文本', 10, 35)
+
+// 普通文本
+doc.setTextColor(0, 0, 0)
+doc.setFontSize(12)
+doc.text('这是正常大小的文本', 10, 50)
+
+doc.save('styled.pdf')</code></pre>
+            </div>
+
+            <div class="demo-content">
+              <h4>📋 样式示例:</h4>
+              <div class="preview-box">
+                <p style="font-size: 24px; font-weight: bold">PDF标题</p>
+                <p style="font-size: 16px; color: #667eea">带颜色的文本</p>
+                <p style="font-size: 12px">这是正常大小的文本</p>
+                <p class="note">PDF中将应用这些样式</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 示例3: 绘制图形 -->
+          <div v-else-if="currentExample === 2">
+            <h3>示例 3: 绘制图形和线条</h3>
+            <p>使用jsPDF的图形API绘制矩形、圆形、线条等基本图形。</p>
+
+            <div class="controls">
+              <button @click="example3Generate" class="btn btn-primary" :disabled="loading">
+                {{ loading ? '⏳ 生成中...' : '🎨 生成图形PDF' }}
+              </button>
+            </div>
+
+            <div class="code-display">
+              <h4>代码示例:</h4>
+              <pre><code>const doc = new jsPDF()
+
+// 绘制矩形（边框）
+doc.rect(10, 10, 50, 30)
+
+// 绘制填充矩形
+doc.setFillColor(102, 126, 234)
+doc.rect(70, 10, 50, 30, 'F')
+
+// 绘制圆形
+doc.circle(35, 70, 20)
+
+// 绘制线条
+doc.line(10, 110, 100, 110)
+
+// 设置线条粗细和颜色
+doc.setLineWidth(2)
+doc.setDrawColor(255, 0, 0)
+doc.line(10, 120, 100, 120)
+
+doc.save('shapes.pdf')</code></pre>
+            </div>
+
+            <div class="demo-content">
+              <h4>📋 图形预览:</h4>
+              <div class="preview-box">
+                <svg width="200" height="150" style="border: 1px solid #e2e8f0">
+                  <rect x="10" y="10" width="50" height="30" fill="none" stroke="black" />
+                  <rect x="70" y="10" width="50" height="30" fill="#667eea" />
+                  <circle cx="35" cy="70" r="20" fill="none" stroke="black" />
+                  <line x1="10" y1="110" x2="100" y2="110" stroke="black" />
+                  <line x1="10" y1="120" x2="100" y2="120" stroke="red" stroke-width="2" />
+                </svg>
+                <p class="note">PDF中将包含这些图形</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 示例4: 多页文档 -->
+          <div v-else-if="currentExample === 3">
+            <h3>示例 4: 创建多页PDF文档</h3>
+            <p>使用addPage()方法创建多页PDF文档，适合长内容分页。</p>
+
+            <div class="controls">
+              <button @click="example4Generate" class="btn btn-primary" :disabled="loading">
+                {{ loading ? '⏳ 生成中...' : '📑 生成多页PDF' }}
+              </button>
+            </div>
+
+            <div class="code-display">
+              <h4>代码示例:</h4>
+              <pre><code>const doc = new jsPDF()
+
+// 第一页
+doc.setFontSize(20)
+doc.text('第一页', 10, 20)
+doc.setFontSize(12)
+doc.text('这是第一页的内容', 10, 40)
+
+// 添加新页面
+doc.addPage()
+
+// 第二页
+doc.setFontSize(20)
+doc.text('第二页', 10, 20)
+doc.setFontSize(12)
+doc.text('这是第二页的内容', 10, 40)
+
+// 添加第三页
+doc.addPage()
+doc.text('第三页', 10, 20)
+
+doc.save('multi-page.pdf')</code></pre>
+            </div>
+
+            <div class="demo-content">
+              <h4>📋 页面预览:</h4>
+              <div class="preview-box">
+                <div class="page-preview"><strong>第1页:</strong> 封面和介绍</div>
+                <div class="page-preview"><strong>第2页:</strong> 主要内容</div>
+                <div class="page-preview"><strong>第3页:</strong> 总结</div>
+                <p class="note">生成的PDF将包含3页内容</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 示例5: 页面配置 -->
+          <div v-else-if="currentExample === 4">
+            <h3>示例 5: 自定义页面配置</h3>
+            <p>配置页面方向、尺寸、单位等参数，创建符合需求的PDF。</p>
+
+            <div class="controls">
+              <label>
+                页面方向:
+                <select v-model="pageOrientation" class="select-input">
+                  <option value="portrait">纵向</option>
+                  <option value="landscape">横向</option>
+                </select>
+              </label>
+              <button @click="example5Generate" class="btn btn-primary" :disabled="loading">
+                {{ loading ? '⏳ 生成中...' : '📐 生成自定义PDF' }}
+              </button>
+            </div>
+
+            <div class="code-display">
+              <h4>代码示例:</h4>
+              <pre><code>// 纵向A4
+const doc = new jsPDF('portrait', 'mm', 'a4')
+
+// 横向A4
+const doc = new jsPDF('landscape', 'mm', 'a4')
+
+// 完整配置
+const doc = new jsPDF({
+  orientation: '{{ pageOrientation }}',
+  unit: 'mm',
+  format: 'a4'
+})
+
+doc.text('自定义页面配置', 10, 10)
+doc.save('custom.pdf')</code></pre>
+            </div>
+
+            <div class="demo-content">
+              <h4>📋 配置说明:</h4>
+              <div class="preview-box">
+                <p>
+                  <strong>当前方向:</strong> {{ pageOrientation === 'portrait' ? '纵向' : '横向' }}
+                </p>
+                <p><strong>页面格式:</strong> A4 (210mm × 297mm)</p>
+                <p><strong>单位:</strong> 毫米 (mm)</p>
+                <p class="note">可选格式: a4, a3, letter, legal等</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 示例6: 嵌入图片 -->
+          <div v-else-if="currentExample === 5">
+            <h3>示例 6: 在PDF中嵌入图片</h3>
+            <p>使用addImage方法将图片嵌入到PDF文档中。</p>
+
+            <div class="controls">
+              <button @click="example6Generate" class="btn btn-primary" :disabled="loading">
+                {{ loading ? '⏳ 生成中...' : '🖼️ 生成图片PDF' }}
+              </button>
+            </div>
+
+            <div class="code-display">
+              <h4>代码示例:</h4>
+              <pre><code>const doc = new jsPDF()
+
+// 图片数据（base64或DataURL）
+const imgData = 'data:image/png;base64,...'
+
+// 添加图片
+// addImage(imageData, format, x, y, width, height)
+doc.addImage(imgData, 'PNG', 10, 10, 100, 80)
+
+doc.text('PDF中的图片示例', 10, 100)
+
+doc.save('image.pdf')</code></pre>
+            </div>
+
+            <div class="demo-content">
+              <h4>📋 图片预览:</h4>
+              <div class="preview-box">
+                <img
+                  :src="sampleImage"
+                  alt="示例图片"
+                  style="max-width: 200px; border: 1px solid #e2e8f0; border-radius: 4px"
+                />
+                <p class="note">此图片将被嵌入到PDF中</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 高级功能演示 -->
+        <div class="advanced-section">
+          <h2 class="section-title">🚀 高级功能演示</h2>
+
+          <div class="example-tabs">
+            <button
+              v-for="(example, index) in advancedExamples"
+              :key="index"
+              :class="['tab-button', { active: currentAdvanced === index }]"
+              @click="currentAdvanced = index"
+            >
+              {{ example }}
+            </button>
+          </div>
+
+          <div class="example-content">
+            <!-- 高级1: 表格生成 (autoTable) -->
+            <div v-if="currentAdvanced === 0">
+              <h3>高级 1: 表格生成 (autoTable插件)</h3>
+              <p>使用jsPDF-autoTable插件快速生成专业的表格，支持自动分页和样式定制。</p>
+
+              <div class="controls">
+                <button @click="advanced1Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '📊 生成表格PDF' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre><code>import 'jspdf-autotable'
+
+const doc = new jsPDF()
+
+doc.autoTable({
+  head: [['姓名', '部门', '职位', '工资']],
+  body: [
+    ['张三', '技术部', '工程师', '¥15,000'],
+    ['李四', '产品部', '产品经理', '¥18,000'],
+    // ... 更多数据
+  ],
+  startY: 20,
+  theme: 'grid',
+  headStyles: {
+    fillColor: [102, 126, 234],
+    textColor: 255,
+    fontStyle: 'bold'
+  },
+  styles: {
+    font: 'helvetica',
+    fontSize: 10
+  }
+})
+
+doc.save('table.pdf')</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <h4>📋 表格数据预览:</h4>
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>姓名</th>
+                      <th>部门</th>
+                      <th>职位</th>
+                      <th>工资</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="i in 5" :key="i">
+                      <td>员工{{ i }}</td>
+                      <td>{{ ['技术部', '产品部', '设计部', '运营部', '市场部'][i - 1] }}</td>
+                      <td>{{ ['工程师', '产品经理', '设计师', '运营专员', '市场专员'][i - 1] }}</td>
+                      <td>¥{{ 12000 + i * 1000 }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 高级2: 自动分页 -->
+            <div v-else-if="currentAdvanced === 1">
+              <h3>高级 2: 自动分页处理</h3>
+              <p>当内容超过一页时，自动添加新页面并继续渲染内容。</p>
+
+              <div class="controls">
+                <label>
+                  生成行数:
+                  <input
+                    v-model.number="autoPageLines"
+                    type="number"
+                    min="10"
+                    max="200"
+                    class="number-input"
+                  />
+                </label>
+                <button @click="advanced2Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '📑 生成自动分页PDF' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const doc = new jsPDF()
+const pageHeight = doc.internal.pageSize.height
+let yPosition = 20
+
+for (let i = 0; i &lt; totalLines; i++) {
+  // 检查是否需要换页
+  if (yPosition &gt; pageHeight - 20) {
+    doc.addPage()
+    yPosition = 20
+  }
+
+  doc.text(`第 ${i + 1} 行内容`, 10, yPosition)
+  yPosition += 10
+}
+
+doc.save('auto-page.pdf')</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <div class="preview-box">
+                  <p><strong>当前设置:</strong> 生成 {{ autoPageLines }} 行内容</p>
+                  <p><strong>预计页数:</strong> 约 {{ Math.ceil(autoPageLines / 25) }} 页</p>
+                  <p class="note">内容超出当前页面高度时将自动添加新页</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 高级3: 添加页眉页脚 -->
+            <div v-else-if="currentAdvanced === 2">
+              <h3>高级 3: 页眉和页脚</h3>
+              <p>为每一页添加页眉、页脚和页码，增强文档专业性。</p>
+
+              <div class="controls">
+                <button @click="advanced3Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '📄 生成带页眉页脚PDF' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const doc = new jsPDF()
+const pageCount = 3
+
+for (let i = 1; i &lt;= pageCount; i++) {
+  if (i &gt; 1) doc.addPage()
+
+  // 页眉
+  doc.setFontSize(10)
+  doc.setTextColor(100)
+  doc.text('公司机密文件', 105, 10, { align: 'center' })
+  doc.line(10, 12, 200, 12)
+
+  // 内容
+  doc.setFontSize(14)
+  doc.setTextColor(0)
+  doc.text(`第 ${i} 页内容`, 10, 30)
+
+  // 页脚
+  doc.setFontSize(10)
+  doc.setTextColor(100)
+  doc.line(10, 285, 200, 285)
+  doc.text(`第 ${i}/${pageCount} 页`, 105, 290, { align: 'center' })
+}
+
+doc.save('header-footer.pdf')</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <div class="preview-box">
+                  <div style="border: 1px solid #e2e8f0; padding: 1rem; margin: 0.5rem 0">
+                    <p
+                      style="
+                        text-align: center;
+                        color: #718096;
+                        font-size: 0.9rem;
+                        border-bottom: 1px solid #e2e8f0;
+                        padding-bottom: 0.5rem;
+                      "
+                    >
+                      公司机密文件
+                    </p>
+                    <p style="margin: 1rem 0"><strong>页面内容区域</strong></p>
+                    <p
+                      style="
+                        text-align: center;
+                        color: #718096;
+                        font-size: 0.9rem;
+                        border-top: 1px solid #e2e8f0;
+                        padding-top: 0.5rem;
+                      "
+                    >
+                      第 1/3 页
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 高级4: 文本换行和对齐 -->
+            <div v-else-if="currentAdvanced === 3">
+              <h3>高级 4: 文本换行和对齐</h3>
+              <p>使用splitTextToSize实现文本自动换行，支持多种对齐方式。</p>
+
+              <div class="controls">
+                <button @click="advanced4Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '📝 生成文本换行PDF' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre><code>const doc = new jsPDF()
+const longText = '这是一段很长的文本...'
+
+// 自动换行
+const maxWidth = 180
+const lines = doc.splitTextToSize(longText, maxWidth)
+doc.text(lines, 10, 20)
+
+// 左对齐
+doc.text('左对齐文本', 10, 60)
+
+// 居中对齐
+doc.text('居中对齐文本', 105, 80, { align: 'center' })
+
+// 右对齐
+doc.text('右对齐文本', 200, 100, { align: 'right' })
+
+doc.save('text-align.pdf')</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <div class="preview-box">
+                  <p style="text-align: left">← 左对齐文本</p>
+                  <p style="text-align: center">居中对齐文本</p>
+                  <p style="text-align: right">右对齐文本 →</p>
+                  <p style="margin-top: 1rem; border-top: 1px solid #e2e8f0; padding-top: 1rem">
+                    这是一段很长的文本，当文本超过指定宽度时，jsPDF的splitTextToSize方法会自动将其分割成多行，确保内容不会超出页面边界。这个功能对于处理动态内容非常有用。
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 高级5: 链接和书签 -->
+            <div v-else-if="currentAdvanced === 4">
+              <h3>高级 5: 添加链接和书签</h3>
+              <p>在PDF中添加可点击的超链接和内部跳转链接。</p>
+
+              <div class="controls">
+                <button @click="advanced5Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '🔗 生成带链接PDF' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre><code>const doc = new jsPDF()
+
+// 添加外部链接
+doc.text('访问 jsPDF 官网', 10, 20)
+doc.link(10, 15, 50, 10, { url: 'https://github.com/parallax/jsPDF' })
+
+// 添加内部链接
+doc.text('点击跳转到第二页', 10, 40)
+doc.link(10, 35, 60, 10, { pageNumber: 2 })
+
+// 第二页
+doc.addPage()
+doc.text('这是第二页', 10, 20)
+
+doc.save('links.pdf')</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <div class="preview-box">
+                  <p>
+                    <a href="#" style="color: #667eea; text-decoration: underline"
+                      >访问 jsPDF 官网</a
+                    >
+                    (外部链接)
+                  </p>
+                  <p>
+                    <a href="#" style="color: #667eea; text-decoration: underline"
+                      >点击跳转到第二页</a
+                    >
+                    (内部链接)
+                  </p>
+                  <p class="note">PDF中的链接区域可以点击跳转</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 高级6: 水印和背景 -->
+            <div v-else-if="currentAdvanced === 5">
+              <h3>高级 6: 添加水印和背景</h3>
+              <p>为PDF添加半透明水印或背景图片，增强文档安全性。</p>
+
+              <div class="controls">
+                <button @click="advanced6Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '💧 生成带水印PDF' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre><code>const doc = new jsPDF()
+
+// 设置透明度
+doc.setGState(new doc.GState({ opacity: 0.2 }))
+
+// 添加旋转的水印文字
+doc.setFontSize(60)
+doc.setTextColor(200, 200, 200)
+doc.text('机密文件', 105, 150, {
+  align: 'center',
+  angle: 45
+})
+
+// 恢复正常透明度
+doc.setGState(new doc.GState({ opacity: 1 }))
+
+// 添加正常内容
+doc.setFontSize(14)
+doc.setTextColor(0, 0, 0)
+doc.text('这是带水印的文档内容', 10, 20)
+
+doc.save('watermark.pdf')</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <div class="preview-box" style="position: relative">
+                  <div
+                    style="
+                      position: absolute;
+                      top: 50%;
+                      left: 50%;
+                      transform: translate(-50%, -50%) rotate(45deg);
+                      font-size: 3rem;
+                      color: rgba(200, 200, 200, 0.3);
+                      pointer-events: none;
+                    "
+                  >
+                    机密文件
+                  </div>
+                  <p><strong>这是带水印的文档内容</strong></p>
+                  <p>水印以半透明形式显示在背景中</p>
+                  <p class="note">水印不会影响正常内容的阅读</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 保留原有文档 -->
+        <div class="divider"></div>
+
         <div class="controls">
           <button @click="generateBasicPDF" class="btn btn-primary" :disabled="loading">
             {{ loading ? '⏳ 生成中...' : '📄 生成基础PDF' }}
@@ -253,6 +897,532 @@ import { createChineseJsPDF } from '@/utils/fontLoader'
 
 const loading = ref(false)
 const statusMessage = ref('')
+const currentExample = ref(0)
+const currentDate = ref(new Date().toLocaleDateString('zh-CN'))
+const pageOrientation = ref<'portrait' | 'landscape'>('portrait')
+
+// 示例标签
+const examples = ['基础PDF', '文本样式', '绘制图形', '多页文档', '页面配置', '嵌入图片']
+
+// 高级功能标签
+const currentAdvanced = ref(0)
+const advancedExamples = ['表格生成', '自动分页', '页眉页脚', '文本换行', '链接书签', '水印背景']
+
+const autoPageLines = ref(50)
+
+// 示例图片
+const sampleImage =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='160'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23764ba2;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad)' width='200' height='160'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='20' fill='white' text-anchor='middle' dominant-baseline='middle'%3EjsPDF%3C/text%3E%3C/svg%3E"
+
+// 示例1: 创建基础PDF
+const example1Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成PDF...'
+
+  try {
+    const doc = await createChineseJsPDF()
+
+    doc.text('Hello World!', 10, 10)
+    doc.text('这是使用 jsPDF 生成的 PDF 文档', 10, 20)
+    doc.text('生成时间: ' + currentDate.value, 10, 30)
+
+    doc.save('basic-example.pdf')
+    statusMessage.value = ''
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    alert('PDF生成失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 示例2: 文本样式
+const example2Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成PDF...'
+
+  try {
+    const doc = await createChineseJsPDF()
+
+    // 大标题
+    doc.setFontSize(24)
+    doc.setFont('SourceHanSansSC', 'bold')
+    doc.text('PDF文档标题', 10, 20)
+
+    // 带颜色的副标题
+    doc.setTextColor(102, 126, 234)
+    doc.setFontSize(16)
+    doc.text('带颜色的文本示例', 10, 35)
+
+    // 普通文本
+    doc.setTextColor(0, 0, 0)
+    doc.setFontSize(12)
+    doc.setFont('SourceHanSansSC', 'normal')
+    doc.text('这是正常大小的文本', 10, 50)
+
+    // 粗体
+    doc.setFont('SourceHanSansSC', 'bold')
+    doc.text('这是粗体文本', 10, 65)
+
+    doc.save('styled-text.pdf')
+    statusMessage.value = ''
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    alert('PDF生成失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 示例3: 绘制图形
+const example3Generate = () => {
+  loading.value = true
+  statusMessage.value = '正在生成PDF...'
+
+  try {
+    const doc = new jsPDF()
+
+    doc.setFontSize(16)
+    doc.text('Shapes and Graphics', 10, 10)
+
+    // 矩形（边框）
+    doc.rect(10, 20, 50, 30)
+
+    // 填充矩形
+    doc.setFillColor(102, 126, 234)
+    doc.rect(70, 20, 50, 30, 'F')
+
+    // 边框+填充矩形
+    doc.setFillColor(72, 187, 120)
+    doc.rect(130, 20, 50, 30, 'FD')
+
+    // 圆形
+    doc.circle(35, 80, 20)
+
+    // 填充圆形
+    doc.setFillColor(237, 137, 54)
+    doc.circle(95, 80, 20, 'F')
+
+    // 线条
+    doc.line(10, 120, 100, 120)
+
+    // 粗线条
+    doc.setLineWidth(2)
+    doc.setDrawColor(255, 0, 0)
+    doc.line(10, 130, 100, 130)
+
+    doc.save('shapes.pdf')
+    statusMessage.value = ''
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    alert('PDF生成失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 示例4: 多页文档
+const example4Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成PDF...'
+
+  try {
+    const doc = await createChineseJsPDF()
+
+    // 第一页
+    doc.setFontSize(20)
+    doc.text('第一页', 10, 20)
+    doc.setFontSize(12)
+    doc.text('这是第一页的内容。', 10, 40)
+    doc.text('我们将添加更多页面到这个文档中。', 10, 50)
+
+    // 添加第二页
+    doc.addPage()
+    doc.setFontSize(20)
+    doc.text('第二页', 10, 20)
+    doc.setFontSize(12)
+    doc.text('这是第二页的内容。', 10, 40)
+    doc.text('你可以根据需要添加任意数量的页面。', 10, 50)
+
+    // 添加第三页
+    doc.addPage()
+    doc.setFontSize(20)
+    doc.text('第三页', 10, 20)
+    doc.setFontSize(12)
+    doc.text('这是最后一页。', 10, 40)
+    doc.text('生成时间: ' + currentDate.value, 10, 50)
+
+    doc.save('multi-page.pdf')
+    statusMessage.value = ''
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    alert('PDF生成失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 示例5: 页面配置
+const example5Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成PDF...'
+
+  try {
+    const doc = await createChineseJsPDF({
+      orientation: pageOrientation.value,
+      unit: 'mm',
+      format: 'a4',
+    })
+
+    doc.setFontSize(16)
+    doc.text('自定义页面配置', 10, 20)
+    doc.setFontSize(12)
+    doc.text('方向: ' + (pageOrientation.value === 'portrait' ? '纵向' : '横向'), 10, 35)
+    doc.text('格式: A4', 10, 45)
+    doc.text('单位: mm', 10, 55)
+
+    doc.save('custom-config.pdf')
+    statusMessage.value = ''
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    alert('PDF生成失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 示例6: 嵌入图片
+const example6Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成PDF...'
+
+  try {
+    const doc = await createChineseJsPDF()
+
+    doc.setFontSize(16)
+    doc.text('PDF中的图片', 10, 10)
+
+    // 添加图片
+    doc.addImage(sampleImage, 'PNG', 10, 20, 100, 80)
+
+    doc.setFontSize(12)
+    doc.text('这个PDF包含一张嵌入的图片。', 10, 110)
+
+    doc.save('image-example.pdf')
+    statusMessage.value = ''
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    alert('PDF生成失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// ==================== 高级功能函数 ====================
+
+// 高级1: 表格生成 (autoTable)
+const advanced1Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成表格PDF...'
+
+  try {
+    const doc = await createChineseJsPDF()
+
+    doc.setFontSize(16)
+    doc.text('员工信息表', 105, 15, { align: 'center' })
+
+    // 注意: jsPDF-autoTable 需要单独安装
+    // 这里使用模拟的表格绘制
+    const headers = ['姓名', '部门', '职位', '工资']
+    const data = [
+      ['张三', '技术部', '前端工程师', '¥15,000'],
+      ['李四', '产品部', '产品经理', '¥18,000'],
+      ['王五', '设计部', 'UI设计师', '¥14,000'],
+      ['赵六', '运营部', '运营专员', '¥13,000'],
+      ['孙七', '市场部', '市场专员', '¥13,000'],
+    ]
+
+    let y = 30
+    const cellWidth = 45
+    const cellHeight = 10
+
+    // 绘制表头
+    doc.setFillColor(102, 126, 234)
+    doc.setTextColor(255, 255, 255)
+    doc.setFontSize(12)
+    headers.forEach((header, i) => {
+      doc.rect(10 + i * cellWidth, y, cellWidth, cellHeight, 'F')
+      doc.text(header, 10 + i * cellWidth + cellWidth / 2, y + 7, { align: 'center' })
+    })
+
+    // 绘制数据行
+    doc.setTextColor(0, 0, 0)
+    doc.setFontSize(10)
+    data.forEach((row, rowIndex) => {
+      y += cellHeight
+      row.forEach((cell, cellIndex) => {
+        doc.rect(10 + cellIndex * cellWidth, y, cellWidth, cellHeight)
+        doc.text(cell, 10 + cellIndex * cellWidth + cellWidth / 2, y + 7, { align: 'center' })
+      })
+    })
+
+    doc.save('table-example.pdf')
+    statusMessage.value = '表格PDF生成成功！'
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    alert('PDF生成失败: ' + error)
+    statusMessage.value = ''
+  } finally {
+    loading.value = false
+  }
+}
+
+// 高级2: 自动分页处理
+const advanced2Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成多页PDF...'
+
+  try {
+    const doc = await createChineseJsPDF()
+    const pageHeight = doc.internal.pageSize.height
+    const margin = 20
+    let yPosition = margin
+
+    doc.setFontSize(14)
+    doc.text('自动分页演示', 105, yPosition, { align: 'center' })
+    yPosition += 15
+
+    doc.setFontSize(10)
+    const lineHeight = 8
+
+    for (let i = 0; i < autoPageLines.value; i++) {
+      // 检查是否需要换页
+      if (yPosition > pageHeight - margin) {
+        doc.addPage()
+        yPosition = margin
+      }
+
+      doc.text(`第 ${i + 1} 行内容 - 这是自动分页的演示文本`, 10, yPosition)
+      yPosition += lineHeight
+    }
+
+    doc.save('auto-page-example.pdf')
+    statusMessage.value = `成功生成${Math.ceil(autoPageLines.value / 30)}页PDF！`
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    alert('PDF生成失败: ' + error)
+    statusMessage.value = ''
+  } finally {
+    loading.value = false
+  }
+}
+
+// 高级3: 页眉和页脚
+const advanced3Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成带页眉页脚的PDF...'
+
+  try {
+    const doc = await createChineseJsPDF()
+    const pageCount = 3
+    const pageWidth = doc.internal.pageSize.width
+    const pageHeight = doc.internal.pageSize.height
+
+    for (let i = 1; i <= pageCount; i++) {
+      if (i > 1) doc.addPage()
+
+      // 页眉
+      doc.setFontSize(10)
+      doc.setTextColor(100, 100, 100)
+      doc.text('公司机密文件', pageWidth / 2, 10, { align: 'center' })
+      doc.line(10, 12, pageWidth - 10, 12)
+
+      // 内容
+      doc.setFontSize(14)
+      doc.setTextColor(0, 0, 0)
+      doc.text(`第 ${i} 页内容`, 10, 30)
+
+      doc.setFontSize(12)
+      doc.text('这是文档的主要内容区域。', 10, 45)
+      doc.text('页眉显示文档标题，页脚显示页码。', 10, 55)
+
+      // 页脚
+      doc.setFontSize(10)
+      doc.setTextColor(100, 100, 100)
+      doc.line(10, pageHeight - 15, pageWidth - 10, pageHeight - 15)
+      doc.text(`第 ${i}/${pageCount} 页`, pageWidth / 2, pageHeight - 10, { align: 'center' })
+      doc.text(currentDate.value, pageWidth - 10, pageHeight - 10, { align: 'right' })
+    }
+
+    doc.save('header-footer-example.pdf')
+    statusMessage.value = '成功生成带页眉页脚的PDF！'
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    alert('PDF生成失败: ' + error)
+    statusMessage.value = ''
+  } finally {
+    loading.value = false
+  }
+}
+
+// 高级4: 文本换行和对齐
+const advanced4Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成文本对齐PDF...'
+
+  try {
+    const doc = await createChineseJsPDF()
+    const pageWidth = doc.internal.pageSize.width
+
+    doc.setFontSize(16)
+    doc.text('文本换行和对齐演示', pageWidth / 2, 20, { align: 'center' })
+
+    // 长文本自动换行
+    const longText =
+      '这是一段很长的文本内容，用于演示jsPDF的文本自动换行功能。当文本超过指定宽度时，splitTextToSize方法会自动将其分割成多行，确保内容不会超出页面边界。这个功能对于处理动态内容非常有用，可以避免文本溢出页面。'
+
+    doc.setFontSize(12)
+    const maxWidth = 180
+    const lines = doc.splitTextToSize(longText, maxWidth)
+    doc.text(lines, 10, 40)
+
+    // 对齐演示
+    const demoY = 90
+    doc.setFontSize(14)
+
+    // 左对齐
+    doc.text('← 左对齐文本 (align: left)', 10, demoY)
+
+    // 居中对齐
+    doc.text('居中对齐文本 (align: center)', pageWidth / 2, demoY + 15, { align: 'center' })
+
+    // 右对齐
+    doc.text('右对齐文本 (align: right) →', pageWidth - 10, demoY + 30, { align: 'right' })
+
+    // 两端对齐演示
+    doc.setFontSize(10)
+    doc.text('注意: jsPDF 支持 left、center、right 三种对齐方式。', 10, demoY + 50)
+
+    doc.save('text-align-example.pdf')
+    statusMessage.value = '成功生成文本对齐PDF！'
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    alert('PDF生成失败: ' + error)
+    statusMessage.value = ''
+  } finally {
+    loading.value = false
+  }
+}
+
+// 高级5: 链接和书签
+const advanced5Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成带链接的PDF...'
+
+  try {
+    const doc = await createChineseJsPDF()
+
+    doc.setFontSize(16)
+    doc.text('PDF链接演示', 10, 20)
+
+    // 外部链接
+    doc.setFontSize(12)
+    doc.setTextColor(0, 0, 255)
+    doc.textWithLink('访问 jsPDF GitHub 仓库', 10, 40, { url: 'https://github.com/parallax/jsPDF' })
+
+    doc.setTextColor(0, 0, 0)
+    doc.text('(点击上方蓝色文字访问外部链接)', 10, 50)
+
+    // 内部链接
+    doc.setTextColor(0, 0, 255)
+    doc.textWithLink('点击跳转到第二页', 10, 70, { pageNumber: 2 })
+
+    doc.setTextColor(0, 0, 0)
+    doc.text('(点击上方蓝色文字跳转到第二页)', 10, 80)
+
+    // 第二页
+    doc.addPage()
+    doc.setFontSize(16)
+    doc.text('第二页内容', 10, 20)
+
+    doc.setFontSize(12)
+    doc.text('您已经通过内部链接跳转到这里！', 10, 40)
+
+    doc.setTextColor(0, 0, 255)
+    doc.textWithLink('返回第一页', 10, 60, { pageNumber: 1 })
+
+    doc.save('links-example.pdf')
+    statusMessage.value = '成功生成带链接的PDF！'
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    alert('PDF生成失败: ' + error)
+    statusMessage.value = ''
+  } finally {
+    loading.value = false
+  }
+}
+
+// 高级6: 水印和背景
+const advanced6Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成带水印的PDF...'
+
+  try {
+    const doc = await createChineseJsPDF()
+    const pageWidth = doc.internal.pageSize.width
+    const pageHeight = doc.internal.pageSize.height
+
+    // 添加水印
+    doc.saveGraphicsState()
+    const GState = (doc as any).GState
+    doc.setGState(new GState({ opacity: 0.2 }))
+    doc.setFontSize(60)
+    doc.setTextColor(200, 200, 200)
+
+    // 旋转文字作为水印
+    const watermarkText = '机密文件'
+    doc.text(watermarkText, pageWidth / 2, pageHeight / 2, {
+      align: 'center',
+      angle: 45,
+    })
+
+    doc.restoreGraphicsState()
+
+    // 添加正常内容
+    doc.setFontSize(16)
+    doc.setTextColor(0, 0, 0)
+    doc.text('带水印的文档', 10, 20)
+
+    doc.setFontSize(12)
+    doc.text('这是一个包含水印的PDF文档示例。', 10, 40)
+    doc.text('水印以半透明形式显示在背景中，', 10, 50)
+    doc.text('不会影响正常内容的阅读。', 10, 60)
+
+    // 添加更多内容
+    const content = [
+      '水印通常用于：',
+      '1. 标识文档的机密性或所有权',
+      '2. 防止未经授权的复制和分发',
+      '3. 标记文档的状态（如草稿、审核中等）',
+      '4. 增强文档的品牌识别度',
+    ]
+
+    let y = 80
+    content.forEach((line) => {
+      doc.text(line, 10, y)
+      y += 10
+    })
+
+    doc.save('watermark-example.pdf')
+    statusMessage.value = '成功生成带水印的PDF！'
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    alert('PDF生成失败: ' + error)
+    statusMessage.value = ''
+  } finally {
+    loading.value = false
+  }
+}
 
 const generateBasicPDF = async () => {
   loading.value = true
@@ -400,7 +1570,7 @@ const generateMultiPagePDF = async () => {
         doc.addPage()
         y = 20
         doc.setFont('SourceHanSansSC', 'bold')
-        doc.text(`第 ${doc.internal.getNumberOfPages()} 页`, 105, 10, { align: 'center' })
+        doc.text(`第 ${(doc.internal as any).getNumberOfPages()} 页`, 105, 10, { align: 'center' })
         doc.setFont('SourceHanSansSC', 'normal')
       }
       doc.text(`第 ${i + 1} 行：这是多页文档的示例内容，用于演示自动分页功能。`, 20, y)
@@ -408,7 +1578,7 @@ const generateMultiPagePDF = async () => {
     }
 
     // 最后一页添加页码
-    const totalPages = doc.internal.getNumberOfPages()
+    const totalPages = (doc.internal as any).getNumberOfPages()
     for (let i = 1; i <= totalPages; i++) {
       doc.setPage(i)
       doc.setFontSize(10)
@@ -501,13 +1671,15 @@ const generateAdvancedPDF = async () => {
     let xPos = 30
     barData.forEach((value, index) => {
       const barHeight = value * 0.5
-      doc.setFillColor(...barColors[index])
+      const color = barColors[index] ?? [0, 0, 0]
+      doc.setFillColor(color[0], color[1], color[2])
       doc.rect(xPos, 185 - barHeight, 30, barHeight, 'F')
 
       doc.setFontSize(9)
       doc.setTextColor(0, 0, 0)
       doc.setFont('SourceHanSansSC', 'normal')
-      doc.text(barLabels[index], xPos + 15, 192, { align: 'center' })
+      const label = barLabels[index] ?? ''
+      doc.text(label, xPos + 15, 192, { align: 'center' })
       doc.text(`${value}%`, xPos + 15, 180 - barHeight, { align: 'center' })
 
       xPos += 40
@@ -632,6 +1804,160 @@ const generateAdvancedPDF = async () => {
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 1.5rem;
+}
+
+.section-title {
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+/* 示例标签样式 */
+.example-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #e2e8f0;
+  flex-wrap: wrap;
+}
+
+.tab-button {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #718096;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tab-button:hover {
+  background: #f7fafc;
+  color: #2d3748;
+}
+
+.tab-button.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 6px 6px 0 0;
+  border-bottom-color: transparent;
+}
+
+/* 示例内容区 */
+.example-content {
+  min-height: 400px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.example-content h3 {
+  color: #2d3748;
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+}
+
+.example-content > div > p {
+  color: #718096;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+/* 代码显示区 */
+.code-display {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.code-display h4 {
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.code-display pre {
+  margin: 0;
+  overflow-x: auto;
+}
+
+.code-display code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #2d3748;
+}
+
+/* 演示内容区 */
+.demo-content {
+  background: white;
+  border: 2px dashed #cbd5e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.demo-content h4 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+/* 预览框 */
+.preview-box {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.preview-box p {
+  margin: 0.5rem 0;
+  line-height: 1.6;
+}
+
+.preview-box .note {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+  color: #718096;
+  font-style: italic;
+}
+
+/* 页面预览 */
+.page-preview {
+  padding: 0.75rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  margin: 0.5rem 0;
+}
+
+/* 选择输入框 */
+.select-input {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  font-size: 1rem;
+  margin: 0 0.5rem;
+}
+
+/* 分隔线 */
+.divider {
+  height: 2px;
+  background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+  margin: 3rem 0;
 }
 
 .controls {
@@ -761,5 +2087,65 @@ const generateAdvancedPDF = async () => {
   font-family: 'Courier New', monospace;
   font-size: 0.9rem;
   line-height: 1.6;
+}
+
+/* 高级功能样式 */
+.advanced-section {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.data-table th,
+.data-table td {
+  border: 1px solid #e2e8f0;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.data-table th {
+  background: #667eea;
+  color: white;
+  font-weight: 600;
+}
+
+.data-table tr:nth-child(even) {
+  background: #f7fafc;
+}
+
+.number-input {
+  padding: 0.5rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 4px;
+  margin: 0 0.5rem;
+  width: 100px;
+  text-align: center;
+}
+
+.preview-box {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.preview-box p {
+  margin: 0.5rem 0;
+}
+
+.preview-box .note {
+  color: #718096;
+  font-size: 0.9rem;
+  font-style: italic;
+  margin-top: 1rem;
 }
 </style>

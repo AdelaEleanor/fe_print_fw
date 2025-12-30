@@ -27,8 +27,9 @@ async function loadFontAsBase64(fontPath: string): Promise<string> {
   const arrayBuffer = await response.arrayBuffer()
   const bytes = new Uint8Array(arrayBuffer)
   let binary = ''
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i])
+  const byteLength = bytes.byteLength
+  for (let i = 0; i < byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]!)
   }
   const base64 = btoa(binary)
 
@@ -43,12 +44,15 @@ async function loadFontAsBase64(fontPath: string): Promise<string> {
  */
 export async function loadJsPDFChineseFont(doc: jsPDF) {
   const fontPath = '/Noto_Sans_SC/NotoSansSC-VariableFont_wght.ttf'
-  const fontName = 'NotoSansSC'
+  // 使用 SourceHanSansSC 作为字体名称，与 JsPDF.vue 中使用的名称保持一致
+  const fontName = 'SourceHanSansSC'
 
   try {
     const base64 = await loadFontAsBase64(fontPath)
-    doc.addFileToVFS('NotoSansSC-VF.ttf', base64)
-    doc.addFont('NotoSansSC-VF.ttf', fontName, 'normal')
+    doc.addFileToVFS('SourceHanSansSC-VF.ttf', base64)
+    // 注册 normal 和 bold 两种字重（可变字体可以模拟粗体）
+    doc.addFont('SourceHanSansSC-VF.ttf', fontName, 'normal')
+    doc.addFont('SourceHanSansSC-VF.ttf', fontName, 'bold')
     doc.setFont(fontName, 'normal')
     return true
   } catch (error) {

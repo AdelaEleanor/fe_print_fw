@@ -72,6 +72,607 @@
       </aside>
 
       <main class="demo-panel">
+        <!-- 基础功能演示 -->
+        <div class="examples-section">
+          <h2 class="section-title">📚 基础功能演示</h2>
+
+          <div class="example-tabs">
+            <button
+              v-for="(example, index) in examples"
+              :key="index"
+              :class="['tab-button', { active: currentExample === index }]"
+              @click="currentExample = index"
+            >
+              {{ example }}
+            </button>
+          </div>
+
+          <div class="example-content">
+            <!-- 示例1: 基础截图 -->
+            <div v-if="currentExample === 0">
+              <h3>示例 1: 基础截图</h3>
+              <p>将HTML元素转换为Canvas，然后导出为PNG图片。</p>
+
+              <div class="controls">
+                <button @click="example1Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 截图中...' : '📸 基础截图' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>import html2canvas from 'html2canvas'
+
+const element = document.getElementById('capture-area')
+const canvas = await html2canvas(element)
+
+// 转为图片
+const imgData = canvas.toDataURL('image/png')
+
+// 下载图片
+const link = document.createElement('a')
+link.href = imgData
+link.download = 'screenshot.png'
+link.click()</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <h4>📋 截图预览区域:</h4>
+                <div id="example1-area" class="capture-preview">
+                  <div class="preview-card">
+                    <h4>🎨 示例内容</h4>
+                    <p>这个区域的内容将被截图</p>
+                    <div class="preview-badge">html2canvas</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 示例2: 高清截图 -->
+            <div v-else-if="currentExample === 1">
+              <h3>示例 2: 高清截图 (scale)</h3>
+              <p>通过设置scale参数提高截图清晰度，适合需要高分辨率的场景。</p>
+
+              <div class="controls">
+                <label>
+                  缩放倍数:
+                  <select v-model="scaleValue" class="select-input">
+                    <option :value="1">1x (标准)</option>
+                    <option :value="2">2x (高清)</option>
+                    <option :value="3">3x (超清)</option>
+                    <option :value="4">4x (极清)</option>
+                  </select>
+                </label>
+                <button @click="example2Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 截图中...' : '🔍 高清截图' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const canvas = await html2canvas(element, {
+  scale: 2,  // 2倍清晰度
+  backgroundColor: '#ffffff'
+})
+
+// scale 值说明:
+// 1: 标准清晰度 (默认)
+// 2: 2倍清晰度，适合Retina屏幕
+// 3-4: 超高清晰度，文件较大</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <h4>📋 高清截图区域:</h4>
+                <div
+                  id="example2-area"
+                  class="capture-preview"
+                  style="background: linear-gradient(135deg, #667eea, #764ba2)"
+                >
+                  <div class="preview-card" style="color: white; background: transparent">
+                    <h4>🔍 高清演示</h4>
+                    <p>当前缩放: {{ scaleValue }}x</p>
+                    <p style="font-size: 0.8rem">渐变背景测试</p>
+                  </div>
+                </div>
+                <p class="note">scale越大，图片越清晰，但文件也越大</p>
+              </div>
+            </div>
+
+            <!-- 示例3: 截图转PDF -->
+            <div v-else-if="currentExample === 2">
+              <h3>示例 3: 截图转PDF</h3>
+              <p>将html2canvas截取的内容通过jsPDF转换为PDF文件。</p>
+
+              <div class="controls">
+                <button @click="example3Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '📄 截图转PDF' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>import html2canvas from 'html2canvas'
+import { jsPDF } from 'jspdf'
+
+const canvas = await html2canvas(element, { scale: 2 })
+const imgData = canvas.toDataURL('image/png')
+
+const pdf = new jsPDF()
+const imgWidth = 210 // A4宽度(mm)
+const imgHeight = (canvas.height * imgWidth) / canvas.width
+
+pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight)
+pdf.save('screenshot.pdf')</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <h4>📋 PDF截图区域:</h4>
+                <div id="example3-area" class="capture-preview">
+                  <div class="preview-card">
+                    <h4>📄 PDF内容</h4>
+                    <p>这个区域将被截图并转为PDF</p>
+                    <table class="mini-table">
+                      <tr>
+                        <th>项目</th>
+                        <th>数值</th>
+                      </tr>
+                      <tr>
+                        <td>性能</td>
+                        <td>85%</td>
+                      </tr>
+                      <tr>
+                        <td>质量</td>
+                        <td>95%</td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 示例4: 自定义背景色 -->
+            <div v-else-if="currentExample === 3">
+              <h3>示例 4: 自定义背景色</h3>
+              <p>设置截图的背景颜色，适合处理透明背景的元素。</p>
+
+              <div class="controls">
+                <label>
+                  背景色:
+                  <input v-model="bgColor" type="color" class="color-input" />
+                </label>
+                <button @click="example4Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 截图中...' : '🎨 自定义背景截图' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const canvas = await html2canvas(element, {
+  backgroundColor: '#ffffff',  // 白色背景
+  // backgroundColor: null,    // 透明背景
+  // backgroundColor: '#f0f0f0' // 灰色背景
+})</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <h4>📋 背景色预览:</h4>
+                <div
+                  id="example4-area"
+                  class="capture-preview"
+                  :style="{ backgroundColor: bgColor }"
+                >
+                  <div class="preview-card" style="background: rgba(255, 255, 255, 0.9)">
+                    <h4>🎨 自定义背景</h4>
+                    <p>当前背景色: {{ bgColor }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 示例5: 过滤元素 -->
+            <div v-else-if="currentExample === 4">
+              <h3>示例 5: 过滤特定元素</h3>
+              <p>使用ignoreElements选项排除不需要截图的元素。</p>
+
+              <div class="controls">
+                <button @click="example5Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 截图中...' : '🚫 过滤元素截图' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const canvas = await html2canvas(element, {
+  ignoreElements: (el) =&gt; {
+    // 忽略带有 'no-capture' 类的元素
+    return el.classList.contains('no-capture')
+  }
+})</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <h4>📋 过滤演示区域:</h4>
+                <div id="example5-area" class="capture-preview">
+                  <div class="preview-card">
+                    <h4>📸 会被截图</h4>
+                    <p>这段文字会出现在截图中</p>
+                    <div
+                      class="no-capture"
+                      style="
+                        background: #fed7d7;
+                        padding: 0.5rem;
+                        border-radius: 4px;
+                        margin-top: 0.5rem;
+                      "
+                    >
+                      🚫 这段不会被截图 (no-capture)
+                    </div>
+                    <p style="margin-top: 0.5rem">这段也会被截图</p>
+                  </div>
+                </div>
+                <p class="note">带有 no-capture 类的元素将被忽略</p>
+              </div>
+            </div>
+
+            <!-- 示例6: 获取Blob -->
+            <div v-else-if="currentExample === 5">
+              <h3>示例 6: 获取Blob对象</h3>
+              <p>将截图转换为Blob对象，适合上传服务器或进一步处理。</p>
+
+              <div class="controls">
+                <label>
+                  图片格式:
+                  <select v-model="imageFormat" class="select-input">
+                    <option value="image/png">PNG</option>
+                    <option value="image/jpeg">JPEG</option>
+                    <option value="image/webp">WebP</option>
+                  </select>
+                </label>
+                <button @click="example6Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '💾 获取Blob' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const canvas = await html2canvas(element)
+
+canvas.toBlob((blob) =&gt; {
+  // 创建 URL
+  const url = URL.createObjectURL(blob)
+  
+  // 下载文件
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'screenshot.png'
+  a.click()
+  
+  // 或上传到服务器
+  const formData = new FormData()
+  formData.append('image', blob, 'screenshot.png')
+  // fetch('/upload', { method: 'POST', body: formData })
+}, 'image/png', 0.9)</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <h4>📋 Blob演示区域:</h4>
+                <div id="example6-area" class="capture-preview">
+                  <div class="preview-card">
+                    <h4>💾 Blob格式</h4>
+                    <p>当前格式: {{ imageFormat }}</p>
+                    <p style="font-size: 0.8rem; color: #718096">适合上传或进一步处理</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 高级功能演示 -->
+        <div class="advanced-section">
+          <h2 class="section-title">🚀 高级功能演示</h2>
+
+          <div class="example-tabs">
+            <button
+              v-for="(example, index) in advancedExamples"
+              :key="index"
+              :class="['tab-button', { active: currentAdvanced === index }]"
+              @click="currentAdvanced = index"
+            >
+              {{ example }}
+            </button>
+          </div>
+
+          <div class="example-content">
+            <!-- 高级1: 长页面截图 -->
+            <div v-if="currentAdvanced === 0">
+              <h3>高级 1: 长页面分页截图</h3>
+              <p>处理超长内容，自动分页生成多页PDF。</p>
+
+              <div class="controls">
+                <button @click="advanced1Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '📑 长页面分页PDF' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>async function captureLongPage(element) {
+  const canvas = await html2canvas(element, { scale: 2 })
+  const pdf = new jsPDF()
+  const imgData = canvas.toDataURL('image/png')
+
+  const pageHeight = 295 // A4高度(mm)
+  const imgWidth = 210
+  const imgHeight = (canvas.height * imgWidth) / canvas.width
+  let heightLeft = imgHeight
+  let position = 0
+
+  pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+  heightLeft -= pageHeight
+
+  while (heightLeft &gt; 0) {
+    position = heightLeft - imgHeight
+    pdf.addPage()
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+    heightLeft -= pageHeight
+  }
+
+  pdf.save('long-page.pdf')
+}</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <h4>📋 长内容预览:</h4>
+                <div id="advanced1-area" class="long-content-preview">
+                  <div v-for="i in 5" :key="i" class="preview-section">
+                    <h5>第 {{ i }} 部分</h5>
+                    <p>这是第 {{ i }} 部分的内容，用于演示长页面分页功能...</p>
+                  </div>
+                </div>
+                <p class="note">内容过长时将自动分割成多页PDF</p>
+              </div>
+            </div>
+
+            <!-- 高级2: 跨域图片处理 -->
+            <div v-else-if="currentAdvanced === 1">
+              <h3>高级 2: 跨域图片处理</h3>
+              <p>使用useCORS和allowTaint选项处理跨域图片。</p>
+
+              <div class="controls">
+                <button @click="advanced2Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 截图中...' : '🌐 跨域截图' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const canvas = await html2canvas(element, {
+  useCORS: true,      // 允许跨域图片
+  allowTaint: false,  // 不允许污染canvas
+  proxy: 'your-proxy-url', // 代理服务器
+  
+  // 或使用 onclone 预处理
+  onclone: (clonedDoc) =&gt; {
+    // 可以在这里替换跨域图片
+    const images = clonedDoc.querySelectorAll('img')
+    images.forEach(img =&gt; {
+      img.crossOrigin = 'anonymous'
+    })
+  }
+})</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <div class="preview-box">
+                  <p><strong>跨域选项说明:</strong></p>
+                  <ul style="text-align: left; margin-left: 1rem">
+                    <li><code>useCORS: true</code> - 尝试使用CORS加载图片</li>
+                    <li><code>allowTaint: true</code> - 允许污染canvas（不能导出）</li>
+                    <li><code>proxy</code> - 通过代理服务器加载图片</li>
+                  </ul>
+                  <p class="note">跨域图片需要服务器设置正确的CORS头</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 高级3: 自定义渲染区域 -->
+            <div v-else-if="currentAdvanced === 2">
+              <h3>高级 3: 自定义渲染区域</h3>
+              <p>使用x, y, width, height参数裁剪指定区域。</p>
+
+              <div class="controls">
+                <label>
+                  X偏移: <input v-model.number="cropX" type="number" class="number-input" min="0" />
+                </label>
+                <label>
+                  Y偏移: <input v-model.number="cropY" type="number" class="number-input" min="0" />
+                </label>
+                <button @click="advanced3Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 截图中...' : '✂️ 裁剪截图' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const canvas = await html2canvas(element, {
+  x: 50,      // 起始X坐标
+  y: 50,      // 起始Y坐标
+  width: 200, // 截取宽度
+  height: 150, // 截取高度
+  scrollX: 0,
+  scrollY: 0
+})</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <h4>📋 裁剪区域预览:</h4>
+                <div id="advanced3-area" class="crop-preview">
+                  <div class="crop-grid">
+                    <div class="crop-cell" v-for="i in 9" :key="i">{{ i }}</div>
+                  </div>
+                  <div
+                    class="crop-indicator"
+                    :style="{ left: cropX + 'px', top: cropY + 'px' }"
+                  ></div>
+                </div>
+                <p class="note">红框表示将要截取的区域 (从 x:{{ cropX }}, y:{{ cropY }} 开始)</p>
+              </div>
+            </div>
+
+            <!-- 高级4: 日志和调试 -->
+            <div v-else-if="currentAdvanced === 3">
+              <h3>高级 4: 日志和调试</h3>
+              <p>启用日志输出，方便调试截图问题。</p>
+
+              <div class="controls">
+                <label> <input v-model="enableLogging" type="checkbox" /> 启用日志 </label>
+                <button @click="advanced4Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 截图中...' : '🔍 调试截图' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const canvas = await html2canvas(element, {
+  logging: true,  // 启用控制台日志
+  
+  // 自定义日志函数
+  onclone: (clonedDoc, element) =&gt; {
+    console.log('克隆的元素:', element)
+    console.log('克隆的文档:', clonedDoc)
+  }
+})
+
+// 常见调试问题:
+// 1. 元素未渲染 - 检查元素是否可见
+// 2. 样式丢失 - 检查CSS是否被正确应用
+// 3. 图片空白 - 检查跨域设置</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <div class="preview-box">
+                  <p><strong>调试提示:</strong></p>
+                  <ul style="text-align: left; margin-left: 1rem">
+                    <li>打开浏览器控制台查看日志输出</li>
+                    <li>logging: true 会输出详细的渲染过程</li>
+                    <li>onclone 回调可用于检查克隆的DOM</li>
+                  </ul>
+                  <p>当前日志状态: {{ enableLogging ? '✅ 已启用' : '❌ 已禁用' }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 高级5: 窗口尺寸控制 -->
+            <div v-else-if="currentAdvanced === 4">
+              <h3>高级 5: 窗口尺寸控制</h3>
+              <p>控制截图时的虚拟窗口尺寸，解决响应式布局问题。</p>
+
+              <div class="controls">
+                <label>
+                  窗口宽度:
+                  <select v-model.number="windowWidth" class="select-input">
+                    <option :value="375">375px (手机)</option>
+                    <option :value="768">768px (平板)</option>
+                    <option :value="1024">1024px (笔记本)</option>
+                    <option :value="1920">1920px (桌面)</option>
+                  </select>
+                </label>
+                <button @click="advanced5Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 截图中...' : '📱 响应式截图' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const canvas = await html2canvas(element, {
+  windowWidth: 1920,   // 虚拟窗口宽度
+  windowHeight: 1080,  // 虚拟窗口高度
+  scrollX: 0,
+  scrollY: -window.scrollY // 补偿滚动位置
+})</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <div class="preview-box">
+                  <p><strong>当前设置:</strong> {{ windowWidth }}px 宽度</p>
+                  <div class="responsive-demo" :style="{ maxWidth: windowWidth + 'px' }">
+                    <p>这是响应式内容区域</p>
+                    <p style="font-size: 0.8rem; color: #718096">宽度会根据设置调整</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 高级6: 性能优化 -->
+            <div v-else-if="currentAdvanced === 5">
+              <h3>高级 6: 性能优化技巧</h3>
+              <p>优化html2canvas的性能，减少内存占用和渲染时间。</p>
+
+              <div class="controls">
+                <button @click="advanced6Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 截图中...' : '⚡ 优化截图' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>const canvas = await html2canvas(element, {
+  // 性能优化选项
+  scale: 1,           // 降低scale减少内存
+  logging: false,     // 关闭日志提升性能
+  imageTimeout: 5000, // 图片加载超时
+  removeContainer: true, // 渲染后移除克隆容器
+  
+  // 忽略不需要的元素
+  ignoreElements: (el) =&gt; {
+    return el.tagName === 'SCRIPT' || 
+           el.tagName === 'NOSCRIPT' ||
+           el.classList.contains('no-capture')
+  }
+})
+
+// 优化建议:
+// 1. 减小截图区域
+// 2. 降低scale值
+// 3. 使用JPEG格式（体积更小）
+// 4. 过滤无关元素</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <div class="preview-box">
+                  <p><strong>性能优化建议:</strong></p>
+                  <table class="mini-table">
+                    <tr>
+                      <th>优化项</th>
+                      <th>效果</th>
+                    </tr>
+                    <tr>
+                      <td>scale: 1</td>
+                      <td>减少50%内存</td>
+                    </tr>
+                    <tr>
+                      <td>logging: false</td>
+                      <td>提升10%速度</td>
+                    </tr>
+                    <tr>
+                      <td>过滤元素</td>
+                      <td>减少渲染时间</td>
+                    </tr>
+                    <tr>
+                      <td>JPEG格式</td>
+                      <td>减少70%体积</td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 原有快捷按钮 -->
+        <div class="divider"></div>
+
         <div class="controls">
           <button @click="captureToImage" class="btn btn-primary">📸 截图转图片</button>
           <button @click="captureToPDF" class="btn btn-secondary">📄 截图转PDF</button>
@@ -258,6 +859,435 @@ import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
 
 const capturedImage = ref('')
+const loading = ref(false)
+const currentExample = ref(0)
+const scaleValue = ref(2)
+const bgColor = ref('#ffffff')
+const imageFormat = ref('image/png')
+
+// 示例标签
+const examples = ['基础截图', '高清截图', '截图转PDF', '自定义背景', '过滤元素', '获取Blob']
+
+// ==================== 基础功能示例 ====================
+
+// 示例1: 基础截图
+const example1Generate = async () => {
+  const element = document.getElementById('example1-area')
+  if (!element) return
+
+  loading.value = true
+  try {
+    const canvas = await html2canvas(element, {
+      backgroundColor: '#ffffff',
+    })
+
+    const imgData = canvas.toDataURL('image/png')
+    capturedImage.value = imgData
+
+    const link = document.createElement('a')
+    link.href = imgData
+    link.download = 'basic-screenshot.png'
+    link.click()
+
+    alert('✅ 基础截图成功！')
+  } catch (error) {
+    console.error('截图失败:', error)
+    alert('❌ 截图失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 示例2: 高清截图
+const example2Generate = async () => {
+  const element = document.getElementById('example2-area')
+  if (!element) return
+
+  loading.value = true
+  try {
+    const canvas = await html2canvas(element, {
+      scale: scaleValue.value,
+      backgroundColor: null, // 保留渐变
+    })
+
+    const imgData = canvas.toDataURL('image/png')
+    capturedImage.value = imgData
+
+    const link = document.createElement('a')
+    link.href = imgData
+    link.download = `hd-screenshot-${scaleValue.value}x.png`
+    link.click()
+
+    alert(`✅ ${scaleValue.value}x 高清截图成功！`)
+  } catch (error) {
+    console.error('截图失败:', error)
+    alert('❌ 截图失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 示例3: 截图转PDF
+const example3Generate = async () => {
+  const element = document.getElementById('example3-area')
+  if (!element) return
+
+  loading.value = true
+  try {
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      backgroundColor: '#ffffff',
+    })
+
+    const imgData = canvas.toDataURL('image/png')
+    const pdf = new jsPDF()
+
+    const imgWidth = 190
+    const imgHeight = (canvas.height * imgWidth) / canvas.width
+
+    pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight)
+    pdf.save('screenshot-to-pdf.pdf')
+
+    capturedImage.value = imgData
+    alert('✅ 截图转PDF成功！')
+  } catch (error) {
+    console.error('生成PDF失败:', error)
+    alert('❌ 生成PDF失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 示例4: 自定义背景色
+const example4Generate = async () => {
+  const element = document.getElementById('example4-area')
+  if (!element) return
+
+  loading.value = true
+  try {
+    const canvas = await html2canvas(element, {
+      backgroundColor: bgColor.value,
+    })
+
+    const imgData = canvas.toDataURL('image/png')
+    capturedImage.value = imgData
+
+    const link = document.createElement('a')
+    link.href = imgData
+    link.download = 'custom-bg-screenshot.png'
+    link.click()
+
+    alert('✅ 自定义背景截图成功！')
+  } catch (error) {
+    console.error('截图失败:', error)
+    alert('❌ 截图失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 示例5: 过滤元素
+const example5Generate = async () => {
+  const element = document.getElementById('example5-area')
+  if (!element) return
+
+  loading.value = true
+  try {
+    const canvas = await html2canvas(element, {
+      backgroundColor: '#ffffff',
+      ignoreElements: (el) => {
+        return el.classList.contains('no-capture')
+      },
+    })
+
+    const imgData = canvas.toDataURL('image/png')
+    capturedImage.value = imgData
+
+    const link = document.createElement('a')
+    link.href = imgData
+    link.download = 'filtered-screenshot.png'
+    link.click()
+
+    alert('✅ 过滤元素截图成功！红色区域已被过滤')
+  } catch (error) {
+    console.error('截图失败:', error)
+    alert('❌ 截图失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 示例6: 获取Blob
+const example6Generate = async () => {
+  const element = document.getElementById('example6-area')
+  if (!element) return
+
+  loading.value = true
+  try {
+    const canvas = await html2canvas(element, {
+      backgroundColor: '#ffffff',
+    })
+
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          alert('❌ Blob生成失败')
+          return
+        }
+
+        const url = URL.createObjectURL(blob)
+        capturedImage.value = url
+
+        const link = document.createElement('a')
+        link.href = url
+        const ext = imageFormat.value.split('/')[1]
+        link.download = `blob-screenshot.${ext}`
+        link.click()
+
+        alert(
+          `✅ Blob生成成功！格式: ${imageFormat.value}, 大小: ${(blob.size / 1024).toFixed(2)}KB`,
+        )
+      },
+      imageFormat.value,
+      0.9,
+    )
+  } catch (error) {
+    console.error('生成Blob失败:', error)
+    alert('❌ 生成Blob失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// ==================== 高级功能示例 ====================
+
+const currentAdvanced = ref(0)
+const advancedExamples = ['长页面分页', '跨域图片', '裁剪区域', '日志调试', '窗口尺寸', '性能优化']
+
+const cropX = ref(20)
+const cropY = ref(20)
+const enableLogging = ref(false)
+const windowWidth = ref(1024)
+
+// 高级1: 长页面分页截图
+const advanced1Generate = async () => {
+  const element = document.getElementById('advanced1-area')
+  if (!element) return
+
+  loading.value = true
+  try {
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      backgroundColor: '#ffffff',
+    })
+
+    const imgData = canvas.toDataURL('image/png')
+    const pdf = new jsPDF()
+
+    const pageHeight = 295
+    const imgWidth = 190
+    const imgHeight = (canvas.height * imgWidth) / canvas.width
+    let heightLeft = imgHeight
+    let position = 0
+
+    pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight)
+    heightLeft -= pageHeight
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight
+      pdf.addPage()
+      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight)
+      heightLeft -= pageHeight
+    }
+
+    pdf.save('long-page-capture.pdf')
+    capturedImage.value = imgData
+    alert('✅ 长页面分页PDF生成成功！')
+  } catch (error) {
+    console.error('生成失败:', error)
+    alert('❌ 生成失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 高级2: 跨域图片处理
+const advanced2Generate = async () => {
+  const element = document.getElementById('capture-area')
+  if (!element) return
+
+  loading.value = true
+  try {
+    const canvas = await html2canvas(element, {
+      useCORS: true,
+      allowTaint: false,
+      backgroundColor: '#ffffff',
+      scale: 2,
+    })
+
+    const imgData = canvas.toDataURL('image/png')
+    capturedImage.value = imgData
+
+    const link = document.createElement('a')
+    link.href = imgData
+    link.download = 'cors-screenshot.png'
+    link.click()
+
+    alert('✅ 跨域截图成功！')
+  } catch (error) {
+    console.error('截图失败:', error)
+    alert('❌ 截图失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 高级3: 自定义渲染区域
+const advanced3Generate = async () => {
+  const element = document.getElementById('advanced3-area')
+  if (!element) return
+
+  loading.value = true
+  try {
+    const canvas = await html2canvas(element, {
+      x: cropX.value,
+      y: cropY.value,
+      width: 150,
+      height: 100,
+      backgroundColor: '#ffffff',
+    })
+
+    const imgData = canvas.toDataURL('image/png')
+    capturedImage.value = imgData
+
+    const link = document.createElement('a')
+    link.href = imgData
+    link.download = 'cropped-screenshot.png'
+    link.click()
+
+    alert(`✅ 裁剪截图成功！从 (${cropX.value}, ${cropY.value}) 开始`)
+  } catch (error) {
+    console.error('截图失败:', error)
+    alert('❌ 截图失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 高级4: 日志和调试
+const advanced4Generate = async () => {
+  const element = document.getElementById('capture-area')
+  if (!element) return
+
+  loading.value = true
+  try {
+    console.log('开始调试截图...')
+    const canvas = await html2canvas(element, {
+      logging: enableLogging.value,
+      backgroundColor: '#ffffff',
+      scale: 2,
+      onclone: (clonedDoc, el) => {
+        if (enableLogging.value) {
+          console.log('克隆的元素:', el)
+          console.log('元素尺寸:', el.offsetWidth, 'x', el.offsetHeight)
+        }
+      },
+    })
+
+    const imgData = canvas.toDataURL('image/png')
+    capturedImage.value = imgData
+
+    const link = document.createElement('a')
+    link.href = imgData
+    link.download = 'debug-screenshot.png'
+    link.click()
+
+    alert('✅ 调试截图成功！' + (enableLogging.value ? '请查看控制台日志' : ''))
+  } catch (error) {
+    console.error('截图失败:', error)
+    alert('❌ 截图失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 高级5: 窗口尺寸控制
+const advanced5Generate = async () => {
+  const element = document.getElementById('capture-area')
+  if (!element) return
+
+  loading.value = true
+  try {
+    const canvas = await html2canvas(element, {
+      windowWidth: windowWidth.value,
+      windowHeight: 800,
+      backgroundColor: '#ffffff',
+      scale: 2,
+    })
+
+    const imgData = canvas.toDataURL('image/png')
+    capturedImage.value = imgData
+
+    const link = document.createElement('a')
+    link.href = imgData
+    link.download = `responsive-${windowWidth.value}px.png`
+    link.click()
+
+    alert(`✅ ${windowWidth.value}px 窗口宽度截图成功！`)
+  } catch (error) {
+    console.error('截图失败:', error)
+    alert('❌ 截图失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 高级6: 性能优化
+const advanced6Generate = async () => {
+  const element = document.getElementById('capture-area')
+  if (!element) return
+
+  loading.value = true
+  const startTime = performance.now()
+
+  try {
+    const canvas = await html2canvas(element, {
+      scale: 1,
+      logging: false,
+      imageTimeout: 5000,
+      removeContainer: true,
+      backgroundColor: '#ffffff',
+      ignoreElements: (el) => {
+        return (
+          el.tagName === 'SCRIPT' ||
+          el.tagName === 'NOSCRIPT' ||
+          el.classList.contains('no-capture')
+        )
+      },
+    })
+
+    const endTime = performance.now()
+    const imgData = canvas.toDataURL('image/jpeg', 0.8)
+    capturedImage.value = imgData
+
+    const link = document.createElement('a')
+    link.href = imgData
+    link.download = 'optimized-screenshot.jpg'
+    link.click()
+
+    const fileSize = ((imgData.length * 0.75) / 1024).toFixed(2)
+    alert(
+      `✅ 优化截图成功！\n耗时: ${(endTime - startTime).toFixed(0)}ms\n文件大小: ~${fileSize}KB`,
+    )
+  } catch (error) {
+    console.error('截图失败:', error)
+    alert('❌ 截图失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// ==================== 原有快捷功能 ====================
 
 const captureToImage = async () => {
   const element = document.getElementById('capture-area')
@@ -663,5 +1693,266 @@ const captureWithOptions = async () => {
   font-family: 'Courier New', monospace;
   font-size: 0.9rem;
   line-height: 1.6;
+}
+
+/* 示例展示区域样式 */
+.examples-section {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  color: #667eea;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #667eea;
+}
+
+.example-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.tab-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.tab-button:hover {
+  background: #f7fafc;
+  border-color: #667eea;
+}
+
+.tab-button.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.example-content {
+  background: #f7fafc;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.example-content h3 {
+  color: #2d3748;
+  margin-bottom: 0.75rem;
+}
+
+.example-content > p {
+  color: #4a5568;
+  margin-bottom: 1rem;
+}
+
+.code-display {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.code-display h4 {
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.code-display pre {
+  background: #2d3748;
+  color: #e2e8f0;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.demo-content {
+  margin-top: 1rem;
+}
+
+.demo-content h4 {
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.capture-preview {
+  background: white;
+  border: 2px dashed #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  min-height: 120px;
+}
+
+.preview-card {
+  background: #f7fafc;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.preview-card h4 {
+  color: #667eea;
+  margin-bottom: 0.5rem;
+}
+
+.preview-badge {
+  display: inline-block;
+  background: #667eea;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.mini-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.mini-table th,
+.mini-table td {
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.mini-table th {
+  background: #667eea;
+  color: white;
+}
+
+.select-input {
+  padding: 0.5rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 4px;
+  margin: 0 0.5rem;
+}
+
+.color-input {
+  padding: 0.25rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 4px;
+  margin: 0 0.5rem;
+  width: 60px;
+  height: 36px;
+  cursor: pointer;
+}
+
+.note {
+  color: #718096;
+  font-size: 0.9rem;
+  font-style: italic;
+  margin-top: 0.75rem;
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+  margin: 2rem 0;
+}
+
+/* 高级功能样式 */
+.advanced-section {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.long-content-preview {
+  background: white;
+  border: 2px dashed #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.preview-section {
+  background: #f7fafc;
+  border-radius: 4px;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.preview-section h5 {
+  color: #667eea;
+  margin-bottom: 0.25rem;
+}
+
+.preview-box {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 1.5rem;
+}
+
+.number-input {
+  padding: 0.5rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 4px;
+  margin: 0 0.5rem;
+  width: 80px;
+  text-align: center;
+}
+
+.crop-preview {
+  background: white;
+  border: 2px dashed #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  position: relative;
+  min-height: 150px;
+}
+
+.crop-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.crop-cell {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  padding: 1rem;
+  text-align: center;
+  border-radius: 4px;
+}
+
+.crop-indicator {
+  position: absolute;
+  width: 150px;
+  height: 100px;
+  border: 2px solid #e53e3e;
+  background: rgba(229, 62, 62, 0.1);
+  pointer-events: none;
+}
+
+.responsive-demo {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-top: 1rem;
+  transition: max-width 0.3s ease;
 }
 </style>

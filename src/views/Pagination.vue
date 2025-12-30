@@ -1054,18 +1054,18 @@ const generateHtml2PdfPaging = async () => {
   const options = {
     margin: 15,
     filename: 'html2pdf-paging.pdf',
-    image: { type: 'jpeg', quality: 0.95 },
+    image: { type: 'jpeg' as const, quality: 0.95 },
     html2canvas: {
       scale: 2,
       useCORS: true,
     },
     jsPDF: {
-      unit: 'mm',
-      format: 'a4',
-      orientation: 'portrait',
+      unit: 'mm' as const,
+      format: 'a4' as const,
+      orientation: 'portrait' as const,
     },
     pagebreak: {
-      mode: ['css', 'legacy'],
+      mode: ['css', 'legacy'] as ('css' | 'legacy')[],
       before: '.html2canvas-break',
     },
   }
@@ -1160,7 +1160,7 @@ const generatePdfLibPaging = async () => {
   const pdfBytes = await pdfDoc.save()
 
   // 下载PDF
-  const blob = new Blob([pdfBytes], { type: 'application/pdf' })
+  const blob = new Blob([pdfBytes as unknown as ArrayBuffer], { type: 'application/pdf' })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
@@ -1229,11 +1229,12 @@ const printWithCSS = () => {
 const printElementPaging = async () => {
   try {
     const module = await import('print-html-element')
-    const printElement = module.default || module
+    const printFn =
+      (module as any).printElement || (module as any).default?.printElement || module.printElement
 
     const element = document.getElementById('print-element-content')
-    if (element && typeof printElement === 'function') {
-      printElement(element)
+    if (element && typeof printFn === 'function') {
+      printFn(element)
     } else {
       // 降级方案：使用临时窗口
       const printWindow = window.open('', '', 'width=800,height=600')
