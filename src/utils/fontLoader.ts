@@ -39,20 +39,31 @@ async function loadFontAsBase64(fontPath: string): Promise<string> {
 }
 
 /**
- * 为 jsPDF 加载中文字体 (可变字体，支持 100-900 全部字重)
+ * 为 jsPDF 加载中文字体（使用静态字体，确保粗体正确显示）
  * @param doc jsPDF 实例
  */
 export async function loadJsPDFChineseFont(doc: jsPDF) {
-  const fontPath = '/Noto_Sans_SC/NotoSansSC-VariableFont_wght.ttf'
-  // 使用 SourceHanSansSC 作为字体名称，与 JsPDF.vue 中使用的名称保持一致
+  const regularPath = '/Noto_Sans_SC/static/NotoSansSC-Regular.ttf'
+  const boldPath = '/Noto_Sans_SC/static/NotoSansSC-Bold.ttf'
   const fontName = 'SourceHanSansSC'
 
   try {
-    const base64 = await loadFontAsBase64(fontPath)
-    doc.addFileToVFS('SourceHanSansSC-VF.ttf', base64)
-    // 注册 normal 和 bold 两种字重（可变字体可以模拟粗体）
-    doc.addFont('SourceHanSansSC-VF.ttf', fontName, 'normal')
-    doc.addFont('SourceHanSansSC-VF.ttf', fontName, 'bold')
+    // 加载常规字体 (weight 400)
+    const regularBase64 = await loadFontAsBase64(regularPath)
+    doc.addFileToVFS('SourceHanSansSC-Regular.ttf', regularBase64)
+    doc.addFont('SourceHanSansSC-Regular.ttf', fontName, 'normal', 400)
+
+    // 加载粗体字体 (weight 700) - 使用独立的Bold字体文件
+    const boldBase64 = await loadFontAsBase64(boldPath)
+    doc.addFileToVFS('SourceHanSansSC-Bold.ttf', boldBase64)
+    doc.addFont('SourceHanSansSC-Bold.ttf', fontName, 'bold', 700)
+
+    // 中文字体通常没有真正的italic，使用oblique模拟（浏览器会自动倾斜）
+    // 斜体使用常规字体 + italic样式
+    doc.addFont('SourceHanSansSC-Regular.ttf', fontName, 'italic', 400)
+    // 粗斜体使用粗体字体 + italic样式
+    doc.addFont('SourceHanSansSC-Bold.ttf', fontName, 'bolditalic', 700)
+
     doc.setFont(fontName, 'normal')
     return true
   } catch (error) {
@@ -62,12 +73,13 @@ export async function loadJsPDFChineseFont(doc: jsPDF) {
 }
 
 /**
- * 为 pdfmake 配置中文字体 (可变字体)
+ * 为 pdfmake 配置中文字体（使用静态字体，确保粗体正确显示）
  */
 export async function configurePdfMakeChinese() {
   if (fontsLoaded) return
 
-  const fontPath = '/Noto_Sans_SC/NotoSansSC-VariableFont_wght.ttf'
+  const regularPath = '/Noto_Sans_SC/static/NotoSansSC-Regular.ttf'
+  const boldPath = '/Noto_Sans_SC/static/NotoSansSC-Bold.ttf'
 
   pdfMake.fonts = {
     Roboto: {
@@ -80,10 +92,11 @@ export async function configurePdfMakeChinese() {
         'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/fonts/Roboto/Roboto-MediumItalic.ttf',
     },
     NotoSansSC: {
-      normal: window.location.origin + fontPath,
-      bold: window.location.origin + fontPath,
-      italics: window.location.origin + fontPath,
-      bolditalics: window.location.origin + fontPath,
+      normal: window.location.origin + regularPath,
+      bold: window.location.origin + boldPath,
+      // 中文字体通常没有真正的italic，pdfmake会自动倾斜文字
+      italics: window.location.origin + regularPath,
+      bolditalics: window.location.origin + boldPath,
     },
   }
 

@@ -891,7 +891,7 @@ doc.save('paginated.pdf');</code></pre>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { jsPDF } from 'jspdf'
 import { createChineseJsPDF } from '@/utils/fontLoader'
 
@@ -904,15 +904,77 @@ const pageOrientation = ref<'portrait' | 'landscape'>('portrait')
 // 示例标签
 const examples = ['基础PDF', '文本样式', '绘制图形', '多页文档', '页面配置', '嵌入图片']
 
+// 将PDF Blob在新窗口/iframe中打开并触发打印（复用pdfmake页面的实现思路）
+const openBlobInPrintWindow = async (blob: Blob) => {
+  const url = URL.createObjectURL(blob)
+  const iframe = document.createElement('iframe')
+  iframe.style.position = 'fixed'
+  iframe.style.right = '0'
+  iframe.style.bottom = '0'
+  iframe.style.width = '0'
+  iframe.style.height = '0'
+  iframe.style.border = '0'
+  iframe.src = url
+  document.body.appendChild(iframe)
+
+  await new Promise<void>((resolve) => {
+    iframe.onload = () => {
+      setTimeout(() => {
+        try {
+          iframe.contentWindow?.focus()
+          iframe.contentWindow?.print()
+
+          // 监听打印完成事件（打印对话框关闭后清理）
+          const cleanup = () => {
+            setTimeout(() => {
+              try {
+                document.body.removeChild(iframe)
+              } catch (e) {}
+              URL.revokeObjectURL(url)
+            }, 100)
+          }
+
+          // 尝试监听 afterprint 事件
+          if (iframe.contentWindow) {
+            iframe.contentWindow.addEventListener('afterprint', cleanup, { once: true })
+            // 备用：如果5分钟后还没清理，强制清理
+            setTimeout(cleanup, 300000)
+          } else {
+            cleanup()
+          }
+        } catch (e) {
+          window.open(url)
+          setTimeout(() => URL.revokeObjectURL(url), 5000)
+        }
+        resolve()
+      }, 200)
+    }
+  })
+}
+
 // 高级功能标签
 const currentAdvanced = ref(0)
 const advancedExamples = ['表格生成', '自动分页', '页眉页脚', '文本换行', '链接书签', '水印背景']
 
 const autoPageLines = ref(50)
 
-// 示例图片
-const sampleImage =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='160'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23764ba2;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad)' width='200' height='160'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='20' fill='white' text-anchor='middle' dominant-baseline='middle'%3EjsPDF%3C/text%3E%3C/svg%3E"
+// 示例图片 - 使用本地logo
+const sampleImage = ref('')
+
+// 在组件挂载时加载logo图片
+onMounted(async () => {
+  try {
+    const response = await fetch('/imgs/logo.jpg')
+    const blob = await response.blob()
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      sampleImage.value = reader.result as string
+    }
+    reader.readAsDataURL(blob)
+  } catch (error) {
+    console.error('加载logo失败:', error)
+  }
+})
 
 // 示例1: 创建基础PDF
 const example1Generate = async () => {
@@ -926,7 +988,9 @@ const example1Generate = async () => {
     doc.text('这是使用 jsPDF 生成的 PDF 文档', 10, 20)
     doc.text('生成时间: ' + currentDate.value, 10, 30)
 
-    doc.save('basic-example.pdf')
+    const blob = (doc as any).output ? (doc as any).output('blob') : null
+    if (blob) await openBlobInPrintWindow(blob)
+    else doc.save('basic-example.pdf')
     statusMessage.value = ''
   } catch (error) {
     console.error('PDF生成错误:', error)
@@ -946,25 +1010,28 @@ const example2Generate = async () => {
 
     // 大标题
     doc.setFontSize(24)
-    doc.setFont('SourceHanSansSC', 'bold')
+    doc.setFont('SourceHanSansSC', 'bold', 700) // 明确设置weight
     doc.text('PDF文档标题', 10, 20)
 
     // 带颜色的副标题
     doc.setTextColor(102, 126, 234)
     doc.setFontSize(16)
+    doc.setFont('SourceHanSansSC', 'normal')
     doc.text('带颜色的文本示例', 10, 35)
 
     // 普通文本
     doc.setTextColor(0, 0, 0)
     doc.setFontSize(12)
-    doc.setFont('SourceHanSansSC', 'normal')
+    doc.setFont('SourceHanSansSC', 'normal', 400)
     doc.text('这是正常大小的文本', 10, 50)
 
-    // 粗体
-    doc.setFont('SourceHanSansSC', 'bold')
-    doc.text('这是粗体文本', 10, 65)
+    // 粗体 - 使用更粗的字重
+    doc.setFont('SourceHanSansSC', 'bold', 700)
+    doc.text('这是粗体文本（字重700）', 10, 65)
 
-    doc.save('styled-text.pdf')
+    const blob = (doc as any).output ? (doc as any).output('blob') : null
+    if (blob) await openBlobInPrintWindow(blob)
+    else doc.save('styled-text.pdf')
     statusMessage.value = ''
   } catch (error) {
     console.error('PDF生成错误:', error)
@@ -975,7 +1042,7 @@ const example2Generate = async () => {
 }
 
 // 示例3: 绘制图形
-const example3Generate = () => {
+const example3Generate = async () => {
   loading.value = true
   statusMessage.value = '正在生成PDF...'
 
@@ -1011,7 +1078,9 @@ const example3Generate = () => {
     doc.setDrawColor(255, 0, 0)
     doc.line(10, 130, 100, 130)
 
-    doc.save('shapes.pdf')
+    const blob = (doc as any).output ? (doc as any).output('blob') : null
+    if (blob) await openBlobInPrintWindow(blob)
+    else doc.save('shapes.pdf')
     statusMessage.value = ''
   } catch (error) {
     console.error('PDF生成错误:', error)
@@ -1052,7 +1121,9 @@ const example4Generate = async () => {
     doc.text('这是最后一页。', 10, 40)
     doc.text('生成时间: ' + currentDate.value, 10, 50)
 
-    doc.save('multi-page.pdf')
+    const blob = (doc as any).output ? (doc as any).output('blob') : null
+    if (blob) await openBlobInPrintWindow(blob)
+    else doc.save('multi-page.pdf')
     statusMessage.value = ''
   } catch (error) {
     console.error('PDF生成错误:', error)
@@ -1081,7 +1152,9 @@ const example5Generate = async () => {
     doc.text('格式: A4', 10, 45)
     doc.text('单位: mm', 10, 55)
 
-    doc.save('custom-config.pdf')
+    const blob = (doc as any).output ? (doc as any).output('blob') : null
+    if (blob) await openBlobInPrintWindow(blob)
+    else doc.save('custom-config.pdf')
     statusMessage.value = ''
   } catch (error) {
     console.error('PDF生成错误:', error)
@@ -1103,12 +1176,16 @@ const example6Generate = async () => {
     doc.text('PDF中的图片', 10, 10)
 
     // 添加图片
-    doc.addImage(sampleImage, 'PNG', 10, 20, 100, 80)
+    if (sampleImage.value) {
+      doc.addImage(sampleImage.value, 'JPEG', 10, 20, 100, 80)
+    }
 
     doc.setFontSize(12)
     doc.text('这个PDF包含一张嵌入的图片。', 10, 110)
 
-    doc.save('image-example.pdf')
+    const blob = (doc as any).output ? (doc as any).output('blob') : null
+    if (blob) await openBlobInPrintWindow(blob)
+    else doc.save('image-example.pdf')
     statusMessage.value = ''
   } catch (error) {
     console.error('PDF生成错误:', error)
@@ -1166,8 +1243,10 @@ const advanced1Generate = async () => {
       })
     })
 
-    doc.save('table-example.pdf')
-    statusMessage.value = '表格PDF生成成功！'
+    const blob = (doc as any).output ? (doc as any).output('blob') : null
+    if (blob) await openBlobInPrintWindow(blob)
+    else doc.save('table-example.pdf')
+    statusMessage.value = ''
   } catch (error) {
     console.error('PDF生成错误:', error)
     alert('PDF生成失败: ' + error)
@@ -1206,8 +1285,10 @@ const advanced2Generate = async () => {
       yPosition += lineHeight
     }
 
-    doc.save('auto-page-example.pdf')
-    statusMessage.value = `成功生成${Math.ceil(autoPageLines.value / 30)}页PDF！`
+    const blob = (doc as any).output ? (doc as any).output('blob') : null
+    if (blob) await openBlobInPrintWindow(blob)
+    else doc.save('auto-page-example.pdf')
+    statusMessage.value = ''
   } catch (error) {
     console.error('PDF生成错误:', error)
     alert('PDF生成失败: ' + error)
@@ -1254,8 +1335,10 @@ const advanced3Generate = async () => {
       doc.text(currentDate.value, pageWidth - 10, pageHeight - 10, { align: 'right' })
     }
 
-    doc.save('header-footer-example.pdf')
-    statusMessage.value = '成功生成带页眉页脚的PDF！'
+    const blob = (doc as any).output ? (doc as any).output('blob') : null
+    if (blob) await openBlobInPrintWindow(blob)
+    else doc.save('header-footer-example.pdf')
+    statusMessage.value = ''
   } catch (error) {
     console.error('PDF生成错误:', error)
     alert('PDF生成失败: ' + error)
@@ -1303,8 +1386,10 @@ const advanced4Generate = async () => {
     doc.setFontSize(10)
     doc.text('注意: jsPDF 支持 left、center、right 三种对齐方式。', 10, demoY + 50)
 
-    doc.save('text-align-example.pdf')
-    statusMessage.value = '成功生成文本对齐PDF！'
+    const blob = (doc as any).output ? (doc as any).output('blob') : null
+    if (blob) await openBlobInPrintWindow(blob)
+    else doc.save('text-align-example.pdf')
+    statusMessage.value = ''
   } catch (error) {
     console.error('PDF生成错误:', error)
     alert('PDF生成失败: ' + error)
@@ -1351,8 +1436,10 @@ const advanced5Generate = async () => {
     doc.setTextColor(0, 0, 255)
     doc.textWithLink('返回第一页', 10, 60, { pageNumber: 1 })
 
-    doc.save('links-example.pdf')
-    statusMessage.value = '成功生成带链接的PDF！'
+    const blob = (doc as any).output ? (doc as any).output('blob') : null
+    if (blob) await openBlobInPrintWindow(blob)
+    else doc.save('links-example.pdf')
+    statusMessage.value = ''
   } catch (error) {
     console.error('PDF生成错误:', error)
     alert('PDF生成失败: ' + error)
@@ -1413,8 +1500,10 @@ const advanced6Generate = async () => {
       y += 10
     })
 
-    doc.save('watermark-example.pdf')
-    statusMessage.value = '成功生成带水印的PDF！'
+    const blob = (doc as any).output ? (doc as any).output('blob') : null
+    if (blob) await openBlobInPrintWindow(blob)
+    else doc.save('watermark-example.pdf')
+    statusMessage.value = ''
   } catch (error) {
     console.error('PDF生成错误:', error)
     alert('PDF生成失败: ' + error)

@@ -993,7 +993,8 @@ const advanced2Print = () => {
     header: 'Print.js 图片集合',
     headerStyle: 'font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px;',
     imageStyle:
-      'width: 60%; margin: 30px auto; display: block; border: 2px solid #e2e8f0; border-radius: 8px;',
+      'width: 80%; max-width: 500px; margin: 20px auto; display: block; border: 2px solid #e2e8f0; border-radius: 8px; page-break-after: always; page-break-inside: avoid;',
+    style: '@media print { img { page-break-after: always; page-break-inside: avoid; } }',
   })
 }
 

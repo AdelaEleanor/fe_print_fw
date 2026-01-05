@@ -1146,6 +1146,55 @@ const download = (pdfBytes: Uint8Array, fileName: string) => {
   URL.revokeObjectURL(url)
 }
 
+// 在新窗口/隐藏 iframe 中打开 PDF 并触发打印
+const printPdfBytes = async (pdfBytes: Uint8Array) => {
+  const blob = new Blob([pdfBytes as unknown as ArrayBuffer], { type: 'application/pdf' })
+  const url = URL.createObjectURL(blob)
+  const iframe = document.createElement('iframe')
+  iframe.style.position = 'fixed'
+  iframe.style.right = '0'
+  iframe.style.bottom = '0'
+  iframe.style.width = '0'
+  iframe.style.height = '0'
+  iframe.style.border = '0'
+  iframe.src = url
+  document.body.appendChild(iframe)
+
+  await new Promise<void>((resolve) => {
+    iframe.onload = () => {
+      setTimeout(() => {
+        try {
+          iframe.contentWindow?.focus()
+          iframe.contentWindow?.print()
+
+          // 监听打印完成事件（打印对话框关闭后清理）
+          const cleanup = () => {
+            setTimeout(() => {
+              try {
+                document.body.removeChild(iframe)
+              } catch (e) {}
+              URL.revokeObjectURL(url)
+            }, 100)
+          }
+
+          // 尝试监听 afterprint 事件
+          if (iframe.contentWindow) {
+            iframe.contentWindow.addEventListener('afterprint', cleanup, { once: true })
+            // 备用：如果5分钟后还没清理，强制清理
+            setTimeout(cleanup, 300000)
+          } else {
+            cleanup()
+          }
+        } catch (e) {
+          window.open(url)
+          setTimeout(() => URL.revokeObjectURL(url), 5000)
+        }
+        resolve()
+      }, 200)
+    }
+  })
+}
+
 // 辅助函数：颜色转换
 const hexToRgb = (hex: string) => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
@@ -1331,7 +1380,7 @@ const advanced1Generate = async () => {
   }
 
   const mergedBytes = await mergedPdf.save()
-  download(mergedBytes, 'merged.pdf')
+  await printPdfBytes(mergedBytes)
 }
 
 const advanced2Generate = async () => {
@@ -1360,7 +1409,7 @@ const advanced2Generate = async () => {
   copiedPages.forEach((page) => newPdf.addPage(page))
 
   const splitBytes = await newPdf.save()
-  download(splitBytes, 'split.pdf')
+  await printPdfBytes(splitBytes)
 }
 
 const advanced3Generate = async () => {
@@ -1454,7 +1503,7 @@ const advanced5Generate = async () => {
   page.drawText('(Images with different opacity)', { x: 50, y: 450, size: 12, font })
 
   const pdfBytes = await pdfDoc.save()
-  download(pdfBytes, 'images.pdf')
+  await printPdfBytes(pdfBytes)
 }
 
 const advanced6Generate = async () => {
@@ -1479,7 +1528,7 @@ const advanced6Generate = async () => {
   }
 
   const pdfBytes = await pdfDoc.save()
-  download(pdfBytes, 'copied-pages.pdf')
+  await printPdfBytes(pdfBytes)
 }
 
 // ==================== 原有快捷功能 ====================
@@ -1520,7 +1569,7 @@ const createBasicPDF = async () => {
   })
 
   const pdfBytes = await pdfDoc.save()
-  download(pdfBytes, 'basic-pdf-lib.pdf')
+  await printPdfBytes(pdfBytes)
 }
 
 const modifyExistingPDF = async () => {
@@ -1555,7 +1604,7 @@ const modifyExistingPDF = async () => {
   }
 
   const modifiedPdfBytes = await pdfDoc.save()
-  download(modifiedPdfBytes, 'modified-pdf.pdf')
+  await printPdfBytes(modifiedPdfBytes)
 }
 
 const mergePDFs = async () => {
@@ -1591,7 +1640,7 @@ const mergePDFs = async () => {
   copiedPagesB.forEach((page) => mergedPdf.addPage(page))
 
   const mergedPdfBytes = await mergedPdf.save()
-  download(mergedPdfBytes, 'merged-pdf.pdf')
+  await printPdfBytes(mergedPdfBytes)
 }
 
 const embedImages = async () => {
@@ -1630,7 +1679,7 @@ const embedImages = async () => {
   }
 
   const pdfBytes = await pdfDoc.save()
-  download(pdfBytes, 'images-embedded.pdf')
+  await printPdfBytes(pdfBytes)
 }
 
 const addWatermark = async () => {
@@ -1669,7 +1718,7 @@ const addWatermark = async () => {
   })
 
   const watermarkedPdf = await pdfDoc.save()
-  download(watermarkedPdf, 'watermarked.pdf')
+  await printPdfBytes(watermarkedPdf)
 }
 
 const fillForm = async () => {
@@ -1712,7 +1761,7 @@ const fillForm = async () => {
   })
 
   const filledPdfBytes = await pdfDoc.save()
-  download(filledPdfBytes, 'filled-form.pdf')
+  await printPdfBytes(filledPdfBytes)
 }
 
 const createComplexDoc = async () => {
@@ -1723,24 +1772,33 @@ const createComplexDoc = async () => {
   const coverPage = pdfDoc.addPage([600, 800])
   const { width: coverWidth, height: coverHeight } = coverPage.getSize()
 
-  coverPage.drawText('Technical Research Report', {
-    x: coverWidth / 2 - 120,
+  // 注: PDF-LIB不直接支持中文，显示拼音替代
+  coverPage.drawText('Frontend Printing Report', {
+    x: 120,
     y: coverHeight / 2 + 100,
-    size: 50,
+    size: 32,
     font: helveticaBoldFont,
     color: rgb(0, 0.25, 0.5),
   })
 
-  coverPage.drawText('Modern Frontend Printing', {
-    x: coverWidth / 2 - 90,
-    y: coverHeight / 2 + 40,
-    size: 24,
+  coverPage.drawText('(Qian Duan Da Yin Ji Shu Bao Gao)', {
+    x: 150,
+    y: coverHeight / 2 + 60,
+    size: 14,
+    font: timesRomanFont,
+    color: rgb(0.4, 0.4, 0.4),
+  })
+
+  coverPage.drawText('Modern Web Printing Solutions', {
+    x: 130,
+    y: coverHeight / 2 + 20,
+    size: 20,
     font: timesRomanFont,
     color: rgb(0.2, 0.2, 0.2),
   })
 
   coverPage.drawText(`Date: ${new Date().toLocaleDateString('en-US')}`, {
-    x: coverWidth / 2 - 60,
+    x: 220,
     y: 100,
     size: 14,
     font: timesRomanFont,
@@ -1750,45 +1808,52 @@ const createComplexDoc = async () => {
   const contentPage = pdfDoc.addPage([600, 800])
   const { height: contentHeight } = contentPage.getSize()
 
-  contentPage.drawText('Chapter 1: Overview', {
-    x: 50,
+  contentPage.drawText('Chapter 1: Technical Overview', {
+    x: 30,
     y: contentHeight - 50,
-    size: 24,
+    size: 22,
     font: helveticaBoldFont,
     color: rgb(0, 0, 0),
+  })
+
+  contentPage.drawText('(Di Yi Zhang: Ji Shu Gai Shu)', {
+    x: 30,
+    y: contentHeight - 75,
+    size: 11,
+    font: timesRomanFont,
+    color: rgb(0.5, 0.5, 0.5),
   })
 
   const paragraphs = [
-    'This report provides comprehensive research on modern',
-    'frontend printing framework solutions, including native',
-    'browser APIs and third-party libraries.',
+    'This report introduces modern frontend printing',
+    'framework technology selection and implementation,',
+    'including native browser APIs and third-party libs.',
     '',
-    'PDF-LIB is a powerful modern PDF manipulation library',
-    'supporting creation, editing, merging, and form filling.',
+    'PDF-LIB is a powerful modern PDF manipulation',
+    'library supporting creation, editing, merging',
+    'and form filling features.',
+    '',
+    'Key Features:',
+    '- Pure JavaScript, no backend required',
+    '- Modern ES6+ syntax support',
+    '- Complete TypeScript type definitions',
+    '- Can edit existing PDF documents',
   ]
 
-  let yPosition = contentHeight - 100
+  let yPosition = contentHeight - 110
   paragraphs.forEach((text) => {
     contentPage.drawText(text, {
-      x: 50,
+      x: 30,
       y: yPosition,
-      size: 14,
+      size: 12,
       font: timesRomanFont,
       color: rgb(0.2, 0.2, 0.2),
     })
-    yPosition -= 25
-  })
-
-  contentPage.drawText('Chapter 2: Technology Selection', {
-    x: 50,
-    y: yPosition - 30,
-    size: 24,
-    font: helveticaBoldFont,
-    color: rgb(0, 0, 0),
+    yPosition -= 20
   })
 
   const pdfBytes = await pdfDoc.save()
-  download(pdfBytes, 'complex-document.pdf')
+  await printPdfBytes(pdfBytes)
 }
 </script>
 

@@ -732,7 +732,11 @@ pdfMake.createPdf(docDefinition).download('basic.pdf')</code></pre>
               <div class="demo-content">
                 <div class="preview-box">
                   <p>
-                    <a href="#" style="color: #667eea; text-decoration: underline"
+                    <a
+                      href="https://pdfmake.github.io/docs/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style="color: #667eea; text-decoration: underline"
                       >访问 pdfmake 官网</a
                     >
                     (外部链接)
@@ -1034,10 +1038,78 @@ onMounted(async () => {
     await configurePdfMakeChinese()
     fontsReady.value = true
     console.log('✅ pdfmake 中文字体配置完成')
+
+    // 加载logo图片
+    const response = await fetch('/imgs/logo.jpg')
+    const blob = await response.blob()
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      sampleImage.value = reader.result as string
+    }
+    reader.readAsDataURL(blob)
   } catch (error) {
-    console.error('❌ pdfmake 字体配置失败:', error)
+    console.error('❌ pdfmake 字体或图片配置失败:', error)
   }
 })
+
+// 将PDF Blob在新窗口/iframe中打开并触发打印
+const openBlobInPrintWindow = async (blob: Blob) => {
+  try {
+    const url = URL.createObjectURL(blob)
+    const iframe = document.createElement('iframe')
+    iframe.style.position = 'fixed'
+    iframe.style.right = '0'
+    iframe.style.bottom = '0'
+    iframe.style.width = '0'
+    iframe.style.height = '0'
+    iframe.style.border = '0'
+    iframe.src = url
+    document.body.appendChild(iframe)
+
+    await new Promise<void>((resolve) => {
+      iframe.onload = () => {
+        try {
+          // 有些浏览器需要稍微延迟再调用print
+          setTimeout(() => {
+            try {
+              iframe.contentWindow?.focus()
+              iframe.contentWindow?.print()
+
+              // 监听打印完成事件（打印对话框关闭后清理）
+              const cleanup = () => {
+                setTimeout(() => {
+                  try {
+                    document.body.removeChild(iframe)
+                  } catch (e) {}
+                  URL.revokeObjectURL(url)
+                }, 100)
+              }
+
+              // 尝试监听 afterprint 事件
+              if (iframe.contentWindow) {
+                iframe.contentWindow.addEventListener('afterprint', cleanup, { once: true })
+                // 备用：如果5分钟后还没清理，强制清理
+                setTimeout(cleanup, 300000)
+              } else {
+                cleanup()
+              }
+            } catch (e) {
+              console.warn('触发打印失败，尝试打开新标签页打印', e)
+              window.open(url)
+              setTimeout(() => URL.revokeObjectURL(url), 5000)
+            }
+            resolve()
+          }, 200)
+        } catch (e) {
+          resolve()
+        }
+      }
+    })
+  } catch (err) {
+    console.error('openBlobInPrintWindow 错误:', err)
+    throw err
+  }
+}
 
 // ==================== 基础功能示例函数 ====================
 
@@ -1063,7 +1135,7 @@ const example1Generate = async () => {
       ...chineseStyles,
     }
 
-    pdfMake.createPdf(docDefinition).download('pdfmake-basic.pdf')
+    pdfMake.createPdf(docDefinition).getBlob((blob: Blob) => openBlobInPrintWindow(blob))
     statusMessage.value = '✅ PDF生成成功！'
   } catch (error) {
     console.error('PDF生成错误:', error)
@@ -1106,7 +1178,7 @@ const example2Generate = async () => {
       defaultStyle: chineseStyles.defaultStyle,
     }
 
-    pdfMake.createPdf(docDefinition).download('pdfmake-styles.pdf')
+    pdfMake.createPdf(docDefinition).getBlob((blob: Blob) => openBlobInPrintWindow(blob))
     statusMessage.value = '✅ PDF生成成功！'
   } catch (error) {
     console.error('PDF生成错误:', error)
@@ -1164,7 +1236,7 @@ const example3Generate = async () => {
       defaultStyle: chineseStyles.defaultStyle,
     }
 
-    pdfMake.createPdf(docDefinition).download('pdfmake-lists.pdf')
+    pdfMake.createPdf(docDefinition).getBlob((blob: Blob) => openBlobInPrintWindow(blob))
     statusMessage.value = '✅ PDF生成成功！'
   } catch (error) {
     console.error('PDF生成错误:', error)
@@ -1231,7 +1303,7 @@ const example4Generate = async () => {
       defaultStyle: chineseStyles.defaultStyle,
     }
 
-    pdfMake.createPdf(docDefinition).download('pdfmake-columns.pdf')
+    pdfMake.createPdf(docDefinition).getBlob((blob: Blob) => openBlobInPrintWindow(blob))
     statusMessage.value = '✅ PDF生成成功！'
   } catch (error) {
     console.error('PDF生成错误:', error)
@@ -1284,7 +1356,7 @@ const example5Generate = async () => {
       defaultStyle: chineseStyles.defaultStyle,
     }
 
-    pdfMake.createPdf(docDefinition).download('pdfmake-header-footer.pdf')
+    pdfMake.createPdf(docDefinition).getBlob((blob: Blob) => openBlobInPrintWindow(blob))
     statusMessage.value = '✅ PDF生成成功！'
   } catch (error) {
     console.error('PDF生成错误:', error)
@@ -1342,7 +1414,7 @@ const example6Generate = async () => {
       defaultStyle: chineseStyles.defaultStyle,
     }
 
-    pdfMake.createPdf(docDefinition).download('pdfmake-pagination.pdf')
+    pdfMake.createPdf(docDefinition).getBlob((blob: Blob) => openBlobInPrintWindow(blob))
     statusMessage.value = '✅ PDF生成成功！'
   } catch (error) {
     console.error('PDF生成错误:', error)
@@ -1357,9 +1429,8 @@ const example6Generate = async () => {
 const currentAdvanced = ref(0)
 const advancedExamples = ['表格', '图片嵌入', '水印背景', '复杂表格', '链接目录', '完整报告']
 
-// 示例图片 (SVG格式)
-const sampleImage =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='150'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23764ba2;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad)' width='200' height='150'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='18' fill='white' text-anchor='middle' dominant-baseline='middle'%3Epdfmake%3C/text%3E%3C/svg%3E"
+// 示例图片
+const sampleImage = ref('')
 
 // 高级1: 表格生成
 const advanced1Generate = async () => {
@@ -1413,7 +1484,7 @@ const advanced1Generate = async () => {
       defaultStyle: chineseStyles.defaultStyle,
     }
 
-    pdfMake.createPdf(docDefinition).download('pdfmake-table.pdf')
+    pdfMake.createPdf(docDefinition).getBlob((blob: Blob) => openBlobInPrintWindow(blob))
     statusMessage.value = '✅ 表格PDF生成成功！'
   } catch (error) {
     console.error('PDF生成错误:', error)
@@ -1442,19 +1513,25 @@ const advanced2Generate = async () => {
         { text: '支持多种图片格式和对齐方式', style: 'subheader' },
         { text: '图片居左:', margin: [0, 10, 0, 5] },
         {
-          image: sampleImage,
+          image:
+            sampleImage.value ||
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
           width: 150,
           alignment: 'left',
         },
         { text: '图片居中:', margin: [0, 20, 0, 5] },
         {
-          image: sampleImage,
+          image:
+            sampleImage.value ||
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
           width: 150,
           alignment: 'center',
         },
         { text: '图片居右:', margin: [0, 20, 0, 5] },
         {
-          image: sampleImage,
+          image:
+            sampleImage.value ||
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
           width: 150,
           alignment: 'right',
         },
@@ -1476,7 +1553,7 @@ const advanced2Generate = async () => {
       defaultStyle: chineseStyles.defaultStyle,
     }
 
-    pdfMake.createPdf(docDefinition).download('pdfmake-images.pdf')
+    pdfMake.createPdf(docDefinition).getBlob((blob: Blob) => openBlobInPrintWindow(blob))
     statusMessage.value = '✅ 图片PDF生成成功！'
   } catch (error) {
     console.error('PDF生成错误:', error)
@@ -1542,7 +1619,7 @@ const advanced3Generate = async () => {
       defaultStyle: chineseStyles.defaultStyle,
     }
 
-    pdfMake.createPdf(docDefinition).download('pdfmake-watermark.pdf')
+    pdfMake.createPdf(docDefinition).getBlob((blob: Blob) => openBlobInPrintWindow(blob))
     statusMessage.value = '✅ 水印PDF生成成功！'
   } catch (error) {
     console.error('PDF生成错误:', error)
@@ -1634,7 +1711,7 @@ const advanced4Generate = async () => {
       defaultStyle: chineseStyles.defaultStyle,
     }
 
-    pdfMake.createPdf(docDefinition).download('pdfmake-complex-table.pdf')
+    pdfMake.createPdf(docDefinition).getBlob((blob: Blob) => openBlobInPrintWindow(blob))
     statusMessage.value = '✅ 复杂表格PDF生成成功！'
   } catch (error) {
     console.error('PDF生成错误:', error)
@@ -1707,7 +1784,7 @@ const advanced5Generate = async () => {
       defaultStyle: chineseStyles.defaultStyle,
     }
 
-    pdfMake.createPdf(docDefinition).download('pdfmake-links.pdf')
+    pdfMake.createPdf(docDefinition).getBlob((blob: Blob) => openBlobInPrintWindow(blob))
     statusMessage.value = '✅ 带链接PDF生成成功！'
   } catch (error) {
     console.error('PDF生成错误:', error)
@@ -1817,7 +1894,7 @@ const advanced6Generate = async () => {
       defaultStyle: chineseStyles.defaultStyle,
     }
 
-    pdfMake.createPdf(docDefinition).download('pdfmake-report.pdf')
+    pdfMake.createPdf(docDefinition).getBlob((blob: Blob) => openBlobInPrintWindow(blob))
     statusMessage.value = '✅ 完整报告生成成功！'
   } catch (error) {
     console.error('PDF生成错误:', error)
@@ -1864,7 +1941,7 @@ const generateSimplePDF = async () => {
       ...chineseStyles,
     }
 
-    pdfMake.createPdf(docDefinition).download('pdfmake-chinese-simple.pdf')
+    pdfMake.createPdf(docDefinition).getBlob((blob: Blob) => openBlobInPrintWindow(blob))
 
     statusMessage.value = '✅ PDF 生成成功！'
     setTimeout(() => {
@@ -1923,7 +2000,7 @@ const generateTablePDF = async () => {
       ...chineseStyles,
     }
 
-    pdfMake.createPdf(docDefinition).download('pdfmake-chinese-table.pdf')
+    pdfMake.createPdf(docDefinition).getBlob((blob: Blob) => openBlobInPrintWindow(blob))
 
     statusMessage.value = '✅ 表格 PDF 生成成功！'
     setTimeout(() => {
@@ -2055,7 +2132,7 @@ const generateComplexPDF = async () => {
       },
     }
 
-    pdfMake.createPdf(docDefinition).download('pdfmake-chinese-complex.pdf')
+    pdfMake.createPdf(docDefinition).getBlob((blob: Blob) => openBlobInPrintWindow(blob))
 
     statusMessage.value = '✅ 复杂 PDF 生成成功！'
     setTimeout(() => {
@@ -2230,7 +2307,7 @@ const generateReportPDF = async () => {
       },
     }
 
-    pdfMake.createPdf(docDefinition).download('前端打印完整调研报告.pdf')
+    pdfMake.createPdf(docDefinition).getBlob((blob: Blob) => openBlobInPrintWindow(blob))
 
     statusMessage.value = '✅ 完整报告生成成功！'
     setTimeout(() => {

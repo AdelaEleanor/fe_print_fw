@@ -280,6 +280,102 @@ doc.save('paged-document.pdf');</code></pre>
           <h2>3. pdfmake 声明式分页</h2>
           <button @click="generatePdfmakePaging" class="btn btn-info">📋 生成 pdfmake 分页</button>
 
+          <div
+            class="info-box"
+            style="
+              background: #f0f9ff;
+              padding: 15px;
+              border-radius: 8px;
+              margin: 15px 0;
+              border-left: 4px solid #4299e1;
+            "
+          >
+            <h4 style="margin-top: 0; color: #4299e1">💡 pdfmake 分页核心优势</h4>
+            <p><strong>声明式分页，零计算负担！</strong></p>
+
+            <div style="background: white; padding: 12px; border-radius: 6px; margin: 10px 0">
+              <h5 style="color: #2d3748; margin-top: 0">🎯 vs jsPDF 的核心区别</h5>
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem">
+                <tr>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0"><strong>特性</strong></td>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0"><strong>jsPDF</strong></td>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0"><strong>pdfmake</strong></td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0">分页方式</td>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0">❌ 手动计算Y坐标</td>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0">✅ 自动分页</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0">页眉页脚</td>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0">❌ 需遍历所有页添加</td>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0">✅ header/footer函数</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0">表格跨页</td>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0">❌ 需手动切割数据</td>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0">✅ 自动跨页+表头重复</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0">代码复杂度</td>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0">⚠️ 高（100+ 行）</td>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0">✅ 低（10-20 行）</td>
+                </tr>
+              </table>
+            </div>
+
+            <h5 style="color: #2d3748">✅ 核心优势</h5>
+            <ul style="margin: 10px 0; line-height: 1.8">
+              <li>
+                <strong>零分页计算：</strong>添加 <code>pageBreak: 'before'</code> 或
+                <code>pageBreak: 'after'</code> 即可
+              </li>
+              <li><strong>自动布局引擎：</strong>内容超出页面自动创建新页，无需判断Y坐标</li>
+              <li><strong>表格智能分页：</strong>大表格自动跨页，表头自动在每页重复显示</li>
+              <li>
+                <strong>内置页眉页脚：</strong>通过 <code>header()</code> 和
+                <code>footer()</code> 函数定义一次，所有页自动应用
+              </li>
+              <li>
+                <strong>条件分页：</strong>支持 <code>pageBreakBefore</code> 函数动态判断是否分页
+              </li>
+            </ul>
+
+            <h5 style="color: #2d3748">⚠️ 相比 jsPDF 的劣势</h5>
+            <ul style="margin: 10px 0; line-height: 1.8">
+              <li>
+                <strong>精确度：</strong>无法控制元素精确到像素的位置（jsPDF 可以
+                <code>text(x, y)</code>）
+              </li>
+              <li><strong>自由度：</strong>布局由引擎控制，复杂自定义布局不如 jsPDF 灵活</li>
+              <li><strong>体积：</strong>库体积约 600KB，比 jsPDF (200KB) 大 3 倍</li>
+            </ul>
+
+            <h5 style="color: #2d3748">🎯 最佳应用场景</h5>
+            <div
+              style="
+                background: #fffbeb;
+                padding: 10px;
+                border-radius: 4px;
+                border-left: 3px solid #f59e0b;
+              "
+            >
+              <p style="margin: 0"><strong>推荐场景：</strong></p>
+              <ul style="margin: 5px 0">
+                <li>📄 合同文档、发票、报告（内容为主，无复杂图形）</li>
+                <li>📊 大型数据表格（需要自动跨页）</li>
+                <li>📝 多页文档（10+ 页，需页眉页脚）</li>
+                <li>⚡ 快速开发（不想手动计算分页逻辑）</li>
+              </ul>
+              <p style="margin: 5px 0 0 0"><strong>不推荐：</strong></p>
+              <ul style="margin: 5px 0">
+                <li>❌ 需要精确像素控制的设计稿（用 jsPDF）</li>
+                <li>❌ 复杂图形、图表（用 jsPDF + Canvas）</li>
+                <li>❌ 对文件体积极度敏感（用 jsPDF）</li>
+              </ul>
+            </div>
+          </div>
+
           <div class="code-block">
             <h4>pdfmake 分页代码</h4>
             <pre><code>import pdfMake from 'pdfmake/build/pdfmake';
@@ -287,29 +383,30 @@ doc.save('paged-document.pdf');</code></pre>
 const docDefinition = {
   content: [
     { text: '第一页内容' },
-    { text: '第二页内容', pageBreak: 'before' },
+    { text: '第二页内容', pageBreak: 'before' },  // ✅ 只需一个属性！
     {
       text: '第三页内容',
+      // ✅ 支持条件分页
       pageBreakBefore: (currentNode, followingNodesOnPage) => {
         return currentNode.headlineLevel === 1;
       }
     },
-    // 大表格自动分页
+    // ✅ 大表格自动分页 + 表头重复
     {
       table: {
-        headerRows: 1,
+        headerRows: 1,  // 表头在每页重复
         body: largeDataArray
       },
       layout: 'lightHorizontalLines'
     }
   ],
-  // 页眉
+  // ✅ 页眉：定义一次，所有页自动应用
   header: (currentPage, pageCount) => ({
     text: '文档标题',
     alignment: 'center',
     margin: [0, 10]
   }),
-  // 页脚
+  // ✅ 页脚：自动获取当前页码和总页数
   footer: (currentPage, pageCount) => ({
     text: \`第 \${currentPage} 页 / 共 \${pageCount} 页\`,
     alignment: 'center'
@@ -323,6 +420,52 @@ pdfMake.createPdf(docDefinition).download();</code></pre>
         <div class="section">
           <h2>4. html2canvas + html2pdf 分页</h2>
           <button @click="generateHtml2PdfPaging" class="btn btn-warning">🖼️ HTML转PDF分页</button>
+
+          <div
+            class="info-box"
+            style="
+              background: #fffbeb;
+              padding: 15px;
+              border-radius: 8px;
+              margin: 15px 0;
+              border-left: 4px solid #f59e0b;
+            "
+          >
+            <h4 style="margin-top: 0; color: #f59e0b">💡 html2pdf 分页特点</h4>
+
+            <h5 style="color: #2d3748">✅ 核心优势</h5>
+            <ul style="margin: 10px 0; line-height: 1.8">
+              <li><strong>HTML原样转换：</strong>复杂的 HTML/CSS 布局可以直接转 PDF</li>
+              <li><strong>样式完美保留：</strong>Flexbox、Grid、动画效果等都能转换</li>
+              <li><strong>中文支持好：</strong>使用浏览器渲染，无需字体文件</li>
+              <li><strong>易于使用：</strong>几行代码即可完成转换</li>
+            </ul>
+
+            <h5 style="color: #2d3748">⚠️ 分页劣势</h5>
+            <ul style="margin: 10px 0; line-height: 1.8">
+              <li><strong>精度问题：</strong>分页位置依赖CSS，不同浏览器可能有差异</li>
+              <li><strong>性能较差：</strong>先截图再转PDF，大页面耗时长</li>
+              <li><strong>文件较大：</strong>转换后的PDF实际上是图片，文字无法选中</li>
+              <li><strong>表格截断：</strong>表格可能被分页截断，需要手动调整</li>
+            </ul>
+
+            <h5 style="color: #2d3748">🎯 最佳应用场景</h5>
+            <div
+              style="
+                background: white;
+                padding: 10px;
+                border-radius: 4px;
+                border: 1px solid #f59e0b;
+              "
+            >
+              <p style="margin: 0"><strong>✅ 推荐：</strong>已有复杂 HTML 页面需要导出为 PDF</p>
+              <p style="margin: 5px 0">
+                <strong>✅ 推荐：</strong>设计稿还原（需要完全保留原样式）
+              </p>
+              <p style="margin: 5px 0"><strong>❌ 不推荐：</strong>大量文字文档（PDF 文件太大）</p>
+              <p style="margin: 5px 0"><strong>❌ 不推荐：</strong>需要文字可选中和复制的场景</p>
+            </div>
+          </div>
 
           <div class="code-block">
             <h4>html2pdf 分页代码</h4>
@@ -341,9 +484,9 @@ const options = {
     orientation: 'portrait'
   },
   pagebreak: {
-    mode: ['avoid-all', 'css', 'legacy'],
-    before: '.page-break-before',
-    after: '.page-break-after'
+    mode: ['avoid-all', 'css', 'legacy'],  // 分页模式
+    before: '.page-break-before',           // 在此类前分页
+    after: '.page-break-after'              // 在此类后分页
   }
 };
 
@@ -354,6 +497,60 @@ html2pdf().set(options).from(element).save();</code></pre>
         <div class="section">
           <h2>5. PDF-LIB 高级分页</h2>
           <button @click="generatePdfLibPaging" class="btn btn-success">📚 PDF-LIB 分页示例</button>
+
+          <div
+            class="info-box"
+            style="
+              background: #f0fdf4;
+              padding: 15px;
+              border-radius: 8px;
+              margin: 15px 0;
+              border-left: 4px solid #10b981;
+            "
+          >
+            <h4 style="margin-top: 0; color: #10b981">💡 PDF-LIB 分页特点</h4>
+
+            <h5 style="color: #2d3748">✅ 独特优势（其他库做不到的）</h5>
+            <ul style="margin: 10px 0; line-height: 1.8">
+              <li><strong>编辑现有PDF：</strong>可以打开并修改已有PDF文件</li>
+              <li><strong>页面操作：</strong>插入、删除、复制、旋转页面</li>
+              <li><strong>合并PDF：</strong>将多个PDF合并为一个</li>
+              <li><strong>拆分PDF：</strong>从大PDF提取特定页面</li>
+              <li><strong>表单填充：</strong>可编程方式填写PDF表单</li>
+            </ul>
+
+            <h5 style="color: #2d3748">⚠️ vs jsPDF/pdfmake 的劣势</h5>
+            <ul style="margin: 10px 0; line-height: 1.8">
+              <li><strong>从零创建复杂：</strong>不如 pdfmake 方便（需手动计算坐标）</li>
+              <li><strong>学习曲线陡：</strong>API 较底层，需要了解 PDF 规范</li>
+              <li><strong>布局引擎弱：</strong>没有自动分页、表格跨页等功能</li>
+              <li><strong>中文支持：</strong>需要手动嵌入字体，增加文件大小</li>
+            </ul>
+
+            <h5 style="color: #2d3748">🎯 最佳应用场景</h5>
+            <div
+              style="
+                background: white;
+                padding: 10px;
+                border-radius: 4px;
+                border: 1px solid #10b981;
+              "
+            >
+              <p style="margin: 0"><strong>✅ 推荐场景：</strong></p>
+              <ul style="margin: 5px 0">
+                <li>📝 修改现有PDF（添加水印、签名、页码）</li>
+                <li>🔗 合并多个PDF文档</li>
+                <li>📋 批量填写PDF表单</li>
+                <li>✂️ 从大文件提取特定页面</li>
+              </ul>
+              <p style="margin: 10px 0 0 0"><strong>❌ 不推荐场景：</strong></p>
+              <ul style="margin: 5px 0">
+                <li>从零创建复杂文档（用 pdfmake）</li>
+                <li>需要快速开发（用 pdfmake 或 html2pdf）</li>
+                <li>大量文字排版（用 pdfmake）</li>
+              </ul>
+            </div>
+          </div>
 
           <div class="code-block">
             <h4>PDF-LIB 分页代码</h4>
@@ -381,6 +578,11 @@ for (let i = 0; i &lt; 5; i++) {
   });
 }
 
+// ✅ 高级操作：合并其他PDF
+const existingPdf = await PDFDocument.load(pdfBytes);
+const [copiedPage] = await pdfDoc.copyPages(existingPdf, [0]);
+pdfDoc.addPage(copiedPage);
+
 const pdfBytes = await pdfDoc.save();
 // 下载PDF</code></pre>
           </div>
@@ -390,23 +592,76 @@ const pdfBytes = await pdfDoc.save();
           <h2>6. Print.js 和 vue3-print-nb CSS分页</h2>
           <button @click="printWithCSS" class="btn btn-info">⚡ CSS分页打印</button>
 
+          <div
+            class="info-box"
+            style="
+              background: #f8fafc;
+              padding: 15px;
+              border-radius: 8px;
+              margin: 15px 0;
+              border-left: 4px solid #64748b;
+            "
+          >
+            <h4 style="margin-top: 0; color: #64748b">💡 Print.js / vue3-print-nb 分页特点</h4>
+
+            <h5 style="color: #2d3748">✅ 核心优势</h5>
+            <ul style="margin: 10px 0; line-height: 1.8">
+              <li><strong>极致轻量：</strong>Print.js 仅 ~10KB，vue3-print-nb ~15KB</li>
+              <li><strong>快速打印：</strong>直接触发浏览器打印对话框，无需转换</li>
+              <li><strong>Vue集成：</strong>vue3-print-nb 提供 v-print 指令，开发效率高</li>
+              <li><strong>多种资源：</strong>支持 HTML、图片、PDF、JSON 等多种格式</li>
+            </ul>
+
+            <h5 style="color: #2d3748">⚠️ 分页劣势</h5>
+            <ul style="margin: 10px 0; line-height: 1.8">
+              <li><strong>完全依赖CSS：</strong>分页控制能力 = CSS 分页能力（有限）</li>
+              <li><strong>无法生成PDF：</strong>只能打印，不能导出为PDF文件</li>
+              <li><strong>浏览器差异：</strong>不同浏览器打印效果可能不同</li>
+              <li><strong>精度低：</strong>无法精确控制分页位置</li>
+            </ul>
+
+            <h5 style="color: #2d3748">🎯 最佳应用场景</h5>
+            <div
+              style="
+                background: white;
+                padding: 10px;
+                border-radius: 4px;
+                border: 1px solid #64748b;
+              "
+            >
+              <p style="margin: 0"><strong>✅ 完美适配：</strong></p>
+              <ul style="margin: 5px 0">
+                <li>🖨️ 快速打印功能（用户直接打印，不需要PDF文件）</li>
+                <li>🎯 简单页面打印（订单、收据、标签）</li>
+                <li>⚡ 对文件大小敏感的项目（需要极小体积）</li>
+                <li>📱 移动端打印（浏览器原生支持）</li>
+              </ul>
+              <p style="margin: 10px 0 0 0"><strong>❌ 不推荐：</strong></p>
+              <ul style="margin: 5px 0">
+                <li>需要生成PDF文件（用 jsPDF/pdfmake）</li>
+                <li>精确分页控制（用 jsPDF）</li>
+                <li>复杂文档布局（用 pdfmake）</li>
+              </ul>
+            </div>
+          </div>
+
           <div id="print-css-content" class="demo-content print-demo">
             <div class="print-page">
-              <h3>1 - Print.js CSS</h3>
-              <p>Print.jsCSS。</p>
-              <p>Print.js。</p>
-              <p>CSS @media print：</p>
+              <h3>第 1 页 - Print.js 轻量级打印</h3>
+              <p>Print.js 是最轻量的打印库，仅需 CSS 控制分页。</p>
+              <p>适合快速开发简单打印功能。</p>
+              <p>分页通过 CSS @media print 实现：</p>
               <ul>
-                <li>API</li>
-                <li>(~10KB)</li>
-                <li></li>
+                <li>无需复杂 API</li>
+                <li>体积极小 (~10KB)</li>
+                <li>浏览器兼容性好</li>
               </ul>
             </div>
 
             <div class="print-page page-break-before">
-              <h3>2 - CSS</h3>
-              <p>.page-break-before。</p>
-              <p>CSS：</p>
+              <h3>第 2 页 - CSS 分页控制</h3>
+              <p>本页使用 .page-break-before 类强制分页。</p>
+              <p>CSS 代码：</p>
               <pre><code>.page-break-before &lbrace;
   page-break-before: always;
   break-before: page;
@@ -414,12 +669,12 @@ const pdfBytes = await pdfDoc.save();
             </div>
 
             <div class="print-page page-break-before">
-              <h3>3 - Vue</h3>
-              <p>vue3-print-nbVue：</p>
+              <h3>第 3 页 - Vue 指令集成</h3>
+              <p>vue3-print-nb 为 Vue 3 提供打印指令：</p>
               <pre><code>&lt;div v-print="printConfig"&gt;
-
+  打印内容
 &lt;/div&gt;</code></pre>
-              <p>CSS。</p>
+              <p>分页控制同样依赖 CSS。</p>
             </div>
           </div>
 
@@ -467,9 +722,54 @@ printJS({
           <h2>7. print-html-element 简单分页</h2>
           <button @click="printElementPaging" class="btn btn-secondary">🎯 元素打印分页</button>
 
+          <div
+            class="info-box"
+            style="
+              background: #faf5ff;
+              padding: 15px;
+              border-radius: 8px;
+              margin: 15px 0;
+              border-left: 4px solid #a855f7;
+            "
+          >
+            <h4 style="margin-top: 0; color: #a855f7">💡 print-html-element 分页特点</h4>
+
+            <h5 style="color: #2d3748">✅ 核心优势</h5>
+            <ul style="margin: 10px 0; line-height: 1.8">
+              <li><strong>体积最小：</strong>仅 5KB！所有打印库中最轻量</li>
+              <li><strong>API最简：</strong>只需一个函数 <code>printElement(element)</code></li>
+              <li><strong>零配置：</strong>无需任何配置，开箱即用</li>
+              <li><strong>DOM直接打印：</strong>无转换损耗，速度最快</li>
+            </ul>
+
+            <h5 style="color: #2d3748">⚠️ 劣势</h5>
+            <ul style="margin: 10px 0; line-height: 1.8">
+              <li><strong>功能最少：</strong>仅支持打印，无其他功能</li>
+              <li><strong>分页=CSS：</strong>分页能力完全依赖CSS</li>
+              <li><strong>无PDF导出：</strong>只能触发浏览器打印对话框</li>
+            </ul>
+
+            <h5 style="color: #2d3748">🎯 应用场景</h5>
+            <div
+              style="
+                background: white;
+                padding: 10px;
+                border-radius: 4px;
+                border: 1px solid #a855f7;
+              "
+            >
+              <p style="margin: 0"><strong>✅ 最适合：</strong>对体积极度敏感的项目</p>
+              <p style="margin: 5px 0"><strong>✅ 推荐：</strong>只需要简单打印功能，不需要配置</p>
+              <p style="margin: 5px 0"><strong>⚖️ 对比：</strong>比 Print.js (10KB) 还小一半</p>
+              <p style="margin: 5px 0">
+                <strong>❌ 不推荐：</strong>需要复杂配置或PDF导出（用其他库）
+              </p>
+            </div>
+          </div>
+
           <div id="print-element-content" class="demo-content print-demo">
             <div class="print-section">
-              <h3>第1节 - 超轻量级</h3>
+              <h3>第1页 - 超轻量级</h3>
               <p>print-html-element 是最小的打印库，仅有 5KB！</p>
               <p>它直接打印 DOM 元素，无需任何转换。</p>
               <div class="highlight-box">
@@ -481,24 +781,87 @@ printJS({
                   <li>支持 CSS 分页</li>
                 </ul>
               </div>
+              <p style="margin-top: 20px">下面是一些填充内容，用于演示分页效果。</p>
+              <p>当内容超过一页时，CSS 会自动处理分页。</p>
+              <p>这里展示了如何使用浏览器原生的打印功能。</p>
             </div>
 
             <div class="print-section page-break-before">
-              <h3>第2节 - 浏览器原生</h3>
+              <h3>第2页 - CSS 分页控制</h3>
               <p>这个库利用浏览器的原生打印对话框。</p>
               <p>分页完全由 CSS 控制：</p>
               <div class="code-sample">
-                <code> .page-break-before &lbrace; page-break-before: always; &rbrace; </code>
+                <code> .page-break-before { page-break-before: always; break-before: page; } </code>
+              </div>
+              <p style="margin-top: 15px">
+                使用 <code>.page-break-before</code> 类强制在此元素前分页。
+              </p>
+              <div style="background: #f0f7ff; padding: 15px; border-radius: 8px; margin-top: 15px">
+                <strong>优势：</strong>
+                <ul>
+                  <li>无需配置，开箱即用</li>
+                  <li>体积极小，加载快</li>
+                  <li>兼容所有浏览器</li>
+                </ul>
               </div>
             </div>
 
             <div class="print-section page-break-before">
-              <h3>第3节 - 简单使用</h3>
+              <h3>第3页 - 简单使用</h3>
               <p>只需一行代码即可打印任意元素：</p>
               <div class="code-sample">
                 <code>printElement(document.getElementById('myElement'));</code>
               </div>
-              <p>非常适合简单的打印需求，无需生成PDF。</p>
+              <p style="margin-top: 15px">非常适合简单的打印需求，无需生成PDF。</p>
+              <div
+                style="
+                  background: #fef3c7;
+                  padding: 15px;
+                  border-radius: 8px;
+                  margin-top: 15px;
+                  border-left: 4px solid #f59e0b;
+                "
+              >
+                <strong>⚠️ 注意：</strong>
+                <p style="margin: 5px 0 0 0">分页精度取决于浏览器，不同浏览器可能有细微差异。</p>
+              </div>
+            </div>
+
+            <div class="print-section page-break-before">
+              <h3>第4页 - 对比总结</h3>
+              <table style="width: 100%; border-collapse: collapse; margin: 15px 0">
+                <thead>
+                  <tr style="background: #a855f7; color: white">
+                    <th style="padding: 10px; border: 1px solid #ddd">特性</th>
+                    <th style="padding: 10px; border: 1px solid #ddd">print-html-element</th>
+                    <th style="padding: 10px; border: 1px solid #ddd">Print.js</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd">体积</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; background: #dcfce7">
+                      ✅ 5KB
+                    </td>
+                    <td style="padding: 8px; border: 1px solid #ddd">⚠️ 10KB</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd">API复杂度</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; background: #dcfce7">
+                      ✅ 极简
+                    </td>
+                    <td style="padding: 8px; border: 1px solid #ddd">⚠️ 需要配置</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd">分页控制</td>
+                    <td style="padding: 8px; border: 1px solid #ddd">CSS</td>
+                    <td style="padding: 8px; border: 1px solid #ddd">CSS</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p style="margin-top: 20px; font-weight: bold; color: #a855f7">
+                最适合：对体积极度敏感的项目，只需简单打印功能。
+              </p>
             </div>
           </div>
 
@@ -509,7 +872,7 @@ printJS({
 // print-html-element 依赖浏览器原生打印和CSS
 // 分页控制通过 CSS 实现
 const element = document.getElementById('content');
-printElement(element);
+printElement(element);  // ✅ 就这么简单！
 
 // CSS 分页样式
 /*
@@ -748,12 +1111,57 @@ tfoot {
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import { jsPDF } from 'jspdf'
 import pdfMake from 'pdfmake/build/pdfmake'
 import * as pdfFonts from 'pdfmake/build/vfs_fonts'
+import { loadJsPDFChineseFont, configurePdfMakeChinese } from '@/utils/fontLoader'
 
 // @ts-ignore
 pdfMake.vfs = pdfFonts.pdfMake?.vfs || pdfFonts
+
+// 统一的打印辅助函数
+function openBlobInPrintWindow(blob: Blob) {
+  const url = URL.createObjectURL(blob)
+  const iframe = document.createElement('iframe')
+  iframe.style.display = 'none'
+  iframe.src = url
+  document.body.appendChild(iframe)
+
+  const cleanup = () => {
+    if (document.body.contains(iframe)) {
+      document.body.removeChild(iframe)
+    }
+    URL.revokeObjectURL(url)
+  }
+
+  iframe.onload = () => {
+    setTimeout(() => {
+      try {
+        iframe.contentWindow?.print()
+      } catch (e) {
+        console.error('打印失败:', e)
+      }
+    }, 500)
+  }
+
+  // 监听打印完成事件
+  if (iframe.contentWindow) {
+    iframe.contentWindow.addEventListener('afterprint', cleanup)
+  }
+
+  // 5分钟后强制清理
+  setTimeout(cleanup, 300000)
+}
+
+// 加载字体
+onMounted(async () => {
+  try {
+    await configurePdfMakeChinese()
+  } catch (error) {
+    console.error('字体加载失败:', error)
+  }
+})
 
 const printCSSPaging = () => {
   const element = document.getElementById('css-paging')
@@ -813,360 +1221,645 @@ const printCSSPaging = () => {
 
 const generateJsPDFPaging = async () => {
   const doc = new jsPDF()
+
+  // 加载中文字体
+  try {
+    await loadJsPDFChineseFont(doc)
+  } catch (error) {
+    console.error('字体加载失败:', error)
+    alert('字体加载失败，请刷新页面重试')
+    return
+  }
+
   const pageHeight = doc.internal.pageSize.height
   const pageWidth = doc.internal.pageSize.width
   let yPosition = 20
 
-  // 第一页：展示精确控制的优势
-  doc.setFontSize(18)
-  doc.text('jsPDF: Pixel-Perfect Control', pageWidth / 2, yPosition, { align: 'center' })
+  // ========== 第1页：展示精确Y坐标控制 ==========
+  doc.setFontSize(20)
+  doc.setTextColor(102, 126, 234)
+  doc.text('jsPDF: 像素级精确控制', pageWidth / 2, yPosition, { align: 'center' })
   yPosition += 15
 
   doc.setFontSize(12)
   doc.setTextColor(0, 128, 0)
-  doc.text('Advantage Demo: Exact Position Control', 20, yPosition)
+  doc.text('✓ 优势1：精确位置控制', 20, yPosition)
   yPosition += 10
 
   doc.setTextColor(0, 0, 0)
   doc.setFontSize(10)
+  doc.text(`当前Y坐标: ${yPosition.toFixed(2)}mm - 我们精确知道这个位置`, 20, yPosition)
+  yPosition += 8
+
+  doc.text(`当前Y坐标: ${yPosition.toFixed(2)}mm - 每个像素都在掌控之中`, 20, yPosition)
+  yPosition += 8
+
+  doc.text(`当前Y坐标: ${yPosition.toFixed(2)}mm - 无CSS干扰，无浏览器差异！`, 20, yPosition)
+  yPosition += 15
+
+  // 精确绘制图形
+  doc.setDrawColor(102, 126, 234)
+  doc.setLineWidth(0.5)
+  doc.rect(20, yPosition, 50, 30) // 精确矩形
+  doc.circle(100, yPosition + 15, 15) // 精确圆形
+  doc.line(130, yPosition, 180, yPosition + 30) // 精确斜线
+  yPosition += 40
+
+  doc.setFontSize(12)
+  doc.setTextColor(0, 128, 0)
+  doc.text('✓ 优势2：精确表格布局', 20, yPosition)
+  yPosition += 10
+
+  // 表格 - 像素级对齐
+  doc.setFontSize(10)
+  doc.setTextColor(0, 0, 0)
+  doc.line(20, yPosition, 190, yPosition)
+  yPosition += 5
+  doc.text('产品', 25, yPosition)
+  doc.text('数量', 100, yPosition)
+  doc.text('价格', 150, yPosition)
+  yPosition += 3
+  doc.line(20, yPosition, 190, yPosition)
+  yPosition += 5
+
+  for (let i = 1; i <= 8; i++) {
+    doc.text(`商品 ${i}`, 25, yPosition)
+    doc.text(`${i * 2}`, 105, yPosition)
+    doc.text(`¥${i * 10}.00`, 150, yPosition)
+    yPosition += 6
+  }
+  doc.line(20, yPosition, 190, yPosition)
+  yPosition += 15
+
+  // ========== 手动分页逻辑演示 ==========
+  doc.setFontSize(12)
+  doc.setTextColor(255, 140, 0)
+  doc.text('⚠ 关键点：手动分页逻辑', 20, yPosition)
+  yPosition += 10
+
+  doc.setFontSize(9)
+  doc.setTextColor(100, 100, 100)
   doc.text(
-    `Y Position: ${yPosition.toFixed(1)}mm - This text is at EXACTLY this position`,
+    '代码: if (yPosition > pageHeight - 30) { doc.addPage(); yPosition = 20; }',
     20,
     yPosition,
   )
-  yPosition += 15
-
-  doc.text(`Y Position: ${yPosition.toFixed(1)}mm - We control every pixel`, 20, yPosition)
-  yPosition += 15
-
-  doc.text(`Y Position: ${yPosition.toFixed(1)}mm - No browser variance`, 20, yPosition)
-  yPosition += 20
-
-  // 绘制表格演示精确对齐
-  doc.setFontSize(11)
-  doc.text('Table with Exact Alignment:', 20, yPosition)
-  yPosition += 8
-
-  // 表格线条 - 精确定位
-  doc.line(20, yPosition, 190, yPosition) // 顶部线
-  yPosition += 5
-  doc.text('Item', 25, yPosition)
-  doc.text('Price', 150, yPosition)
-  yPosition += 3
-  doc.line(20, yPosition, 190, yPosition) // 分隔线
-  yPosition += 5
-
-  for (let i = 1; i <= 5; i++) {
-    doc.text(`Product ${i}`, 25, yPosition)
-    doc.text(`$${i * 10}.00`, 150, yPosition)
-    yPosition += 6
-  }
-  doc.line(20, yPosition, 190, yPosition) // 底部线
-  yPosition += 15
-
-  // 展示自动分页功能
-  doc.setFontSize(12)
-  doc.setTextColor(0, 128, 0)
-  doc.text('Advantage: Auto Page Break Control', 20, yPosition)
   yPosition += 10
 
-  doc.setTextColor(0, 0, 0)
   doc.setFontSize(10)
+  doc.setTextColor(0, 0, 0)
 
-  // 添加大量内容演示自动分页
-  for (let i = 0; i < 60; i++) {
-    // 检查是否需要新页（关键分页逻辑）
+  // 添加大量内容演示手动分页
+  for (let i = 0; i < 50; i++) {
+    // ⚠️ 关键：手动判断是否需要新页
     if (yPosition > pageHeight - 30) {
       doc.addPage()
       yPosition = 20
 
-      // 在新页面添加页眉
-      doc.setFontSize(12)
-      doc.setTextColor(128, 128, 128)
-      doc.text(`Continued from previous page...`, 20, yPosition)
-      yPosition += 10
-      doc.setTextColor(0, 0, 0)
       doc.setFontSize(10)
+      doc.setTextColor(128, 128, 128)
+      doc.text('>>> 触发分页（手动检查）', 20, yPosition)
+      yPosition += 8
+      doc.setTextColor(0, 0, 0)
     }
 
-    doc.text(
-      `Line ${i + 1} at Y=${yPosition.toFixed(1)}mm - Precise control guaranteed`,
-      20,
-      yPosition,
-    )
-    yPosition += 7
+    doc.text(`第 ${i + 1} 行 | Y=${yPosition.toFixed(1)}mm | 需要手动计算`, 20, yPosition)
+    yPosition += 6
   }
 
-  // 添加页码到所有页面
-  // @ts-ignore - getNumberOfPages exists but type definition is incomplete
+  // 手动添加页码到所有页
+  // @ts-ignore
   const totalPages = doc.internal.getNumberOfPages()
   for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i)
-    doc.setFontSize(9)
-    doc.text(`${i} / ${totalPages}`, pageWidth / 2, pageHeight - 10, {
+    doc.setFontSize(8)
+    doc.setTextColor(128, 128, 128)
+    doc.text(`第 ${i}/${totalPages} 页 | 手动添加页码`, pageWidth / 2, pageHeight - 8, {
       align: 'center',
     })
   }
 
-  doc.save('jspdf-paging.pdf')
+  // ✅ 改为打印预览
+  const blob = doc.output('blob')
+  openBlobInPrintWindow(blob)
 }
 
 const generatePdfmakePaging = () => {
   const docDefinition: any = {
     pageSize: 'A4',
     pageMargins: [40, 60, 40, 60],
+    // ✅ Advantage 1: Built-in header (NO manual loop needed!)
     header: (currentPage: number, pageCount: number) => ({
-      text: 'pdfmake Declarative Pagination Demo',
-      alignment: 'center',
-      margin: [0, 20, 0, 0],
-      fontSize: 10,
-      color: '#666',
+      columns: [
+        { text: 'pdfmake Demo', alignment: 'left', margin: [40, 20, 0, 0], fontSize: 9 },
+        {
+          text: `Auto Header (Page ${currentPage}/${pageCount})`,
+          alignment: 'right',
+          margin: [0, 20, 40, 0],
+          fontSize: 9,
+          color: '#666',
+        },
+      ],
     }),
+    // ✅ Advantage 2: Built-in footer (NO manual loop needed!)
     footer: (currentPage: number, pageCount: number) => ({
-      text: `Page ${currentPage} of ${pageCount}`,
+      text: `Page ${currentPage} of ${pageCount} | Auto-generated by pdfmake`,
       alignment: 'center',
       margin: [0, 0, 0, 20],
+      fontSize: 8,
+      color: '#999',
     }),
+    defaultStyle: {
+      font: 'NotoSansSC',
+    },
     content: [
-      { text: 'Advantage: Built-in Header & Footer', style: 'header' },
+      // ========== Page 1 ==========
+      { text: 'pdfmake: 零计算分页', style: 'title', color: '#4299e1' },
+      { text: '✓ 优势1：声明式分页', style: 'header' },
       {
-        text: 'No manual calculation needed! pdfmake automatically adds header and footer to every page.',
-      },
-      { text: 'Just define them once in the document definition.', margin: [0, 5, 0, 20] },
-
-      { text: 'Advantage: Declarative Page Breaks', style: 'header', pageBreak: 'before' },
-      {
-        text: 'Simply add pageBreak: "before" or "after" property. ',
+        text: '无需Y坐标追踪！只需添加 pageBreak 属性：',
+        margin: [0, 0, 0, 5],
       },
       {
-        text: 'No Y-position calculation required!',
+        text: '{ text: "内容", pageBreak: "before" } ← 就这么简单！',
         bold: true,
         color: '#008800',
-        margin: [0, 5, 0, 20],
+        background: '#f0f9ff',
+        margin: [20, 5, 20, 15],
+      },
+      {
+        text: '对比 jsPDF: if (yPosition > pageHeight - 30) { doc.addPage(); yPosition = 20; }',
+        fontSize: 9,
+        color: '#dc2626',
+        margin: [20, 0, 20, 20],
       },
 
-      { text: 'Advantage: Auto Table Pagination', style: 'header', pageBreak: 'before' },
+      // ========== Page 2 (Declarative break!) ==========
       {
-        text: 'Large tables automatically split across pages. Table headers repeat on each page!',
+        text: '✓ 优势2：自动页眉页脚',
+        style: 'header',
+        pageBreak: 'before', // ← 只需一个属性！
+      },
+      {
+        text: '定义 header() 和 footer() 一次 → 自动应用到所有页面！',
         margin: [0, 0, 0, 10],
       },
       {
+        text: '无需像 jsPDF 那样手动遍历所有页面！',
+        bold: true,
+        color: '#008800',
+        margin: [0, 0, 0, 20],
+      },
+      {
+        ul: ['页眉自动显示当前页码', '页脚自动显示总页数', 'pdfmake 为你计算一切', '零手动追踪'],
+      },
+
+      // ========== Page 3: Smart Table ==========
+      {
+        text: '✓ 优势3：智能表格分页',
+        style: 'header',
+        pageBreak: 'before',
+      },
+      {
+        text: '表格自动跨页分割。表头在每页自动重复！',
+        margin: [0, 0, 0, 10],
+        bold: true,
+        color: '#4299e1',
+      },
+      // Large table (will auto-paginate)
+      {
         table: {
-          headerRows: 1,
+          headerRows: 1, // ← 每页自动重复！
           widths: ['*', 'auto', 'auto', 'auto'],
           body: [
             [
-              { text: 'Product Name', style: 'tableHeader' },
-              { text: 'Qty', style: 'tableHeader' },
-              { text: 'Price', style: 'tableHeader' },
-              { text: 'Total', style: 'tableHeader' },
+              { text: '产品名称（自动重复表头）', style: 'tableHeader' },
+              { text: '数量', style: 'tableHeader' },
+              { text: '单价', style: 'tableHeader' },
+              { text: '小计', style: 'tableHeader' },
             ],
-            ...Array.from({ length: 50 }, (_, i) => [
-              `Product Item #${i + 1}`,
+            ...Array.from({ length: 60 }, (_, i) => [
+              `产品项目 #${i + 1}`,
               `${i + 1}`,
-              `$${(i + 1) * 10}.00`,
-              `$${(i + 1) * (i + 1) * 10}.00`,
+              `¥${(i + 1) * 12}.00`,
+              `¥${(i + 1) * (i + 1) * 12}.00`,
             ]),
           ],
         },
         layout: {
           fillColor: (rowIndex: number) =>
-            rowIndex === 0 ? '#667eea' : rowIndex % 2 === 0 ? '#f7fafc' : null,
+            rowIndex === 0 ? '#4299e1' : rowIndex % 2 === 0 ? '#f0f9ff' : null,
+          hLineWidth: () => 0.5,
+          vLineWidth: () => 0.5,
+          hLineColor: () => '#cbd5e0',
+          vLineColor: () => '#cbd5e0',
         },
       },
 
+      // ========== Summary Page ==========
       {
-        text: 'Summary',
+        text: '总结：为什么 pdfmake 适合多页文档',
         style: 'header',
         pageBreak: 'before',
+        color: '#10b981',
       },
       {
-        text: 'pdfmake Advantages Demonstrated:',
-        bold: true,
-        margin: [0, 0, 0, 10],
-      },
-      {
-        ul: [
-          'Automatic header/footer on all pages',
-          'Simple pageBreak properties',
-          'Table auto-pagination with header repetition',
-          'No manual Y-position tracking needed',
-          'Declarative, readable code',
+        ol: [
+          { text: '零Y坐标计算', bold: true },
+          { text: '一行代码实现分页（pageBreak 属性）', bold: true },
+          { text: '所有页面自动添加页眉页脚', bold: true },
+          { text: '智能表格分页，表头自动重复', bold: true },
+          { text: '声明式、可读性强的代码', bold: true },
         ],
+        margin: [0, 10, 0, 20],
+      },
+      {
+        text: '最适合：发票、合同、报告、大型表格',
+        fontSize: 12,
+        color: '#10b981',
+        bold: true,
+        alignment: 'center',
       },
     ],
     styles: {
-      header: {
-        fontSize: 16,
+      title: {
+        fontSize: 20,
         bold: true,
-        margin: [0, 0, 0, 10],
-        color: '#667eea',
+        margin: [0, 0, 0, 20],
+        alignment: 'center',
+      },
+      header: {
+        fontSize: 14,
+        bold: true,
+        margin: [0, 10, 0, 10],
+        color: '#4299e1',
       },
       tableHeader: {
         bold: true,
+        fontSize: 10,
         color: '#ffffff',
+        fillColor: '#4299e1',
       },
     },
   }
 
-  pdfMake.createPdf(docDefinition).download('pdfmake-paging.pdf')
+  // ✅ 改为打印预览
+  try {
+    pdfMake.createPdf(docDefinition).getBlob((blob: Blob) => {
+      openBlobInPrintWindow(blob)
+    })
+  } catch (error) {
+    console.error('PDF生成失败:', error)
+    alert('PDF生成失败，请查看控制台错误信息')
+  }
 }
 
 const generateHtml2PdfPaging = async () => {
-  // 动态导入 html2pdf
   const html2pdf = (await import('html2pdf.js')).default
 
-  // 创建一个包含明确分页的临时元素
+  // 创建复杂HTML演示（展示html2pdf的优势）
   const tempDiv = document.createElement('div')
   tempDiv.innerHTML = `
     <div style="padding: 20px; font-family: 'Microsoft YaHei', Arial, sans-serif;">
-      <h1 style="text-align: center; color: #667eea;">html2pdf.js 分页演示</h1>
-      <h2>第一页 - 简介</h2>
-      <p>html2pdf.js 可以将 HTML 内容转换为 PDF 文档。</p>
-      <p>它结合了 html2canvas 和 jsPDF 的功能。</p>
-      <ul>
-        <li>支持复杂的 HTML 布局</li>
-        <li>保留 CSS 样式</li>
-        <li>支持中文字符</li>
-      </ul>
+      <h1 style="text-align: center; color: #f59e0b; border-bottom: 3px solid #f59e0b; padding-bottom: 10px;">
+        html2pdf.js: 复杂HTML → PDF
+      </h1>
+
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; margin: 20px 0;">
+        <h2 style="margin: 0 0 10px 0;">✓ 核心优势：保留复杂CSS样式</h2>
+        <p style="margin: 0;">渐变、阴影、圆角等样式完美转换！</p>
+      </div>
+
+      <div style="display: flex; gap: 15px; margin: 20px 0;">
+        <div style="flex: 1; background: #fef3c7; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <h3 style="color: #f59e0b; margin-top: 0;">Flexbox 布局</h3>
+          <p>html2pdf 能捕获现代 CSS 布局！</p>
+        </div>
+        <div style="flex: 1; background: #dbeafe; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <h3 style="color: #3b82f6; margin-top: 0;">盒阴影效果</h3>
+          <p>阴影和特效都能保留下来！</p>
+        </div>
+      </div>
+
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <tr style="background: #f59e0b; color: white;">
+          <th style="padding: 10px; border: 1px solid #ddd;">特性</th>
+          <th style="padding: 10px; border: 1px solid #ddd;">jsPDF</th>
+          <th style="padding: 10px; border: 1px solid #ddd;">html2pdf</th>
+        </tr>
+        <tr style="background: #fffbeb;">
+          <td style="padding: 8px; border: 1px solid #ddd;">复杂CSS</td>
+          <td style="padding: 8px; border: 1px solid #ddd;">❌ 手动</td>
+          <td style="padding: 8px; border: 1px solid #ddd;">✅ 自动</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd;">HTML渲染</td>
+          <td style="padding: 8px; border: 1px solid #ddd;">❌ 否</td>
+          <td style="padding: 8px; border: 1px solid #ddd;">✅ 是</td>
+        </tr>
+      </table>
+
       <div class="html2canvas-break"></div>
 
-      <h2>第二页 - 分页控制</h2>
-      <p>html2pdf.js 通过 CSS 控制分页：</p>
-      <ul>
-        <li>使用 page-break-before/after 属性</li>
-        <li>避免元素被截断：avoid-all</li>
-        <li>配置分页模式：mode: ['css', 'legacy']</li>
-      </ul>
+      <h2 style="color: #f59e0b;">Page 2: CSS-Based Pagination</h2>
+      <p>html2pdf uses <strong>CSS page-break</strong> properties:</p>
+      <div style="background: #f4f4f4; padding: 15px; border-radius: 8px; font-family: monospace; margin: 15px 0;">
+        .page-break { page-break-after: always; }
+      </div>
+
+      <div style="background: #fee2e2; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ef4444;">
+        <h3 style="color: #dc2626; margin-top: 0;">⚠ 局限性</h3>
+        <p>与 jsPDF 的像素级精确控制不同，html2pdf 依赖浏览器渲染。</p>
+        <p>不同浏览器的分页位置可能略有差异。</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0;">
+        <div style="background: #dbeafe; padding: 15px; text-align: center; border-radius: 8px;">网格 1</div>
+        <div style="background: #fef3c7; padding: 15px; text-align: center; border-radius: 8px;">网格 2</div>
+        <div style="background: #dcfce7; padding: 15px; text-align: center; border-radius: 8px;">网格 3</div>
+      </div>
+
       <div class="html2canvas-break"></div>
 
-      <h2>第三页 - 使用方法</h2>
-      <p>非常简单的 API 调用：</p>
-      <pre style="background: #f4f4f4; padding: 10px; border-radius: 4px;">html2pdf()
-  .set(options)
-  .from(element)
-  .save()</pre>
-      <p>自动处理 HTML 元素的转换和分页。</p>
+      <h2 style="color: #f59e0b;">第3页：最佳使用场景</h2>
+      <ul style="line-height: 2;">
+        <li>✅ <strong>现有HTML页面</strong>需要导出为PDF</li>
+        <li>✅ <strong>复杂CSS布局</strong>（Flexbox、Grid、渐变）</li>
+        <li>✅ <strong>设计稿</strong>或带样式的报表</li>
+        <li>❌ <strong>不适合：</strong>大量文本文档（文件体积大）</li>
+        <li>❌ <strong>不适合：</strong>需要文本选择（基于图片的PDF）</li>
+      </ul>
+
+      <div style="background: #f0fdf4; padding: 20px; border-radius: 12px; text-align: center; border: 2px dashed #10b981;">
+        <h3 style="color: #10b981; margin-top: 0;">总结</h3>
+        <p style="margin: 0; font-size: 18px;">html2pdf = HTML/CSS → 截图 → PDF</p>
+        <p style="margin: 10px 0 0 0; color: #666;">适合设计类内容，不适合文本密集型文档</p>
+      </div>
     </div>
   `
   document.body.appendChild(tempDiv)
 
   const options = {
-    margin: 15,
-    filename: 'html2pdf-paging.pdf',
+    margin: 10,
+    filename: 'html2pdf-demo.pdf',
     image: { type: 'jpeg' as const, quality: 0.95 },
-    html2canvas: {
-      scale: 2,
-      useCORS: true,
-    },
-    jsPDF: {
-      unit: 'mm' as const,
-      format: 'a4' as const,
-      orientation: 'portrait' as const,
-    },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const },
     pagebreak: {
       mode: ['css', 'legacy'] as ('css' | 'legacy')[],
       before: '.html2canvas-break',
     },
   }
 
-  await html2pdf().set(options).from(tempDiv).save()
+  // ✅ 改为打印预览
+  try {
+    const worker = html2pdf().set(options).from(tempDiv)
+    // 正确的方式：使用 toPdf() 然后 output('blob')
+    const pdf = await worker.toPdf().get('pdf')
+    const blob = pdf.output('blob')
 
-  // 清理临时元素
-  document.body.removeChild(tempDiv)
+    document.body.removeChild(tempDiv)
+    openBlobInPrintWindow(blob)
+  } catch (error) {
+    console.error('HTML转PDF失败:', error)
+    if (document.body.contains(tempDiv)) {
+      document.body.removeChild(tempDiv)
+    }
+    alert('HTML转PDF失败，请查看控制台错误信息')
+  }
 }
 
 const generatePdfLibPaging = async () => {
-  const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib')
+  const { PDFDocument, rgb } = await import('pdf-lib')
+  const fontkit = await import('@pdf-lib/fontkit')
 
   const pdfDoc = await PDFDocument.create()
 
-  // 使用标准字体
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
-  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
+  // 注册fontkit（必须在embedFont之前）
+  pdfDoc.registerFontkit(fontkit.default)
 
-  // 创建5页示例
-  for (let i = 0; i < 5; i++) {
-    const page = pdfDoc.addPage([600, 800])
+  // 加载中文字体
+  let chineseFont: any
+  let chineseBoldFont: any
+  try {
+    const fontPath = '/Noto_Sans_SC/static/NotoSansSC-Regular.ttf'
+    const boldFontPath = '/Noto_Sans_SC/static/NotoSansSC-Bold.ttf'
 
-    // 页面标题
-    page.drawText(`Page ${i + 1}`, {
-      x: 50,
-      y: 750,
-      size: 24,
-      font: boldFont,
-      color: rgb(0.4, 0.49, 0.92),
-    })
+    console.log('开始加载字体...')
+    const fontResponse = await fetch(fontPath)
+    if (!fontResponse.ok) {
+      throw new Error(`字体加载失败: ${fontPath} (${fontResponse.status})`)
+    }
+    const fontBytes = await fontResponse.arrayBuffer()
+    console.log('Regular字体加载成功，大小:', fontBytes.byteLength)
 
-    // 页面内容
-    page.drawText(`This is page ${i + 1} content`, {
-      x: 50,
-      y: 700,
-      size: 14,
-      font: font,
-      color: rgb(0, 0, 0),
-    })
+    const boldFontResponse = await fetch(boldFontPath)
+    if (!boldFontResponse.ok) {
+      throw new Error(`粗体字体加载失败: ${boldFontPath} (${boldFontResponse.status})`)
+    }
+    const boldFontBytes = await boldFontResponse.arrayBuffer()
+    console.log('Bold字体加载成功，大小:', boldFontBytes.byteLength)
 
-    page.drawText('PDF-LIB Advanced Features:', {
-      x: 50,
-      y: 670,
-      size: 12,
-      font: font,
-      color: rgb(0.2, 0.2, 0.2),
-    })
+    console.log('开始嵌入字体到PDF...')
+    chineseFont = await pdfDoc.embedFont(new Uint8Array(fontBytes))
+    console.log('Regular字体嵌入成功')
+    chineseBoldFont = await pdfDoc.embedFont(new Uint8Array(boldFontBytes))
+    console.log('Bold字体嵌入成功')
+  } catch (error) {
+    console.error('字体加载失败:', error)
+    alert(`字体加载失败: ${error instanceof Error ? error.message : '未知错误'}`)
+    return
+  }
 
-    page.drawText('- Add/Remove pages dynamically', {
-      x: 70,
-      y: 650,
-      size: 11,
-      font: font,
-      color: rgb(0.3, 0.3, 0.3),
-    })
+  // ========== Page 1: 页面操作演示 ==========
+  const page1 = pdfDoc.addPage([600, 800])
+  page1.drawText('PDF-LIB: 高级页面操作', {
+    x: 50,
+    y: 750,
+    size: 22,
+    font: chineseBoldFont,
+    color: rgb(0.06, 0.72, 0.51),
+  })
 
-    page.drawText('- Modify existing PDF files', {
-      x: 70,
-      y: 635,
-      size: 11,
-      font: font,
-      color: rgb(0.3, 0.3, 0.3),
-    })
+  page1.drawText('✓ 独特优势：插入/删除/重排页面', {
+    x: 50,
+    y: 710,
+    size: 14,
+    font: chineseBoldFont,
+    color: rgb(0, 0.5, 0),
+  })
 
-    page.drawText('- Merge multiple PDFs', {
-      x: 70,
-      y: 620,
-      size: 11,
-      font: font,
-      color: rgb(0.3, 0.3, 0.3),
-    })
+  page1.drawText('不同于 jsPDF/pdfmake，PDF-LIB 可以：', {
+    x: 50,
+    y: 680,
+    size: 12,
+    font: chineseFont,
+  })
 
-    page.drawText('- Fill PDF forms programmatically', {
-      x: 70,
-      y: 605,
-      size: 11,
-      font: font,
-      color: rgb(0.3, 0.3, 0.3),
-    })
+  const features = [
+    '• addPage() - 在任意位置插入页面',
+    '• removePage(index) - 删除特定页面',
+    '• insertPage(index) - 在指定索引插入',
+    '• getPages() - 获取所有页面数组',
+  ]
 
-    // 页脚
-    page.drawText(`Page ${i + 1} of 5`, {
-      x: 240,
-      y: 30,
-      size: 12,
-      font: font,
+  let yPos = 660
+  features.forEach((text) => {
+    page1.drawText(text, { x: 70, y: yPos, size: 11, font: chineseFont })
+    yPos -= 20
+  })
+
+  page1.drawText('✓ 页面操作演示：', {
+    x: 50,
+    y: yPos - 20,
+    size: 14,
+    font: chineseBoldFont,
+    color: rgb(0, 0.5, 0),
+  })
+
+  page1.drawText('此文档将在第2页后插入一个页面...', {
+    x: 50,
+    y: yPos - 45,
+    size: 11,
+    font: chineseFont,
+    color: rgb(0.5, 0, 0),
+  })
+
+  // ========== Page 2 ==========
+  const page2 = pdfDoc.addPage([600, 800])
+  page2.drawText('第2页：合并 & 复制页面', {
+    x: 50,
+    y: 750,
+    size: 18,
+    font: chineseBoldFont,
+    color: rgb(0.06, 0.72, 0.51),
+  })
+
+  page2.drawText('✓ 优势：合并多个PDF', {
+    x: 50,
+    y: 710,
+    size: 14,
+    font: chineseBoldFont,
+    color: rgb(0, 0.5, 0),
+  })
+
+  const mergeSteps = [
+    '1. const existingPdf = await PDFDocument.load(bytes)',
+    '2. const [page] = await doc.copyPages(existingPdf, [0])',
+    '3. doc.addPage(page) // 合并完成！',
+  ]
+
+  yPos = 680
+  mergeSteps.forEach((text) => {
+    page2.drawText(text, { x: 70, y: yPos, size: 10, font: chineseFont, color: rgb(0.2, 0.2, 0.2) })
+    yPos -= 18
+  })
+
+  page2.drawText('vs jsPDF/pdfmake: 无法合并现有PDF', {
+    x: 70,
+    y: yPos - 20,
+    size: 11,
+    font: chineseFont,
+    color: rgb(0.7, 0, 0),
+  })
+
+  // ========== 插入一个新页面（演示插入功能）==========
+  const insertedPage = pdfDoc.insertPage(2, [600, 800]) // 在索引2插入
+  insertedPage.drawText('🎉 插入的页面（索引2）', {
+    x: 50,
+    y: 750,
+    size: 20,
+    font: chineseBoldFont,
+    color: rgb(1, 0, 0),
+  })
+
+  insertedPage.drawText('✓ 此页面在创建后被插入！', {
+    x: 50,
+    y: 710,
+    size: 14,
+    font: chineseBoldFont,
+    color: rgb(0, 0.5, 0),
+  })
+
+  insertedPage.drawText('代码：', { x: 50, y: 680, size: 12, font: chineseBoldFont })
+  insertedPage.drawText('pdfDoc.insertPage(2, [600, 800])', {
+    x: 70,
+    y: 660,
+    size: 11,
+    font: chineseFont,
+    color: rgb(0.2, 0.2, 0.7),
+  })
+
+  insertedPage.drawText('jsPDF/pdfmake 无法做到！', {
+    x: 70,
+    y: 640,
+    size: 11,
+    font: chineseFont,
+    color: rgb(0.7, 0, 0),
+  })
+
+  // ========== Page 3 (原本的Page 2之后) ==========
+  const page3 = pdfDoc.addPage([600, 800])
+  page3.drawText('第3页：编辑现有PDF', {
+    x: 50,
+    y: 750,
+    size: 18,
+    font: chineseBoldFont,
+    color: rgb(0.06, 0.72, 0.51),
+  })
+
+  page3.drawText('✓ 加载并修改现有PDF：', {
+    x: 50,
+    y: 710,
+    size: 14,
+    font: chineseBoldFont,
+    color: rgb(0, 0.5, 0),
+  })
+
+  const editExamples = [
+    '• 添加水印到现有文档',
+    '• 添加签名或印章',
+    '• 修改表单字段',
+    '• 提取特定页面',
+    '• 旋转页面',
+  ]
+
+  yPos = 680
+  editExamples.forEach((text) => {
+    page3.drawText(text, { x: 70, y: yPos, size: 11, font: chineseFont })
+    yPos -= 20
+  })
+
+  page3.drawText('jsPDF/pdfmake: 只能创建新PDF', {
+    x: 70,
+    y: yPos - 20,
+    size: 11,
+    font: chineseFont,
+    color: rgb(0.7, 0, 0),
+  })
+
+  // ========== 手动添加页码（因为PDF-LIB没有自动页眉页脚）==========
+  const pages = pdfDoc.getPages()
+  pages.forEach((page, index) => {
+    page.drawText(`第 ${index + 1}/${pages.length} 页 | 需要手动编号`, {
+      x: 180,
+      y: 20,
+      size: 9,
+      font: chineseFont,
       color: rgb(0.5, 0.5, 0.5),
     })
-  }
+  })
 
   const pdfBytes = await pdfDoc.save()
 
-  // 下载PDF
-  const blob = new Blob([pdfBytes as unknown as ArrayBuffer], { type: 'application/pdf' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = 'pdf-lib-paging.pdf'
-  link.click()
-  URL.revokeObjectURL(url)
+  // ✅ 改为打印预览
+  try {
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' })
+    openBlobInPrintWindow(blob)
+  } catch (error) {
+    console.error('PDF-LIB打印失败:', error)
+    alert('PDF打印失败，请查看控制台错误信息')
+  }
 }
 
 const printWithCSS = () => {
@@ -1661,6 +2354,11 @@ tbody tr:hover {
   .page-break-after {
     page-break-after: always;
     break-after: page;
+  }
+
+  .page-break-before {
+    page-break-before: always;
+    break-before: page;
   }
 }
 </style>
