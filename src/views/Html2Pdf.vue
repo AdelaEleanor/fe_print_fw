@@ -1338,6 +1338,30 @@ const example7Generate = async () => {
     // 等待 ECharts 完全渲染
     await new Promise((resolve) => setTimeout(resolve, 500))
 
+    // 将 Canvas 转换为图片
+    let originalCanvas: HTMLCanvasElement | null = null
+    let replacedImg: HTMLImageElement | null = null
+    if (html2pdfChart && html2pdfChartRef.value) {
+      const canvas = html2pdfChartRef.value.querySelector('canvas')
+      if (canvas) {
+        originalCanvas = canvas
+        const imgDataURL = html2pdfChart.getDataURL({
+          type: 'png',
+          pixelRatio: 2,
+          backgroundColor: '#fff',
+        })
+        replacedImg = document.createElement('img')
+        replacedImg.src = imgDataURL
+        replacedImg.style.width = '100%'
+        replacedImg.style.height = '220px'
+        replacedImg.style.display = 'block'
+        replacedImg.style.border = '1px solid #e2e8f0'
+        replacedImg.style.marginBottom = '15px'
+        canvas.style.display = 'none'
+        canvas.parentNode?.appendChild(replacedImg)
+      }
+    }
+
     const worker = html2pdf()
       .from(element)
       .set({
@@ -1356,6 +1380,12 @@ const example7Generate = async () => {
 
     const pdf = await worker
     const blob = pdf.output('blob')
+
+    // 恢复 Canvas
+    if (originalCanvas && replacedImg) {
+      replacedImg.remove()
+      originalCanvas.style.display = 'block'
+    }
 
     // 打开打印预览
     const url = URL.createObjectURL(blob)
@@ -1404,6 +1434,29 @@ const example8Generate = async () => {
     // 等待 ECharts 完全渲染
     await new Promise((resolve) => setTimeout(resolve, 500))
 
+    // 将 Canvas 转换为图片
+    let originalCanvas: HTMLCanvasElement | null = null
+    let replacedImg: HTMLImageElement | null = null
+    if (html2pdfChartOptimized && html2pdfChartOptimizedRef.value) {
+      const canvas = html2pdfChartOptimizedRef.value.querySelector('canvas')
+      if (canvas) {
+        originalCanvas = canvas
+        const imgDataURL = html2pdfChartOptimized.getDataURL({
+          type: 'png',
+          pixelRatio: 2,
+          backgroundColor: '#fff',
+        })
+        replacedImg = document.createElement('img')
+        replacedImg.src = imgDataURL
+        replacedImg.style.width = '100%'
+        replacedImg.style.height = '240px'
+        replacedImg.style.display = 'block'
+        replacedImg.style.marginBottom = '20px'
+        canvas.style.display = 'none'
+        canvas.parentNode?.appendChild(replacedImg)
+      }
+    }
+
     const worker = html2pdf()
       .from(element)
       .set({
@@ -1423,6 +1476,12 @@ const example8Generate = async () => {
 
     const pdf = await worker
     const blob = pdf.output('blob')
+
+    // 恢复 Canvas
+    if (originalCanvas && replacedImg) {
+      replacedImg.remove()
+      originalCanvas.style.display = 'block'
+    }
 
     // 打开打印预览
     const url = URL.createObjectURL(blob)

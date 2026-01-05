@@ -150,6 +150,649 @@
       </div>
     </section>
 
+    <section class="architecture">
+      <h2>🏗️ 底层架构分析对比</h2>
+      
+      <!-- 选项卡切换 -->
+      <div class="tabs">
+        <button 
+          v-for="(tab, index) in architectureTabs" 
+          :key="index"
+          :class="['tab-button', { active: currentArchTab === index }]"
+          @click="currentArchTab = index"
+        >
+          {{ tab }}
+        </button>
+      </div>
+
+      <!-- 选项卡内容 -->
+      <div class="tab-content">
+        <!-- Tab 0: 三层架构图 -->
+        <div v-if="currentArchTab === 0" class="arch-overview">
+          <div class="arch-diagram">
+            <div class="arch-layer layer-browser">
+              <h3>🌐 浏览器原生能力层</h3>
+              <div class="arch-boxes">
+                <div class="arch-box">
+                  <strong>1️⃣ 原生打印</strong>
+                  <code>window.print()</code>
+                </div>
+                <div class="arch-box">
+                  <strong>2️⃣ Canvas API</strong>
+                  <code>canvas.toDataURL()</code>
+                </div>
+                <div class="arch-box">
+                  <strong>3️⃣ DOM/CSS渲染</strong>
+                  <code>document.write()</code>
+                </div>
+              </div>
+            </div>
+
+            <div class="arch-arrow">⬇️ 封装与抽象 ⬇️</div>
+
+            <div class="arch-layer layer-frameworks">
+              <h3>📦 框架封装层</h3>
+              <div class="framework-groups">
+                <div class="fw-group">
+                  <h4>基于原生打印</h4>
+                  <ul>
+                    <li>Print.js</li>
+                    <li>print-html-element</li>
+                    <li>vue3-print-nb</li>
+                  </ul>
+                  <span class="tech-badge">window.print()</span>
+                </div>
+                <div class="fw-group">
+                  <h4>基于Canvas转图</h4>
+                  <ul>
+                    <li>html2canvas</li>
+                    <li>html2pdf.js</li>
+                    <li>jsPDF (部分)</li>
+                    <li>pdfmake (部分)</li>
+                  </ul>
+                  <span class="tech-badge">Canvas → PNG</span>
+                </div>
+                <div class="fw-group">
+                  <h4>原生PDF生成</h4>
+                  <ul>
+                    <li>jsPDF</li>
+                    <li>pdfmake</li>
+                    <li>PDF-LIB</li>
+                  </ul>
+                  <span class="tech-badge">PDF字节流</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 1: 详细分类 -->
+        <div v-if="currentArchTab === 1" class="arch-classification">
+          <div class="class-category">
+            <h3>🔵 第1类：原生打印封装</h3>
+            <div class="class-content">
+              <div class="class-info">
+                <p><strong>核心技术：</strong>直接使用 <code>window.print()</code></p>
+                <p><strong>包含框架：</strong>Print.js, vue3-print-nb, print-html-element</p>
+              </div>
+              
+              <div class="class-workflow">
+                <h4>底层流程：</h4>
+                <div class="workflow-steps">
+                  <div class="step">1️⃣ 获取DOM元素</div>
+                  <div class="step-arrow">→</div>
+                  <div class="step">2️⃣ 通过iframe/window.open打开</div>
+                  <div class="step-arrow">→</div>
+                  <div class="step">3️⃣ 调用window.print()</div>
+                  <div class="step-arrow">→</div>
+                  <div class="step">4️⃣ 浏览器打印引擎渲染</div>
+                </div>
+              </div>
+
+              <div class="class-code">
+                <h4>核心代码示例：</h4>
+                <pre><code>const iframe = document.createElement('iframe')
+iframe.srcdoc = htmlContent          // ← HTML字符串
+document.body.appendChild(iframe)
+iframe.contentWindow.print()         // ← 原生打印</code></pre>
+              </div>
+
+              <div class="class-pros-cons">
+                <div class="pros">
+                  <h4>✅ 优势</h4>
+                  <ul>
+                    <li>极轻量（5-18KB）</li>
+                    <li>零性能开销</li>
+                    <li>100%原生支持</li>
+                    <li>最快（无转换步骤）</li>
+                  </ul>
+                </div>
+                <div class="cons">
+                  <h4>❌ 劣势</h4>
+                  <ul>
+                    <li>无法生成PDF文件</li>
+                    <li>依赖浏览器打印引擎</li>
+                    <li>无法精确控制布局</li>
+                    <li>Canvas支持差</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="class-category">
+            <h3>🟢 第2类：Canvas截图 + PDF生成</h3>
+            <div class="class-content">
+              <div class="class-info">
+                <p><strong>核心技术：</strong><code>html2canvas</code> / <code>canvas.toDataURL()</code></p>
+                <p><strong>包含框架：</strong>html2canvas, html2pdf.js, jsPDF(部分), pdfmake(部分), PDF-LIB</p>
+              </div>
+              
+              <div class="class-workflow">
+                <h4>底层流程：</h4>
+                <div class="workflow-steps">
+                  <div class="step">1️⃣ DOM渲染到Canvas</div>
+                  <div class="step-arrow">→</div>
+                  <div class="step">2️⃣ Canvas导出PNG</div>
+                  <div class="step-arrow">→</div>
+                  <div class="step">3️⃣ 嵌入到PDF文档</div>
+                  <div class="step-arrow">→</div>
+                  <div class="step">4️⃣ 生成PDF文件</div>
+                </div>
+              </div>
+
+              <div class="class-code">
+                <h4>核心代码示例：</h4>
+                <pre><code>const canvas = await html2canvas(dom)    // ← DOM→Canvas
+const imgData = canvas.toDataURL()       // ← Canvas→PNG
+pdf.addImage(imgData, 'PNG', x, y, w, h) // ← PNG→PDF
+pdf.download()                           // ← 保存/打印</code></pre>
+              </div>
+
+              <div class="framework-roles">
+                <h4>各框架在此流程中的角色：</h4>
+                <div class="role-grid">
+                  <div class="role-item">
+                    <strong>html2canvas</strong>
+                    <p>专门做第1步（DOM→Canvas）</p>
+                    <span class="role-badge">转换引擎</span>
+                  </div>
+                  <div class="role-item">
+                    <strong>html2pdf.js</strong>
+                    <p>组合使用：html2canvas + jsPDF</p>
+                    <span class="role-badge">一站式方案</span>
+                  </div>
+                  <div class="role-item">
+                    <strong>jsPDF</strong>
+                    <p>自己做第1步：Canvas 2D API手动绘制</p>
+                    <span class="role-badge">轻量但功能有限</span>
+                  </div>
+                  <div class="role-item">
+                    <strong>pdfmake</strong>
+                    <p>声明式API构建文档</p>
+                    <span class="role-badge">高级易用</span>
+                  </div>
+                  <div class="role-item">
+                    <strong>PDF-LIB</strong>
+                    <p>专门编辑现有PDF</p>
+                    <span class="role-badge">PDF操作</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="perf-table-wrapper">
+                <h4>性能对比（转8个图表）：</h4>
+                <table class="perf-table">
+                  <thead>
+                    <tr>
+                      <th>框架</th>
+                      <th>导出时间</th>
+                      <th>PDF体积</th>
+                      <th>文件总大小</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>html2canvas</td>
+                      <td>500ms</td>
+                      <td>+800KB</td>
+                      <td>1.2MB</td>
+                    </tr>
+                    <tr>
+                      <td>html2pdf.js</td>
+                      <td>600ms</td>
+                      <td>+900KB</td>
+                      <td>1.3MB</td>
+                    </tr>
+                    <tr>
+                      <td>jsPDF(转图片)</td>
+                      <td>400ms</td>
+                      <td>+700KB</td>
+                      <td>1.1MB</td>
+                    </tr>
+                    <tr>
+                      <td>pdfmake(转图片)</td>
+                      <td>350ms</td>
+                      <td>+600KB</td>
+                      <td>1MB</td>
+                    </tr>
+                    <tr>
+                      <td>PDF-LIB(转图片)</td>
+                      <td>400ms</td>
+                      <td>+700KB</td>
+                      <td>1.1MB</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="class-category">
+            <h3>🟣 第3类：原生API直接生成PDF</h3>
+            <div class="class-content">
+              <div class="class-info">
+                <p><strong>核心技术：</strong>直接使用PDF二进制格式规范</p>
+                <p><strong>包含框架：</strong>jsPDF, pdfmake, PDF-LIB</p>
+              </div>
+              
+              <div class="class-workflow">
+                <h4>底层流程：</h4>
+                <div class="workflow-steps">
+                  <div class="step">1️⃣ 代码描述内容</div>
+                  <div class="step-arrow">→</div>
+                  <div class="step">2️⃣ 构建PDF字节流</div>
+                  <div class="step-arrow">→</div>
+                  <div class="step">3️⃣ 写入文本/图形</div>
+                  <div class="step-arrow">→</div>
+                  <div class="step">4️⃣ 输出PDF文件</div>
+                </div>
+              </div>
+
+              <div class="class-code">
+                <h4>核心代码示例：</h4>
+                <div class="code-comparison">
+                  <div class="code-block">
+                    <h5>jsPDF（命令式）</h5>
+                    <pre><code>const doc = new jsPDF()
+doc.text('Hello', 10, 10)    // ← 直接写
+doc.rect(10, 20, 50, 50)     // ← 直接画
+doc.save()</code></pre>
+                  </div>
+                  <div class="code-block">
+                    <h5>pdfmake（声明式）</h5>
+                    <pre><code>const docDef = {
+  content: [
+    { text: 'Hello' },  // ← 声明式
+    { text: 'World' }
+  ]
+}
+pdfMake.createPdf(docDef).download()</code></pre>
+                  </div>
+                </div>
+              </div>
+
+              <div class="framework-features">
+                <h4>各框架特点：</h4>
+                <div class="feature-grid">
+                  <div class="feature-card">
+                    <h5>jsPDF</h5>
+                    <p><strong>底层：</strong>直接操作PDF字节流</p>
+                    <p><strong>优势：</strong>极致精确控制、体积最小(150KB)</p>
+                    <p><strong>劣势：</strong>API复杂、需手动定位</p>
+                  </div>
+                  <div class="feature-card">
+                    <h5>pdfmake</h5>
+                    <p><strong>底层：</strong>声明式API + 自动布局引擎</p>
+                    <p><strong>优势：</strong>易用、自动排版(600KB)</p>
+                    <p><strong>劣势：</strong>精度不如jsPDF</p>
+                  </div>
+                  <div class="feature-card">
+                    <h5>PDF-LIB</h5>
+                    <p><strong>底层：</strong>编辑现有PDF二进制</p>
+                    <p><strong>优势：</strong>唯一能编辑的(200KB)</p>
+                    <p><strong>劣势：</strong>创建新文档复杂、不支持中文</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: 完整对比表 -->
+        <div v-if="currentArchTab === 2" class="arch-complete-table">
+          <table class="complete-comparison">
+            <thead>
+              <tr>
+                <th>框架</th>
+                <th>底层技术</th>
+                <th>依赖关系</th>
+                <th>输出类型</th>
+                <th>文件大小</th>
+                <th>优势</th>
+                <th>劣势</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>window.print()</strong></td>
+                <td>浏览器原生</td>
+                <td>无</td>
+                <td>打印/预览</td>
+                <td>0KB</td>
+                <td>零依赖、最快</td>
+                <td>无法生成文件</td>
+              </tr>
+              <tr>
+                <td><strong>Print.js</strong></td>
+                <td>window.print()</td>
+                <td>极小包装</td>
+                <td>打印</td>
+                <td>18KB</td>
+                <td>轻量、易用</td>
+                <td>功能有限</td>
+              </tr>
+              <tr>
+                <td><strong>vue3-print-nb</strong></td>
+                <td>window.print()</td>
+                <td>Vue指令</td>
+                <td>打印</td>
+                <td>15KB</td>
+                <td>Vue生态、指令式</td>
+                <td>仅限Vue 3</td>
+              </tr>
+              <tr>
+                <td><strong>print-html-element</strong></td>
+                <td>window.print()</td>
+                <td>极小包装</td>
+                <td>打印</td>
+                <td>5KB</td>
+                <td>超轻量</td>
+                <td>功能极简</td>
+              </tr>
+              <tr class="table-divider">
+                <td colspan="7"></td>
+              </tr>
+              <tr>
+                <td><strong>html2canvas</strong></td>
+                <td>Canvas绘制引擎</td>
+                <td>独立库</td>
+                <td>PNG图片</td>
+                <td>180KB</td>
+                <td>支持CSS、所见即所得</td>
+                <td>布局问题、性能差</td>
+              </tr>
+              <tr>
+                <td><strong>html2pdf.js</strong></td>
+                <td>html2canvas + jsPDF</td>
+                <td>组合库</td>
+                <td>PDF</td>
+                <td>330KB</td>
+                <td>一站式方案</td>
+                <td>体积大、性能差</td>
+              </tr>
+              <tr class="table-divider">
+                <td colspan="7"></td>
+              </tr>
+              <tr>
+                <td><strong>jsPDF</strong></td>
+                <td>PDF字节流API</td>
+                <td>独立库</td>
+                <td>PDF</td>
+                <td>150KB</td>
+                <td>精确控制、矢量</td>
+                <td>API复杂</td>
+              </tr>
+              <tr>
+                <td><strong>pdfmake</strong></td>
+                <td>PDF生成引擎</td>
+                <td>独立库</td>
+                <td>PDF</td>
+                <td>600KB</td>
+                <td>声明式、易用</td>
+                <td>体积大</td>
+              </tr>
+              <tr>
+                <td><strong>PDF-LIB</strong></td>
+                <td>PDF编辑API</td>
+                <td>独立库</td>
+                <td>PDF</td>
+                <td>200KB</td>
+                <td>可编辑现有PDF</td>
+                <td>创建复杂、无中文</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Tab 3: 性能深度分析 -->
+        <div v-if="currentArchTab === 3" class="arch-performance">
+          <div class="perf-analysis">
+            <h3>⚡ 为什么Print.js比jsPDF快？</h3>
+            <div class="perf-comparison-box">
+              <div class="perf-flow">
+                <h4>Print.js流程：</h4>
+                <div class="flow-steps fast">
+                  <div class="flow-step">DOM</div>
+                  <div class="flow-arrow">→</div>
+                  <div class="flow-step">iframe</div>
+                  <div class="flow-arrow">→</div>
+                  <div class="flow-step">window.print()</div>
+                  <div class="flow-arrow">→</div>
+                  <div class="flow-step">打印机</div>
+                </div>
+                <p class="flow-result">速度：⚡ 极快（直接用已渲染的DOM）</p>
+              </div>
+              
+              <div class="perf-flow">
+                <h4>jsPDF流程：</h4>
+                <div class="flow-steps slow">
+                  <div class="flow-step">DOM</div>
+                  <div class="flow-arrow">→</div>
+                  <div class="flow-step">代码定位</div>
+                  <div class="flow-arrow">→</div>
+                  <div class="flow-step">PDF字节</div>
+                  <div class="flow-arrow">→</div>
+                  <div class="flow-step">打印机</div>
+                </div>
+                <p class="flow-result">速度：🐢 慢（需要计算坐标、构建PDF）</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="perf-analysis">
+            <h3>🎨 为什么pdfmake比jsPDF易用？</h3>
+            <div class="code-comparison-box">
+              <div class="code-sample">
+                <h4>jsPDF（命令式，手动定位）</h4>
+                <pre><code>doc.setFont()
+doc.setFontSize(12)
+doc.text('Title', 10, 20)     // ← 手动定位
+doc.rect(10, 25, 100, 50)     // ← 手动绘制</code></pre>
+              </div>
+              
+              <div class="code-sample">
+                <h4>pdfmake（声明式，自动布局）</h4>
+                <pre><code>{
+  content: [
+    { text: 'Title', fontSize: 12 },  // ← 声明式
+    { columns: [...] }                 // ← 自动布局
+  ]
+}</code></pre>
+              </div>
+            </div>
+            <p class="conclusion"><strong>结论：</strong>pdfmake有布局引擎，jsPDF没有</p>
+          </div>
+
+          <div class="perf-analysis">
+            <h3>❌ 为什么html2canvas有布局问题？</h3>
+            <div class="layout-problem">
+              <h4>html2canvas流程：</h4>
+              <div class="problem-steps">
+                <div class="problem-step">
+                  <span class="step-num">1</span>
+                  <div class="step-content">
+                    <strong>解析HTML/CSS</strong>
+                    <p>→ DOM Tree</p>
+                  </div>
+                </div>
+                <div class="problem-step">
+                  <span class="step-num">2</span>
+                  <div class="step-content">
+                    <strong>应用样式</strong>
+                    <p>→ Style Tree</p>
+                  </div>
+                </div>
+                <div class="problem-step problem">
+                  <span class="step-num">3</span>
+                  <div class="step-content">
+                    <strong>布局计算 ⚠️</strong>
+                    <p>→ Layout Tree</p>
+                    <p class="error">问题源于这里！</p>
+                  </div>
+                </div>
+                <div class="problem-step">
+                  <span class="step-num">4</span>
+                  <div class="step-content">
+                    <strong>Canvas绘制</strong>
+                    <p>→ Rasterization</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="problem-reasons">
+                <h4>问题原因：</h4>
+                <ul>
+                  <li>❌ 浏览器的布局引擎很复杂（display, grid, flex等）</li>
+                  <li>❌ html2canvas需要自己实现布局逻辑</li>
+                  <li>❌ 无法100%还原浏览器的布局</li>
+                  <li>✅ jsPDF不用还原，直接用坐标定位，布局完全可控</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 4: 核心理解 -->
+        <div v-if="currentArchTab === 4" class="arch-understanding">
+          <div class="understanding-box">
+            <h3>💡 核心理解：所有框架本质上都在做3件事</h3>
+            
+            <div class="three-things">
+              <div class="thing-card">
+                <div class="thing-num">1️⃣</div>
+                <h4>获取内容</h4>
+                <div class="thing-options">
+                  <div class="option">
+                    <strong>Print.js</strong>
+                    <p>取DOM本身</p>
+                  </div>
+                  <div class="option">
+                    <strong>html2canvas</strong>
+                    <p>DOM转Canvas</p>
+                  </div>
+                  <div class="option">
+                    <strong>jsPDF</strong>
+                    <p>代码描述内容</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="thing-card">
+                <div class="thing-num">2️⃣</div>
+                <h4>转换格式</h4>
+                <div class="thing-options">
+                  <div class="option">
+                    <strong>Print.js</strong>
+                    <p>HTML → 打印流</p>
+                  </div>
+                  <div class="option">
+                    <strong>html2canvas</strong>
+                    <p>Canvas → PNG</p>
+                  </div>
+                  <div class="option">
+                    <strong>jsPDF</strong>
+                    <p>代码 → PDF字节流</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="thing-card">
+                <div class="thing-num">3️⃣</div>
+                <h4>输出</h4>
+                <div class="thing-options">
+                  <div class="option">
+                    <strong>Print.js</strong>
+                    <p>发给打印机</p>
+                  </div>
+                  <div class="option">
+                    <strong>html2canvas</strong>
+                    <p>PNG blob</p>
+                  </div>
+                  <div class="option">
+                    <strong>jsPDF</strong>
+                    <p>PDF blob</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="selection-guide">
+            <h3>🎯 选择框架的本质</h3>
+            <div class="guide-content">
+              <p class="guide-principle">
+                选A还是B <strong>不在于"哪个更强"</strong>，<br>
+                而在于 <strong>"你的转换成本多高"</strong>
+              </p>
+              
+              <div class="cost-levels">
+                <div class="cost-card low">
+                  <h4>成本低 ✅</h4>
+                  <p><strong>Print.js</strong></p>
+                  <p>直接用DOM</p>
+                  <span class="cost-badge">最快</span>
+                </div>
+                <div class="cost-card medium">
+                  <h4>成本中 ⚠️</h4>
+                  <p><strong>html2canvas</strong></p>
+                  <p>DOM→Canvas</p>
+                  <span class="cost-badge">适中</span>
+                </div>
+                <div class="cost-card high">
+                  <h4>成本高但控制力强 🎯</h4>
+                  <p><strong>jsPDF</strong></p>
+                  <p>代码描述</p>
+                  <span class="cost-badge">精确</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="best-practice">
+            <h3>🌟 最佳实践：为什么ChartComparison用"转图片"？</h3>
+            <div class="practice-reasons">
+              <div class="reason-item">
+                <span class="reason-icon">✅</span>
+                <p>避免浏览器布局差异（Print.js的问题）</p>
+              </div>
+              <div class="reason-item">
+                <span class="reason-icon">✅</span>
+                <p>避免DOM复杂性（html2canvas的问题）</p>
+              </div>
+              <div class="reason-item">
+                <span class="reason-icon">✅</span>
+                <p>保持极简API（不用像jsPDF那样手动定位）</p>
+              </div>
+            </div>
+            <p class="practice-conclusion">
+              <strong>这是最优的平衡点！</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="recommendations">
       <h2>💡 选型建议</h2>
       <div class="recommendation-grid">
@@ -195,6 +838,12 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+
+// 架构分析选项卡
+const architectureTabs = ref(['架构层次图', '详细分类', '完整对比表', '性能深度分析', '核心理解'])
+const currentArchTab = ref(0)
+
 const demos = [
   {
     path: '/native-print',
@@ -279,6 +928,13 @@ const demos = [
     title: '自定义分页',
     description: '分页控制方案对比',
     tags: ['分页', '控制', '自定义'],
+  },
+  {
+    path: '/chart-comparison',
+    icon: '📊',
+    title: '图表打印对比',
+    description: '9种框架图表打印效果实时对比',
+    tags: ['图表', 'ECharts', '对比测试'],
   },
 ]
 </script>
@@ -439,6 +1095,13 @@ const demos = [
   color: #1e40af;
 }
 
+.tag-图表,
+.tag-echarts,
+.tag-对比测试 {
+  background: #fef3c7;
+  color: #92400e;
+}
+
 section {
   margin-bottom: 3rem;
 }
@@ -535,5 +1198,847 @@ tr:hover {
 
 .recommendation-card p strong {
   color: #2d3748;
+}
+
+/* 底层架构分析样式 */
+.architecture {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 3rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e2e8f0;
+  overflow-x: auto;
+}
+
+.tab-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: transparent;
+  color: #718096;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.tab-button:hover {
+  color: #667eea;
+}
+
+.tab-button.active {
+  color: #667eea;
+  border-bottom-color: #667eea;
+}
+
+.tab-content {
+  min-height: 400px;
+}
+
+/* 架构层次图 */
+.arch-diagram {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.arch-layer {
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.layer-browser {
+  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  border: 2px solid #667eea;
+}
+
+.layer-frameworks {
+  background: linear-gradient(135deg, #48bb7815 0%, #10b98115 100%);
+  border: 2px solid #48bb78;
+}
+
+.arch-layer h3 {
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.arch-boxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.arch-box {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.arch-box strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #2d3748;
+}
+
+.arch-box code {
+  background: #f7fafc;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: #667eea;
+}
+
+.arch-arrow {
+  text-align: center;
+  font-size: 1.5rem;
+  color: #718096;
+  margin: 1rem 0;
+}
+
+.framework-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.fw-group {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.fw-group h4 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+.fw-group ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+.fw-group li {
+  padding: 0.5rem 0;
+  color: #4a5568;
+  border-bottom: 1px solid #f7fafc;
+}
+
+.fw-group li:last-child {
+  border-bottom: none;
+}
+
+.tech-badge {
+  display: inline-block;
+  background: #667eea;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* 详细分类 */
+.arch-classification {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.class-category {
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.class-category h3 {
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.class-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.class-info p {
+  margin: 0.5rem 0;
+  color: #4a5568;
+}
+
+.class-info code {
+  background: #f7fafc;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  color: #667eea;
+  font-size: 0.9rem;
+}
+
+.class-workflow h4 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+.workflow-steps {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  background: #f7fafc;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.step {
+  background: white;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  border: 2px solid #667eea;
+  color: #2d3748;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.step-arrow {
+  color: #667eea;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.class-code {
+  background: #1a202c;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.class-code h4 {
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.class-code pre {
+  margin: 0;
+  overflow-x: auto;
+}
+
+.class-code code {
+  color: #68d391;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.class-pros-cons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.pros, .cons {
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.pros {
+  background: #d1fae5;
+  border: 2px solid #48bb78;
+}
+
+.cons {
+  background: #fee2e2;
+  border: 2px solid #e53e3e;
+}
+
+.pros h4, .cons h4 {
+  margin-bottom: 1rem;
+}
+
+.pros ul, .cons ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pros li, .cons li {
+  padding: 0.5rem 0;
+  color: #2d3748;
+}
+
+.framework-roles h4 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.role-item {
+  background: #f7fafc;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.role-item strong {
+  display: block;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.role-item p {
+  font-size: 0.85rem;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+}
+
+.role-badge {
+  display: inline-block;
+  background: #667eea;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+}
+
+.perf-table-wrapper {
+  margin-top: 1rem;
+}
+
+.perf-table-wrapper h4 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+.perf-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.perf-table th,
+.perf-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.perf-table th {
+  background: #f7fafc;
+  color: #2d3748;
+  font-weight: 600;
+}
+
+.perf-table tr:hover {
+  background: #f7fafc;
+}
+
+.code-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.code-block {
+  background: #1a202c;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.code-block h5 {
+  color: white;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.code-block pre {
+  margin: 0;
+}
+
+.code-block code {
+  color: #68d391;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.framework-features h4 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.feature-card {
+  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 2px solid #667eea;
+}
+
+.feature-card h5 {
+  color: #667eea;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.feature-card p {
+  margin: 0.5rem 0;
+  color: #4a5568;
+  font-size: 0.9rem;
+}
+
+/* 完整对比表 */
+.arch-complete-table {
+  overflow-x: auto;
+}
+
+.complete-comparison {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.complete-comparison th,
+.complete-comparison td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.9rem;
+}
+
+.complete-comparison th {
+  background: #f7fafc;
+  color: #2d3748;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.complete-comparison tr:hover {
+  background: #f7fafc;
+}
+
+.table-divider td {
+  height: 0.5rem;
+  padding: 0;
+  background: #e2e8f0;
+}
+
+/* 性能深度分析 */
+.arch-performance {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.perf-analysis {
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.perf-analysis h3 {
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+}
+
+.perf-comparison-box {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.perf-flow h4 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+.flow-steps {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.flow-steps.fast {
+  background: #d1fae5;
+}
+
+.flow-steps.slow {
+  background: #fed7d7;
+}
+
+.flow-step {
+  background: white;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.flow-arrow {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.flow-result {
+  margin-top: 1rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.code-comparison-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.code-sample {
+  background: #1a202c;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.code-sample h4 {
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.code-sample pre {
+  margin: 0;
+}
+
+.code-sample code {
+  color: #68d391;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.conclusion {
+  background: #fef3c7;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #f59e0b;
+  color: #2d3748;
+}
+
+.layout-problem h4 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+.problem-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.problem-step {
+  background: #f7fafc;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  border: 2px solid #e2e8f0;
+  position: relative;
+}
+
+.problem-step.problem {
+  background: #fed7d7;
+  border-color: #e53e3e;
+}
+
+.step-num {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  background: #667eea;
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.problem-step.problem .step-num {
+  background: #e53e3e;
+}
+
+.step-content strong {
+  display: block;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.step-content p {
+  margin: 0.25rem 0;
+  color: #718096;
+  font-size: 0.85rem;
+}
+
+.error {
+  color: #e53e3e !important;
+  font-weight: 600;
+}
+
+.problem-reasons {
+  background: #f7fafc;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.problem-reasons h4 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+.problem-reasons ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.problem-reasons li {
+  padding: 0.5rem 0;
+  color: #4a5568;
+}
+
+/* 核心理解 */
+.arch-understanding {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.understanding-box {
+  border: 2px solid #667eea;
+  border-radius: 12px;
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea05 0%, #764ba205 100%);
+}
+
+.understanding-box h3 {
+  color: #667eea;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.three-things {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.thing-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.thing-num {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.thing-card h4 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.thing-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.option {
+  background: #f7fafc;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.option strong {
+  display: block;
+  color: #667eea;
+  margin-bottom: 0.25rem;
+}
+
+.option p {
+  margin: 0;
+  color: #4a5568;
+  font-size: 0.85rem;
+}
+
+.selection-guide {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.selection-guide h3 {
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.guide-content {
+  text-align: center;
+}
+
+.guide-principle {
+  font-size: 1.1rem;
+  color: #2d3748;
+  margin-bottom: 2rem;
+  line-height: 1.8;
+}
+
+.cost-levels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.cost-card {
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.cost-card.low {
+  background: #d1fae5;
+  border: 2px solid #48bb78;
+}
+
+.cost-card.medium {
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
+}
+
+.cost-card.high {
+  background: #dbeafe;
+  border: 2px solid #3b82f6;
+}
+
+.cost-card h4 {
+  color: #2d3748;
+  margin-bottom: 0.75rem;
+}
+
+.cost-card p {
+  margin: 0.25rem 0;
+  color: #4a5568;
+}
+
+.cost-badge {
+  display: inline-block;
+  margin-top: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  background: white;
+  color: #2d3748;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.best-practice {
+  background: linear-gradient(135deg, #48bb7815 0%, #10b98115 100%);
+  border: 2px solid #48bb78;
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.best-practice h3 {
+  color: #48bb78;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.practice-reasons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.reason-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.reason-icon {
+  font-size: 1.5rem;
+}
+
+.reason-item p {
+  margin: 0;
+  color: #2d3748;
+}
+
+.practice-conclusion {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #48bb78;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  
+  .class-pros-cons,
+  .code-comparison,
+  .code-comparison-box,
+  .cost-levels {
+    grid-template-columns: 1fr;
+  }
+  
+  .workflow-steps,
+  .flow-steps {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .step-arrow,
+  .flow-arrow {
+    transform: rotate(90deg);
+  }
 }
 </style>

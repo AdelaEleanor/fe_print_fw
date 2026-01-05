@@ -68,6 +68,11 @@ const router = createRouter({
       name: 'print-html-element',
       component: () => import('../views/PrintHtmlElement.vue'),
     },
+    {
+      path: '/chart-comparison',
+      name: 'chart-comparison',
+      component: () => import('../views/ChartComparison.vue'),
+    },
   ],
 })
 

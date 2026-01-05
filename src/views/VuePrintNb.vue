@@ -1185,6 +1185,37 @@ const example6Config = {
 const example7Config = {
   id: 'example7-content',
   popTitle: 'ECharts数据看板',
+  beforeOpenCallback: () => {
+    // 打印前将 Canvas 转换为图片
+    if (vueprintChart && vueprintChartRef.value) {
+      const canvas = vueprintChartRef.value.querySelector('canvas')
+      if (canvas) {
+        const imgDataURL = vueprintChart.getDataURL({
+          type: 'png',
+          pixelRatio: 2,
+          backgroundColor: '#fff',
+        })
+        const img = document.createElement('img')
+        img.src = imgDataURL
+        img.style.width = '100%'
+        img.style.height = '250px'
+        img.style.display = 'block'
+        canvas.style.display = 'none'
+        canvas.parentNode?.appendChild(img)
+      }
+    }
+  },
+  closeCallback: () => {
+    // 打印后恢复 Canvas
+    if (vueprintChartRef.value) {
+      const img = vueprintChartRef.value.querySelector('img')
+      const canvas = vueprintChartRef.value.querySelector('canvas')
+      if (img && canvas) {
+        img.remove()
+        canvas.style.display = 'block'
+      }
+    }
+  },
   extraHead: `
     <style>
       @media print {
@@ -1205,6 +1236,7 @@ const example7Config = {
           padding: 10px 0 !important;
           min-height: 300px !important;
         }
+        #example7-content img,
         #example7-content canvas {
           display: block !important;
           margin-bottom: 20px !important;
@@ -1294,6 +1326,37 @@ const initVueprintChartOptimized = () => {
 const example8Config = {
   id: 'example8-content',
   popTitle: '优化版图表打印',
+  beforeOpenCallback: () => {
+    // 打印前将 Canvas 转换为图片
+    if (vueprintChartOptimized && vueprintChartOptimizedRef.value) {
+      const canvas = vueprintChartOptimizedRef.value.querySelector('canvas')
+      if (canvas) {
+        const imgDataURL = vueprintChartOptimized.getDataURL({
+          type: 'png',
+          pixelRatio: 2,
+          backgroundColor: '#fff',
+        })
+        const img = document.createElement('img')
+        img.src = imgDataURL
+        img.style.width = '100%'
+        img.style.height = '280px'
+        img.style.display = 'block'
+        canvas.style.display = 'none'
+        canvas.parentNode?.appendChild(img)
+      }
+    }
+  },
+  closeCallback: () => {
+    // 打印后恢复 Canvas
+    if (vueprintChartOptimizedRef.value) {
+      const img = vueprintChartOptimizedRef.value.querySelector('img')
+      const canvas = vueprintChartOptimizedRef.value.querySelector('canvas')
+      if (img && canvas) {
+        img.remove()
+        canvas.style.display = 'block'
+      }
+    }
+  },
   extraHead: `
     <style>
       @media print {
@@ -1339,7 +1402,8 @@ const example8Config = {
           vertical-align: middle !important;
         }
 
-        /* Canvas 强制静态定位，禁止浮动 */
+        /* 图片和 Canvas 强制静态定位 */
+        #example8-content img,
         #example8-content canvas {
           display: block !important;
           position: static !important;
