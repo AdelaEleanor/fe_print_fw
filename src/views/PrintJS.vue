@@ -342,6 +342,25 @@ printJS({
               </ul>
             </div>
           </div>
+
+          <!-- 示例7: ECharts图表 -->
+          <div v-else-if="currentExample === 6">
+            <h3>示例 7: ECharts图表打印</h3>
+            <p><strong>✨ Print.js优势：</strong>轻量级（10KB）+ 零配置，直接打印。</p>
+
+            <div class="controls">
+              <button @click="example7Print" class="btn btn-primary">📊 打印图表</button>
+            </div>
+
+            <div class="demo-content" id="example7-content">
+              <h2 style="text-align: center">数据看板</h2>
+              <div
+                ref="printjsChartRef"
+                style="height: 250px; border: 1px solid #e2e8f0; margin: 20px 0"
+              ></div>
+              <p style="text-align: center; color: #718096">月度销售趋势</p>
+            </div>
+          </div>
         </div>
 
         <!-- 高级功能演示 -->
@@ -814,14 +833,28 @@ printJS({
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import printJS from 'print-js'
+import * as echarts from 'echarts'
+import type { ECharts } from 'echarts'
 
 const currentDate = ref(new Date().toLocaleDateString('zh-CN'))
 const currentExample = ref(0)
 const printStatus = ref<{ type: string; message: string; time: string } | null>(null)
 
-const examples = ['基础HTML', '自定义样式', '打印图片', 'JSON表格', '回调函数', '页眉配置']
+// ECharts refs
+const printjsChartRef = ref<HTMLDivElement>()
+let printjsChart: ECharts | null = null
+
+const examples = [
+  '基础HTML',
+  '自定义样式',
+  '打印图片',
+  'JSON表格',
+  '回调函数',
+  '页眉配置',
+  'ECharts图表',
+]
 
 // 高级示例标签
 const advancedExamples = ['PDF文件', '多图片', '复杂表格', '页面设置', '样式隔离', '错误处理']
@@ -966,6 +999,42 @@ const example6Print = () => {
       li { margin: 5px 0; }
     `,
   })
+}
+
+// 示例7: ECharts图表打印
+const example7Print = () => {
+  printJS({
+    printable: 'example7-content',
+    type: 'html',
+    targetStyles: ['*'],
+  })
+}
+
+// 监听示例切换
+watch(currentExample, async (newVal) => {
+  if (newVal === 6) {
+    await nextTick()
+    initPrintjsChart()
+  }
+})
+
+// 初始化Print.js的ECharts
+const initPrintjsChart = () => {
+  if (printjsChartRef.value && !printjsChart) {
+    printjsChart = echarts.init(printjsChartRef.value)
+    printjsChart.setOption({
+      title: { text: '销售趋势', left: 'center', textStyle: { fontSize: 14 } },
+      xAxis: { type: 'category', data: ['1月', '2月', '3月', '4月', '5月', '6月'] },
+      yAxis: { type: 'value' },
+      series: [
+        {
+          data: [120, 200, 150, 80, 170, 210],
+          type: 'bar',
+          itemStyle: { color: '#48bb78' },
+        },
+      ],
+    })
+  }
 }
 
 // === 高级示例函数 ===

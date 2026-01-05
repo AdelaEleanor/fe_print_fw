@@ -519,7 +519,8 @@ doc.save('chart-report.pdf')</code></pre>
           <div v-else-if="currentExample === 7">
             <h3>示例 8: 🔍 对比测试 - 与VuePrintNb相同配置</h3>
             <p style="color: #3182ce; font-weight: 500">
-              <strong>📊 测试目的：</strong>使用与VuePrintNb示例8完全相同的ECharts配置，对比jsPDF的输出效果。
+              <strong>📊 测试目的：</strong
+              >使用与VuePrintNb示例8完全相同的ECharts配置，对比jsPDF的输出效果。
             </p>
 
             <div class="controls">
@@ -571,17 +572,17 @@ doc.save('chart-report.pdf')</code></pre>
               <h4>代码示例:</h4>
               <pre><code>// 与VuePrintNb完全相同的ECharts配置
 const option = {
-  title: { 
-    text: '月度销售趋势', 
-    left: 'center', 
-    textStyle: { fontSize: 16, fontWeight: 'bold' } 
+  title: {
+    text: '月度销售趋势',
+    left: 'center',
+    textStyle: { fontSize: 16, fontWeight: 'bold' }
   },
   tooltip: { trigger: 'axis' },
-  grid: { 
+  grid: {
     left: '8%',   // 与VuePrintNb相同
     right: '8%',  // 与VuePrintNb相同
-    bottom: '18%', 
-    top: '22%' 
+    bottom: '18%',
+    top: '22%'
   },
   xAxis: {
     type: 'category',
@@ -606,10 +607,10 @@ const option = {
 }
 
 // jsPDF输出（高质量PNG，精确定位）
-const chartImage = myChart.getDataURL({ 
-  type: 'png', 
+const chartImage = myChart.getDataURL({
+  type: 'png',
   pixelRatio: 3,  // 高清输出
-  backgroundColor: '#fff' 
+  backgroundColor: '#fff'
 })
 const doc = new jsPDF()
 doc.addImage(chartImage, 'PNG', 15, 30, 180, 100)
@@ -1368,7 +1369,11 @@ const initCompareChart = () => {
   if (compareChartRef.value && !compareChart) {
     compareChart = echarts.init(compareChartRef.value)
     compareChart.setOption({
-      title: { text: '月度销售趋势', left: 'center', textStyle: { fontSize: 16, fontWeight: 'bold' } },
+      title: {
+        text: '月度销售趋势',
+        left: 'center',
+        textStyle: { fontSize: 16, fontWeight: 'bold' },
+      },
       tooltip: { trigger: 'axis' },
       grid: { left: '8%', right: '8%', bottom: '18%', top: '22%' },
       xAxis: {

@@ -614,51 +614,109 @@ html2pdf().from(element).save();</code></pre>
           <div v-if="currentExample === 7" class="example-content">
             <h4>8. ✅ 优化方案：解决布局问题</h4>
             <p style="color: #48bb78; font-weight: 500">
-              <strong>✨ 完美解决：</strong>使用Table布局 + 固定尺寸 + 充足间距，确保打印效果与预览一致。
+              <strong>✨ 完美解决：</strong>使用Table布局 + 固定尺寸 +
+              充足间距，确保打印效果与预览一致。
             </p>
-            
+
             <div class="demo-box">
-              <div id="html2pdf-chart-optimized" class="preview-box" style="padding: 25px; background: #f7fafc">
-                <h3 style="text-align: center; color: #2d3748; margin-bottom: 30px; font-size: 18px">
+              <div
+                id="html2pdf-chart-optimized"
+                class="preview-box"
+                style="padding: 25px; background: #f7fafc"
+              >
+                <h3
+                  style="text-align: center; color: #2d3748; margin-bottom: 30px; font-size: 18px"
+                >
                   📊 销售数据报告（优化版）
                 </h3>
-                
+
                 <!-- 使用 table 布局确保最佳兼容性 -->
                 <table style="width: 100%; border-collapse: separate; border-spacing: 20px 0">
                   <tr>
                     <td style="width: 50%; vertical-align: top; padding: 0">
-                      <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1)">
+                      <div
+                        style="
+                          background: white;
+                          padding: 15px;
+                          border-radius: 8px;
+                          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                        "
+                      >
                         <div
                           ref="html2pdfChartOptimizedRef"
                           style="height: 240px; width: 100%; margin-bottom: 20px"
                         ></div>
-                        <p style="text-align: center; color: #4a5568; margin: 0; padding: 10px 0; font-weight: 500; border-top: 2px solid #e2e8f0">
+                        <p
+                          style="
+                            text-align: center;
+                            color: #4a5568;
+                            margin: 0;
+                            padding: 10px 0;
+                            font-weight: 500;
+                            border-top: 2px solid #e2e8f0;
+                          "
+                        >
                           月度销售趋势
                         </p>
                       </div>
                     </td>
                     <td style="width: 50%; vertical-align: top; padding: 0">
-                      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 8px; height: 240px; display: table; width: 100%">
+                      <div
+                        style="
+                          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                          color: white;
+                          padding: 25px;
+                          border-radius: 8px;
+                          height: 240px;
+                          display: table;
+                          width: 100%;
+                        "
+                      >
                         <div style="display: table-cell; vertical-align: middle">
-                          <h4 style="margin: 0 0 20px 0; font-size: 16px; border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 10px">📈 关键指标</h4>
-                          <p style="margin: 12px 0; font-size: 15px"><strong>总销售额:</strong> ¥1,030万</p>
-                          <p style="margin: 12px 0; font-size: 15px"><strong>同比增长:</strong> +25%</p>
-                          <p style="margin: 12px 0; font-size: 15px"><strong>环比增长:</strong> +8%</p>
-                          <p style="margin: 12px 0 0 0; font-size: 13px; opacity: 0.9">✓ CSS渐变完美保留</p>
+                          <h4
+                            style="
+                              margin: 0 0 20px 0;
+                              font-size: 16px;
+                              border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+                              padding-bottom: 10px;
+                            "
+                          >
+                            📈 关键指标
+                          </h4>
+                          <p style="margin: 12px 0; font-size: 15px">
+                            <strong>总销售额:</strong> ¥1,030万
+                          </p>
+                          <p style="margin: 12px 0; font-size: 15px">
+                            <strong>同比增长:</strong> +25%
+                          </p>
+                          <p style="margin: 12px 0; font-size: 15px">
+                            <strong>环比增长:</strong> +8%
+                          </p>
+                          <p style="margin: 12px 0 0 0; font-size: 13px; opacity: 0.9">
+                            ✓ CSS渐变完美保留
+                          </p>
                         </div>
                       </div>
                     </td>
                   </tr>
                 </table>
 
-                <div style="margin-top: 25px; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #48bb78">
+                <div
+                  style="
+                    margin-top: 25px;
+                    padding: 15px;
+                    background: white;
+                    border-radius: 8px;
+                    border-left: 4px solid #48bb78;
+                  "
+                >
                   <p style="margin: 0; color: #2d3748; font-size: 14px">
                     <strong>✅ 优化要点：</strong>
                     Table布局 + 固定高度(240px) + 充足间距(20px) + 独立容器 + 明确边距
                   </p>
                 </div>
               </div>
-              
+
               <button @click="example8Generate" class="btn btn-primary" style="background: #48bb78">
                 🎯 生成优化版PDF
               </button>
@@ -674,7 +732,7 @@ const optimizedContent = `
           &lt;!-- 图表容器：固定高度 + 充足底部间距 --&gt;
           &lt;div style="height: 240px; margin-bottom: 20px;"&gt;&lt;/div&gt;
           &lt;!-- 文字：独立容器 + 顶部边框分隔 --&gt;
-          &lt;p style="margin: 0; padding: 10px 0; 
+          &lt;p style="margin: 0; padding: 10px 0;
                      border-top: 2px solid #e2e8f0;"&gt;
             月度销售趋势
           &lt;/p&gt;
@@ -688,8 +746,8 @@ const optimizedContent = `
 // 等待图表渲染 + 优化配置
 await new Promise(resolve =&gt; setTimeout(resolve, 500));
 html2pdf().set({
-  html2canvas: { 
-    scale: 2, 
+  html2canvas: {
+    scale: 2,
     useCORS: true,
     logging: false,
     backgroundColor: '#f7fafc'
@@ -1442,7 +1500,11 @@ const initHtml2pdfChartOptimized = () => {
   if (html2pdfChartOptimizedRef.value && !html2pdfChartOptimized) {
     html2pdfChartOptimized = echarts.init(html2pdfChartOptimizedRef.value)
     html2pdfChartOptimized.setOption({
-      title: { text: '月度销售额', left: 'center', textStyle: { fontSize: 15, fontWeight: 'bold' } },
+      title: {
+        text: '月度销售额',
+        left: 'center',
+        textStyle: { fontSize: 15, fontWeight: 'bold' },
+      },
       tooltip: { trigger: 'axis' },
       grid: { left: '10%', right: '10%', bottom: '15%', top: '20%' },
       xAxis: {
