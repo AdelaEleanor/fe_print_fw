@@ -484,6 +484,43 @@ const printContent = document.getElementById('form-display');
 printElement(printContent);</code></pre>
             </div>
           </div>
+
+          <!-- 示例7: ECharts图表 -->
+          <div v-if="currentExample === 6" class="example-content">
+            <h4>7. ECharts图表打印</h4>
+            <p class="framework-highlight">
+              🎯 <strong>print-html-element特点：</strong>超轻量（5KB），最简单的API，零配置<br />
+              <span class="advantage">✅ 优势：</span
+              >体积最小（Print.js的一半）；API最简洁；零依赖<br />
+              <span class="disadvantage">⚠️ 对比：</span>vs Print.js - 更轻量；vs html2pdf -
+              直接打印不生成PDF；vs所有其他 - 最简实现
+            </p>
+
+            <div class="demo-box">
+              <div class="preview-box" style="padding: 20px; background: #fff">
+                <div
+                  id="example-print-7"
+                  ref="printElementChartRef"
+                  style="width: 100%; height: 300px"
+                ></div>
+              </div>
+              <button @click="example7Print" class="btn btn-primary">打印图表</button>
+            </div>
+
+            <div class="code-display">
+              <pre v-pre><code>// 1. 初始化ECharts
+const chart = echarts.init(chartRef.value)
+chart.setOption({
+  title: { text: '数据统计' },
+  series: [{ type: 'bar', data: [...] }]
+})
+
+// 2. 一行代码打印
+printElement(chartRef.value)
+
+// 就这么简单！无需配置任何参数</code></pre>
+            </div>
+          </div>
         </div>
 
         <!-- ==================== 高级示例区域 ==================== -->
@@ -775,7 +812,9 @@ printElement(element);</code></pre>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import * as echarts from 'echarts'
+import type { ECharts } from 'echarts'
 
 // @ts-ignore
 const printElement = ref<any>(null)
@@ -789,7 +828,12 @@ const examples = [
   { name: '图文混排' },
   { name: '打印列表' },
   { name: '打印表单' },
+  { name: 'ECharts图表' },
 ]
+
+// ECharts refs
+const printElementChartRef = ref<HTMLDivElement>()
+let printElementChart: ECharts | null = null
 
 // 示例6: 表单数据
 const formData = ref({
@@ -958,6 +1002,52 @@ const example6Print = () => {
   const element = document.getElementById('example-print-6')
   doPrint(element)
 }
+
+// 示例7: ECharts打印
+const initPrintElementChart = () => {
+  if (printElementChartRef.value && !printElementChart) {
+    printElementChart = echarts.init(printElementChartRef.value)
+    printElementChart.setOption({
+      title: {
+        text: '部门销售对比',
+        left: 'center',
+      },
+      tooltip: {
+        trigger: 'axis',
+      },
+      xAxis: {
+        type: 'category',
+        data: ['研发部', '销售部', '市场部', '运营部', '客服部'],
+      },
+      yAxis: {
+        type: 'value',
+      },
+      series: [
+        {
+          name: '销售额',
+          type: 'bar',
+          data: [320, 450, 280, 390, 260],
+          itemStyle: {
+            color: '#409EFF',
+          },
+        },
+      ],
+    })
+  }
+}
+
+const example7Print = () => {
+  const element = document.getElementById('example-print-7')
+  doPrint(element)
+}
+
+// Watch currentExample to initialize chart
+watch(currentExample, async (newVal) => {
+  if (newVal === 6) {
+    await nextTick()
+    initPrintElementChart()
+  }
+})
 
 // ==================== 高级示例函数 ====================
 const advanced1Print = () => {
@@ -1763,5 +1853,37 @@ const advanced6Print = () => {
   .print-only {
     display: block !important;
   }
+}
+
+/* 框架特点说明样式 */
+.framework-highlight {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: #1a202c;
+  padding: 1.2rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  line-height: 2;
+  border: 2px solid #4facfe;
+}
+
+.framework-highlight strong {
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.framework-highlight .advantage {
+  color: #22543d;
+  font-weight: 700;
+  background: rgba(154, 230, 180, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.framework-highlight .disadvantage {
+  color: #742a2a;
+  font-weight: 700;
+  background: rgba(254, 178, 178, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 </style>

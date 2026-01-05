@@ -369,6 +369,253 @@ doc.save('image.pdf')</code></pre>
               </div>
             </div>
           </div>
+
+          <!-- 示例7: ECharts图表转PDF -->
+          <div v-else-if="currentExample === 6">
+            <h3>示例 7: ECharts图表转PDF</h3>
+            <p>
+              <strong>✨ jsPDF优势体现：</strong
+              >将ECharts渲染为图片后，利用jsPDF的<strong>精确坐标控制</strong>和<strong>高质量图片嵌入</strong>能力，实现完美的图表布局。
+            </p>
+
+            <div class="controls">
+              <button @click="example7Generate" class="btn btn-primary" :disabled="loading">
+                {{ loading ? '⏳ 生成中...' : '📊 生成图表PDF' }}
+              </button>
+            </div>
+
+            <div class="info-box" style="background: #f0f7ff; border-left: 4px solid #667eea">
+              <h4 style="color: #667eea; margin-top: 0">💡 jsPDF处理图表的独特优势</h4>
+              <ul style="margin: 10px 0; line-height: 1.8">
+                <li>
+                  <strong>像素级精确定位：</strong>通过x、y坐标精确控制每个图表的位置，避免布局错乱
+                </li>
+                <li><strong>高质量图片输出：</strong>支持高DPI设置，图表清晰度远超HTML渲染</li>
+                <li>
+                  <strong>灵活的尺寸控制：</strong
+                  >可以精确指定每个图表的宽高，轻松实现复杂的混合布局
+                </li>
+                <li>
+                  <strong>分页可控：</strong>可以计算内容高度，在需要的位置精确换页，不会截断图表
+                </li>
+              </ul>
+              <p style="margin: 10px 0; color: #4a5568">
+                <strong>对比其他方案：</strong>
+              </p>
+              <ul style="margin: 0; line-height: 1.8; color: #718096">
+                <li>html2pdf：依赖浏览器渲染，图表质量不稳定，分页位置难控制</li>
+                <li>Print.js：只能打印不能导出PDF，且无法精确控制图表位置</li>
+              </ul>
+            </div>
+
+            <div class="code-display">
+              <h4>代码示例:</h4>
+              <pre><code>import * as echarts from 'echarts'
+import { jsPDF } from 'jspdf'
+
+// 1. 初始化ECharts实例
+const chartDom = document.getElementById('myChart')
+const myChart = echarts.init(chartDom)
+
+// 2. 配置图表
+myChart.setOption({
+  title: { text: '月度销售数据' },
+  xAxis: { data: ['1月', '2月', '3月', '4月', '5月', '6月'] },
+  yAxis: {},
+  series: [{
+    type: 'bar',
+    data: [120, 200, 150, 80, 70, 110]
+  }]
+})
+
+// 3. 将ECharts转为图片（高质量）
+const chartImage = myChart.getDataURL({
+  type: 'png',
+  pixelRatio: 2, // 高清输出
+  backgroundColor: '#fff'
+})
+
+// 4. jsPDF精确控制图表位置和尺寸
+const doc = new jsPDF()
+doc.setFontSize(18)
+doc.text('销售数据分析报告', 105, 20, { align: 'center' })
+
+// 精确定位：x=15, y=30, 宽度=180, 高度=100
+doc.addImage(chartImage, 'PNG', 15, 30, 180, 100)
+
+// 可以继续添加更多内容，精确控制位置
+doc.setFontSize(12)
+doc.text('图表说明：上半年销售趋势', 15, 140)
+
+doc.save('chart-report.pdf')</code></pre>
+            </div>
+
+            <div class="demo-content">
+              <h4>📊 实时图表预览:</h4>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 15px 0">
+                <!-- 饼图 -->
+                <div>
+                  <div
+                    ref="pieChartRef"
+                    style="
+                      width: 100%;
+                      height: 250px;
+                      border: 1px solid #e2e8f0;
+                      border-radius: 8px;
+                    "
+                  ></div>
+                  <p style="text-align: center; color: #718096; margin-top: 8px">销售占比分析</p>
+                </div>
+
+                <!-- 折线图 -->
+                <div>
+                  <div
+                    ref="lineChartRef"
+                    style="
+                      width: 100%;
+                      height: 250px;
+                      border: 1px solid #e2e8f0;
+                      border-radius: 8px;
+                    "
+                  ></div>
+                  <p style="text-align: center; color: #718096; margin-top: 8px">月度销售趋势</p>
+                </div>
+
+                <!-- 柱状图 -->
+                <div>
+                  <div
+                    ref="barChartRef"
+                    style="
+                      width: 100%;
+                      height: 250px;
+                      border: 1px solid #e2e8f0;
+                      border-radius: 8px;
+                    "
+                  ></div>
+                  <p style="text-align: center; color: #718096; margin-top: 8px">产品销量对比</p>
+                </div>
+
+                <!-- 雷达图 -->
+                <div>
+                  <div
+                    ref="radarChartRef"
+                    style="
+                      width: 100%;
+                      height: 250px;
+                      border: 1px solid #e2e8f0;
+                      border-radius: 8px;
+                    "
+                  ></div>
+                  <p style="text-align: center; color: #718096; margin-top: 8px">综合能力评估</p>
+                </div>
+              </div>
+              <p class="note">
+                点击按钮将生成包含这4个图表的PDF文档，每个图表都经过精确定位和尺寸控制
+              </p>
+            </div>
+          </div>
+
+          <!-- 示例8: 对比测试（与VuePrintNb相同的图表） -->
+          <div v-else-if="currentExample === 7">
+            <h3>示例 8: 🔍 对比测试 - 与VuePrintNb相同配置</h3>
+            <p style="color: #3182ce; font-weight: 500">
+              <strong>📊 测试目的：</strong>使用与VuePrintNb示例8完全相同的ECharts配置，对比jsPDF的输出效果。
+            </p>
+
+            <div class="controls">
+              <button @click="example8Generate" class="btn btn-primary" :disabled="loading">
+                {{ loading ? '⏳ 生成中...' : '📄 生成对比PDF' }}
+              </button>
+            </div>
+
+            <div class="info-box" style="background: #edf2f7; border-left: 4px solid #3182ce">
+              <h4 style="color: #3182ce; margin-top: 0">🔍 对比说明</h4>
+              <p style="margin: 10px 0; line-height: 1.8">
+                此示例使用与 <strong>VuePrintNb 示例8</strong> 完全相同的ECharts配置：
+              </p>
+              <ul style="margin: 10px 0; line-height: 1.8">
+                <li><strong>相同的grid配置：</strong>left: '8%', right: '8%'</li>
+                <li><strong>相同的数据：</strong>[120, 200, 150, 80, 170, 210]</li>
+                <li><strong>相同的样式：</strong>折线图 + 面积填充</li>
+              </ul>
+              <p style="margin: 10px 0; color: #4a5568">
+                <strong>预期对比结果：</strong>
+              </p>
+              <ul style="margin: 0; line-height: 1.8; color: #718096">
+                <li>✅ jsPDF: 精确坐标定位，图表完整显示，不受页面边距影响</li>
+                <li>⚠️ VuePrintNb: 受浏览器打印引擎限制，可能出现右侧裁剪</li>
+              </ul>
+            </div>
+
+            <div class="demo-content">
+              <h4>📊 实时图表预览:</h4>
+              <div style="max-width: 600px; margin: 0 auto">
+                <div
+                  ref="compareChartRef"
+                  style="
+                    width: 100%;
+                    height: 280px;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 8px;
+                    background: white;
+                    padding: 0;
+                  "
+                ></div>
+                <p style="text-align: center; color: #718096; margin-top: 8px">
+                  月度销售趋势（与VuePrintNb相同配置）
+                </p>
+              </div>
+            </div>
+
+            <div class="code-display">
+              <h4>代码示例:</h4>
+              <pre><code>// 与VuePrintNb完全相同的ECharts配置
+const option = {
+  title: { 
+    text: '月度销售趋势', 
+    left: 'center', 
+    textStyle: { fontSize: 16, fontWeight: 'bold' } 
+  },
+  tooltip: { trigger: 'axis' },
+  grid: { 
+    left: '8%',   // 与VuePrintNb相同
+    right: '8%',  // 与VuePrintNb相同
+    bottom: '18%', 
+    top: '22%' 
+  },
+  xAxis: {
+    type: 'category',
+    data: ['1月', '2月', '3月', '4月', '5月', '6月'],
+    axisLabel: { fontSize: 13 }
+  },
+  yAxis: {
+    type: 'value',
+    name: '销售额(万)',
+    axisLabel: { fontSize: 13 }
+  },
+  series: [{
+    data: [120, 200, 150, 80, 170, 210],
+    type: 'line',
+    smooth: true,
+    itemStyle: { color: '#667eea' },
+    areaStyle: { color: 'rgba(102, 126, 234, 0.2)' },
+    lineStyle: { width: 3 },
+    symbol: 'circle',
+    symbolSize: 8
+  }]
+}
+
+// jsPDF输出（高质量PNG，精确定位）
+const chartImage = myChart.getDataURL({ 
+  type: 'png', 
+  pixelRatio: 3,  // 高清输出
+  backgroundColor: '#fff' 
+})
+const doc = new jsPDF()
+doc.addImage(chartImage, 'PNG', 15, 30, 180, 100)
+doc.save('compare.pdf')</code></pre>
+            </div>
+          </div>
         </div>
 
         <!-- 高级功能演示 -->
@@ -891,9 +1138,11 @@ doc.save('paginated.pdf');</code></pre>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, nextTick } from 'vue'
 import { jsPDF } from 'jspdf'
 import { createChineseJsPDF } from '@/utils/fontLoader'
+import * as echarts from 'echarts'
+import type { ECharts } from 'echarts'
 
 const loading = ref(false)
 const statusMessage = ref('')
@@ -901,8 +1150,30 @@ const currentExample = ref(0)
 const currentDate = ref(new Date().toLocaleDateString('zh-CN'))
 const pageOrientation = ref<'portrait' | 'landscape'>('portrait')
 
+// ECharts refs
+const pieChartRef = ref<HTMLDivElement>()
+const lineChartRef = ref<HTMLDivElement>()
+const barChartRef = ref<HTMLDivElement>()
+const radarChartRef = ref<HTMLDivElement>()
+const compareChartRef = ref<HTMLDivElement>()
+
+let pieChart: ECharts | null = null
+let lineChart: ECharts | null = null
+let barChart: ECharts | null = null
+let radarChart: ECharts | null = null
+let compareChart: ECharts | null = null
+
 // 示例标签
-const examples = ['基础PDF', '文本样式', '绘制图形', '多页文档', '页面配置', '嵌入图片']
+const examples = [
+  '基础PDF',
+  '文本样式',
+  '绘制图形',
+  '多页文档',
+  '页面配置',
+  '嵌入图片',
+  'ECharts图表',
+  '对比测试',
+]
 
 // 将PDF Blob在新窗口/iframe中打开并触发打印（复用pdfmake页面的实现思路）
 const openBlobInPrintWindow = async (blob: Blob) => {
@@ -975,6 +1246,156 @@ onMounted(async () => {
     console.error('加载logo失败:', error)
   }
 })
+
+// 监听示例切换，当切换到ECharts示例时初始化图表
+watch(currentExample, async (newVal) => {
+  if (newVal === 6) {
+    // 等待DOM更新
+    await nextTick()
+    initCharts()
+  } else if (newVal === 7) {
+    // 示例8: 对比测试
+    await nextTick()
+    initCompareChart()
+  }
+})
+
+// 初始化ECharts图表
+const initCharts = () => {
+  // 饼图 - 销售占比
+  if (pieChartRef.value && !pieChart) {
+    pieChart = echarts.init(pieChartRef.value)
+    pieChart.setOption({
+      title: { text: '产品销售占比', left: 'center', textStyle: { fontSize: 14 } },
+      tooltip: { trigger: 'item', formatter: '{b}: {c}万元 ({d}%)' },
+      legend: { orient: 'vertical', right: 10, top: 'center' },
+      series: [
+        {
+          type: 'pie',
+          radius: '60%',
+          data: [
+            { value: 335, name: '产品A' },
+            { value: 310, name: '产品B' },
+            { value: 234, name: '产品C' },
+            { value: 135, name: '产品D' },
+            { value: 156, name: '产品E' },
+          ],
+          emphasis: {
+            itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0, 0, 0, 0.5)' },
+          },
+        },
+      ],
+    })
+  }
+
+  // 折线图 - 月度趋势
+  if (lineChartRef.value && !lineChart) {
+    lineChart = echarts.init(lineChartRef.value)
+    lineChart.setOption({
+      title: { text: '月度销售趋势', left: 'center', textStyle: { fontSize: 14 } },
+      tooltip: { trigger: 'axis' },
+      xAxis: { type: 'category', data: ['1月', '2月', '3月', '4月', '5月', '6月'] },
+      yAxis: { type: 'value', name: '销售额(万)' },
+      series: [
+        {
+          data: [120, 200, 150, 80, 170, 210],
+          type: 'line',
+          smooth: true,
+          itemStyle: { color: '#667eea' },
+          areaStyle: { color: 'rgba(102, 126, 234, 0.2)' },
+        },
+      ],
+    })
+  }
+
+  // 柱状图 - 产品对比
+  if (barChartRef.value && !barChart) {
+    barChart = echarts.init(barChartRef.value)
+    barChart.setOption({
+      title: { text: '产品销量对比', left: 'center', textStyle: { fontSize: 14 } },
+      tooltip: { trigger: 'axis' },
+      xAxis: { type: 'category', data: ['产品A', '产品B', '产品C', '产品D', '产品E'] },
+      yAxis: { type: 'value', name: '销量' },
+      series: [
+        {
+          data: [820, 932, 901, 934, 1290],
+          type: 'bar',
+          itemStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: '#667eea' },
+              { offset: 1, color: '#764ba2' },
+            ]),
+          },
+        },
+      ],
+    })
+  }
+
+  // 雷达图 - 综合评估
+  if (radarChartRef.value && !radarChart) {
+    radarChart = echarts.init(radarChartRef.value)
+    radarChart.setOption({
+      title: { text: '产品综合评估', left: 'center', textStyle: { fontSize: 14 } },
+      tooltip: {},
+      radar: {
+        indicator: [
+          { name: '销量', max: 100 },
+          { name: '质量', max: 100 },
+          { name: '成本', max: 100 },
+          { name: '服务', max: 100 },
+          { name: '创新', max: 100 },
+        ],
+      },
+      series: [
+        {
+          type: 'radar',
+          data: [
+            {
+              value: [85, 90, 75, 88, 92],
+              name: '产品A',
+              itemStyle: { color: '#667eea' },
+              areaStyle: { color: 'rgba(102, 126, 234, 0.3)' },
+            },
+          ],
+        },
+      ],
+    })
+  }
+}
+
+// 初始化对比测试图表（与VuePrintNb示例8完全相同的配置）
+const initCompareChart = () => {
+  if (compareChartRef.value && !compareChart) {
+    compareChart = echarts.init(compareChartRef.value)
+    compareChart.setOption({
+      title: { text: '月度销售趋势', left: 'center', textStyle: { fontSize: 16, fontWeight: 'bold' } },
+      tooltip: { trigger: 'axis' },
+      grid: { left: '8%', right: '8%', bottom: '18%', top: '22%' },
+      xAxis: {
+        type: 'category',
+        data: ['1月', '2月', '3月', '4月', '5月', '6月'],
+        axisLabel: { fontSize: 13 },
+      },
+      yAxis: {
+        type: 'value',
+        name: '销售额(万)',
+        axisLabel: { fontSize: 13 },
+      },
+      series: [
+        {
+          data: [120, 200, 150, 80, 170, 210],
+          type: 'line',
+          smooth: true,
+          itemStyle: { color: '#667eea' },
+          areaStyle: { color: 'rgba(102, 126, 234, 0.2)' },
+          lineStyle: { width: 3 },
+          symbol: 'circle',
+          symbolSize: 8,
+        },
+      ],
+    })
+  }
+}
 
 // 示例1: 创建基础PDF
 const example1Generate = async () => {
@@ -1190,6 +1611,188 @@ const example6Generate = async () => {
   } catch (error) {
     console.error('PDF生成错误:', error)
     alert('PDF生成失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 示例7: ECharts图表转PDF
+const example7Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成图表PDF...'
+
+  try {
+    const doc = await createChineseJsPDF()
+
+    // 标题
+    doc.setFontSize(20)
+    doc.text('数据分析报告', 105, 15, { align: 'center' })
+
+    doc.setFontSize(10)
+    doc.setTextColor(128, 128, 128)
+    doc.text('生成时间: ' + currentDate.value, 105, 22, { align: 'center' })
+    doc.setTextColor(0, 0, 0)
+
+    let yPosition = 30
+
+    // 获取图表图片 - 高质量输出
+    const getChartImage = (chart: ECharts | null) => {
+      if (!chart) return null
+      return chart.getDataURL({
+        type: 'png',
+        pixelRatio: 2, // 高清输出
+        backgroundColor: '#fff',
+      })
+    }
+
+    // 1. 饼图 - 左上
+    const pieImage = getChartImage(pieChart)
+    if (pieImage) {
+      doc.setFontSize(12)
+      doc.text('1. 产品销售占比分析', 15, yPosition)
+      doc.addImage(pieImage, 'PNG', 15, yPosition + 5, 85, 60)
+    }
+
+    // 2. 折线图 - 右上
+    const lineImage = getChartImage(lineChart)
+    if (lineImage) {
+      doc.setFontSize(12)
+      doc.text('2. 月度销售趋势', 110, yPosition)
+      doc.addImage(lineImage, 'PNG', 110, yPosition + 5, 85, 60)
+    }
+
+    yPosition += 75
+
+    // 添加分析说明
+    doc.setFontSize(10)
+    doc.text('• 产品A和产品B占据市场主要份额，合计约53%', 15, yPosition)
+    doc.text('• 6月销售额达到最高点210万元，增长显著', 15, yPosition + 5)
+    yPosition += 15
+
+    // 3. 柱状图 - 左下
+    const barImage = getChartImage(barChart)
+    if (barImage) {
+      doc.setFontSize(12)
+      doc.text('3. 产品销量对比', 15, yPosition)
+      doc.addImage(barImage, 'PNG', 15, yPosition + 5, 85, 60)
+    }
+
+    // 4. 雷达图 - 右下
+    const radarImage = getChartImage(radarChart)
+    if (radarImage) {
+      doc.setFontSize(12)
+      doc.text('4. 产品综合评估', 110, yPosition)
+      doc.addImage(radarImage, 'PNG', 110, yPosition + 5, 85, 60)
+    }
+
+    yPosition += 75
+
+    // 底部总结
+    doc.setFontSize(10)
+    doc.text('• 产品E销量最高，达到1290件', 15, yPosition)
+    doc.text('• 产品A综合评估得分最高，各项指标均衡', 15, yPosition + 5)
+
+    // 页脚
+    doc.setFontSize(8)
+    doc.setTextColor(128, 128, 128)
+    doc.text('jsPDF优势: 精确的坐标控制 + 高质量图片输出 + 灵活的布局能力', 105, 285, {
+      align: 'center',
+    })
+
+    const blob = (doc as any).output ? (doc as any).output('blob') : null
+    if (blob) await openBlobInPrintWindow(blob)
+    else doc.save('echarts-report.pdf')
+
+    statusMessage.value = '图表PDF生成成功！'
+    setTimeout(() => (statusMessage.value = ''), 3000)
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    alert('PDF生成失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 示例8: 对比测试 - 生成与VuePrintNb相同配置的图表PDF
+const example8Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成对比测试PDF...'
+
+  try {
+    if (!compareChart) {
+      throw new Error('图表未初始化')
+    }
+
+    const doc = await createChineseJsPDF()
+
+    // 标题
+    doc.setFontSize(18)
+    doc.setFont('SourceHanSansSC', 'normal', 400)
+    doc.text('框架对比测试报告', 105, 20, { align: 'center' })
+
+    // 副标题
+    doc.setFontSize(10)
+    doc.setFont('SourceHanSansSC', 'normal')
+    doc.setTextColor(50, 130, 206)
+    doc.text('jsPDF vs VuePrintNb - 相同ECharts配置输出对比', 105, 28, { align: 'center' })
+    doc.setTextColor(0, 0, 0)
+
+    // 获取图表图片 - 高质量输出
+    const chartImage = compareChart.getDataURL({
+      type: 'png',
+      pixelRatio: 3, // 超高清输出
+      backgroundColor: '#fff',
+    })
+
+    // 添加图表说明
+    doc.setFontSize(12)
+    doc.setFont('SourceHanSansSC', 'normal')
+    doc.text('测试配置说明：', 15, 40)
+
+    doc.setFontSize(10)
+    doc.text('• Grid配置: left: 8%, right: 8%, bottom: 18%, top: 22%', 20, 48)
+    doc.text('• 数据点: [120, 200, 150, 80, 170, 210] (1月-6月)', 20, 55)
+    doc.text('• 图表类型: 折线图 + 面积填充', 20, 62)
+    doc.text('• 输出方式: jsPDF精确坐标定位 + 高清PNG嵌入', 20, 69)
+
+    // 添加图表 - 精确定位
+    doc.addImage(chartImage, 'PNG', 15, 75, 180, 100)
+
+    // 添加分析结论
+    doc.setFontSize(12)
+    doc.setFont('SourceHanSansSC', 'normal', 400)
+    doc.text('对比结论：', 15, 185)
+
+    doc.setFontSize(10)
+    doc.setFont('SourceHanSansSC', 'normal')
+    doc.setTextColor(34, 197, 94) // 绿色
+    doc.text('jsPDF优势：', 20, 195)
+    doc.setTextColor(0, 0, 0)
+    doc.text('   1. 图表完整显示，6月数据点和标签不会被裁剪', 25, 202)
+    doc.text('   2. 精确的坐标控制，不受浏览器打印引擎限制', 25, 209)
+    doc.text('   3. 高质量PNG输出（pixelRatio: 3），图表清晰度高', 25, 216)
+    doc.text('   4. 可控的页面边距和布局，适合复杂文档', 25, 223)
+
+    doc.setTextColor(245, 158, 11) // 橙色
+    doc.text('VuePrintNb局限：', 20, 233)
+    doc.setTextColor(0, 0, 0)
+    doc.text('   1. 依赖浏览器打印引擎，图表右侧可能被裁剪', 25, 240)
+    doc.text('   2. Canvas与文字布局可能重叠，需要额外优化', 25, 247)
+    doc.text('   3. 打印预览效果受浏览器和打印机驱动影响', 25, 254)
+
+    // 页脚
+    doc.setFontSize(8)
+    doc.setTextColor(128, 128, 128)
+    doc.text('测试时间: ' + currentDate.value + ' | 框架版本: jsPDF 2.5.1, ECharts 5.x', 105, 285, {
+      align: 'center',
+    })
+
+    const blob = (doc as any).output ? (doc as any).output('blob') : null
+    if (blob) await openBlobInPrintWindow(blob)
+
+    statusMessage.value = '✅ 对比测试PDF已生成，请查看打印预览'
+  } catch (err) {
+    statusMessage.value = '生成失败: ' + (err as Error).message
   } finally {
     loading.value = false
   }

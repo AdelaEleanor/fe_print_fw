@@ -455,6 +455,31 @@ pdfMake.createPdf(docDefinition).download('basic.pdf')</code></pre>
                 </div>
               </div>
             </div>
+
+            <!-- 示例7: ECharts图表 -->
+            <div v-else-if="currentExample === 6">
+              <h3>示例 7: ECharts图表集成</h3>
+              <p>
+                <strong>✨ pdfmake优势：</strong
+                >利用<strong>声明式布局</strong>和<strong>columns自动对齐</strong>，轻松实现图表的响应式排版。
+              </p>
+
+              <div class="controls">
+                <button @click="example7Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 生成中...' : '📊 生成图表PDF' }}
+                </button>
+              </div>
+
+              <div class="demo-content">
+                <div
+                  style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0"
+                >
+                  <div ref="pdfmakePieRef" style="height: 200px; border: 1px solid #e2e8f0"></div>
+                  <div ref="pdfmakeBarRef" style="height: 200px; border: 1px solid #e2e8f0"></div>
+                </div>
+                <p class="note">pdfmake用columns数组实现图表并排，无需手动计算坐标</p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1019,9 +1044,11 @@ pdfMake.createPdf(docDefinition).open();</code></pre>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, nextTick } from 'vue'
 import pdfMake from 'pdfmake/build/pdfmake'
 import { configurePdfMakeChinese, getChinesePdfMakeStyles } from '@/utils/fontLoader'
+import * as echarts from 'echarts'
+import type { ECharts } from 'echarts'
 
 const loading = ref(false)
 const statusMessage = ref('')
@@ -1029,8 +1056,14 @@ const fontsReady = ref(false)
 const currentExample = ref(0)
 const currentDate = ref(new Date().toLocaleDateString('zh-CN'))
 
+// ECharts refs
+const pdfmakePieRef = ref<HTMLDivElement>()
+const pdfmakeBarRef = ref<HTMLDivElement>()
+let pdfmakePieChart: ECharts | null = null
+let pdfmakeBarChart: ECharts | null = null
+
 // 示例标签
-const examples = ['基础文档', '文本样式', '列表', '多列布局', '页眉页脚', '分页控制']
+const examples = ['基础文档', '文本样式', '列表', '多列布局', '页眉页脚', '分页控制', 'ECharts图表']
 
 // 在组件挂载时配置中文字体
 onMounted(async () => {
@@ -1047,10 +1080,51 @@ onMounted(async () => {
       sampleImage.value = reader.result as string
     }
     reader.readAsDataURL(blob)
+
+    // ECharts图表会在用户切换到对应标签时初始化
   } catch (error) {
     console.error('❌ pdfmake 字体或图片配置失败:', error)
   }
 })
+
+// 监听示例切换，当切换到ECharts示例时初始化图表
+watch(currentExample, async (newVal) => {
+  if (newVal === 6) {
+    await nextTick()
+    initPdfmakeCharts()
+  }
+})
+
+// 初始化pdfmake的ECharts
+const initPdfmakeCharts = () => {
+  if (pdfmakePieRef.value && !pdfmakePieChart) {
+    pdfmakePieChart = echarts.init(pdfmakePieRef.value)
+    pdfmakePieChart.setOption({
+      title: { text: '销售占比', left: 'center', textStyle: { fontSize: 14 } },
+      series: [
+        {
+          type: 'pie',
+          radius: '65%',
+          data: [
+            { value: 335, name: '产品A' },
+            { value: 310, name: '产品B' },
+            { value: 234, name: '产品C' },
+          ],
+        },
+      ],
+    })
+  }
+
+  if (pdfmakeBarRef.value && !pdfmakeBarChart) {
+    pdfmakeBarChart = echarts.init(pdfmakeBarRef.value)
+    pdfmakeBarChart.setOption({
+      title: { text: '销量对比', left: 'center', textStyle: { fontSize: 14 } },
+      xAxis: { type: 'category', data: ['产品A', '产品B', '产品C'] },
+      yAxis: { type: 'value' },
+      series: [{ data: [820, 932, 901], type: 'bar', itemStyle: { color: '#48bb78' } }],
+    })
+  }
+}
 
 // 将PDF Blob在新窗口/iframe中打开并触发打印
 const openBlobInPrintWindow = async (blob: Blob) => {
@@ -1416,6 +1490,60 @@ const example6Generate = async () => {
 
     pdfMake.createPdf(docDefinition).getBlob((blob: Blob) => openBlobInPrintWindow(blob))
     statusMessage.value = '✅ PDF生成成功！'
+  } catch (error) {
+    console.error('PDF生成错误:', error)
+    statusMessage.value = '❌ PDF生成失败: ' + error
+  } finally {
+    loading.value = false
+  }
+}
+
+// 示例7: ECharts图表
+const example7Generate = async () => {
+  loading.value = true
+  statusMessage.value = '正在生成图表PDF...'
+
+  try {
+    if (!fontsReady.value) {
+      await configurePdfMakeChinese()
+      fontsReady.value = true
+    }
+
+    // 获取图表图片
+    const pieImage = pdfmakePieChart?.getDataURL({
+      type: 'png',
+      pixelRatio: 2,
+      backgroundColor: '#fff',
+    })
+    const barImage = pdfmakeBarChart?.getDataURL({
+      type: 'png',
+      pixelRatio: 2,
+      backgroundColor: '#fff',
+    })
+
+    const docDefinition: any = {
+      content: [
+        { text: '数据分析报告', style: 'title', alignment: 'center' },
+        { text: '\n' },
+        {
+          columns: [
+            { image: pieImage, width: 250 },
+            { image: barImage, width: 250 },
+          ],
+          columnGap: 10,
+        },
+        { text: '\n' },
+        { text: '✨ pdfmake优势：使用columns轻松实现图表并排，无需手动计算坐标！', style: 'note' },
+      ],
+      styles: {
+        title: { fontSize: 20, bold: true, color: '#48bb78' },
+        note: { fontSize: 10, color: '#718096', italics: true },
+      },
+      defaultStyle: { font: 'NotoSansSC' },
+    }
+
+    pdfMake.createPdf(docDefinition).getBlob((blob: Blob) => openBlobInPrintWindow(blob))
+    statusMessage.value = '✅ 图表PDF生成成功！'
   } catch (error) {
     console.error('PDF生成错误:', error)
     statusMessage.value = '❌ PDF生成失败: ' + error

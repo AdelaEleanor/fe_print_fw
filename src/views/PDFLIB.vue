@@ -740,6 +740,57 @@ pdfDoc.setCreationDate(new Date());
 pdfDoc.setModificationDate(new Date());</code></pre>
             </div>
           </div>
+
+          <!-- 示例7: ECharts图表 -->
+          <div v-if="currentExample === 6" class="example-content">
+            <h4>7. ECharts图表嵌入PDF</h4>
+            <p class="framework-highlight">
+              📝 <strong>PDF-LIB特点：</strong>唯一可编辑现有PDF的库，支持插入、删除、重排页面<br />
+              <span class="advantage">✅ 优势：</span
+              >可在现有PDF插入图表；支持合并/拆分PDF；可修改已有文档<br />
+              <span class="disadvantage">❌ 劣势：</span
+              >体积较大(200KB)；API复杂度高；需手动坐标定位；中文需额外字体<br />
+              <span class="comparison">🔄 对比jsPDF：</span
+              >jsPDF更轻量(120KB)，API更简单，适合生成新PDF<br />
+              <span class="comparison">🔄 对比pdfmake：</span
+              >pdfmake声明式布局更简单，自动排版，适合报表生成
+            </p>
+
+            <div class="demo-box">
+              <div class="preview-box" style="padding: 20px; background: #fff">
+                <div ref="pdflibChartRef" style="width: 100%; height: 300px"></div>
+              </div>
+              <button @click="example7Generate" class="btn btn-primary">导出图表到PDF</button>
+            </div>
+
+            <div class="code-display">
+              <pre v-pre><code>// 1. 将ECharts导出为图片
+const chart = echarts.init(chartRef.value)
+const imageDataUrl = chart.getDataURL({
+  type: 'png',
+  pixelRatio: 2,
+  backgroundColor: '#fff'
+})
+
+// 2. 加载图片到PDF-LIB
+const pdfDoc = await PDFDocument.create()
+const page = pdfDoc.addPage([600, 400])
+const pngImage = await pdfDoc.embedPng(imageDataUrl)
+
+// 3. 在PDF中插入图片
+const { width, height } = pngImage.scale(0.5)
+page.drawImage(pngImage, {
+  x: 50,
+  y: 50,
+  width,
+  height
+})
+
+// 4. 保存PDF
+const pdfBytes = await pdfDoc.save()
+download(pdfBytes, 'chart.pdf', 'application/pdf')</code></pre>
+            </div>
+          </div>
         </div>
 
         <!-- ==================== 高级示例区域 ==================== -->
@@ -1038,8 +1089,10 @@ const pageCount = pdfDoc.getPageCount();</code></pre>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib'
+import * as echarts from 'echarts'
+import type { ECharts } from 'echarts'
 
 // ==================== 基础示例状态 ====================
 const currentExample = ref(0)
@@ -1050,7 +1103,12 @@ const examples = [
   { name: '标准字体' },
   { name: '页面旋转' },
   { name: '元数据' },
+  { name: 'ECharts图表' },
 ]
+
+// ECharts refs
+const pdflibChartRef = ref<HTMLDivElement>()
+let pdflibChart: ECharts | null = null
 
 // 示例1: 创建空白PDF
 const pageWidth = ref(600)
@@ -1221,7 +1279,7 @@ const example1Generate = async () => {
   }
 
   const pdfBytes = await pdfDoc.save()
-  download(pdfBytes, 'blank-pages.pdf')
+  await printPdfBytes(pdfBytes)
 }
 
 const example2Generate = async () => {
@@ -1237,7 +1295,7 @@ const example2Generate = async () => {
   })
 
   const pdfBytes = await pdfDoc.save()
-  download(pdfBytes, 'text.pdf')
+  await printPdfBytes(pdfBytes)
 }
 
 const example3Generate = async () => {
@@ -1275,7 +1333,7 @@ const example3Generate = async () => {
   }
 
   const pdfBytes = await pdfDoc.save()
-  download(pdfBytes, 'shapes.pdf')
+  await printPdfBytes(pdfBytes)
 }
 
 const example4Generate = async () => {
@@ -1296,7 +1354,7 @@ const example4Generate = async () => {
   }
 
   const pdfBytes = await pdfDoc.save()
-  download(pdfBytes, 'fonts.pdf')
+  await printPdfBytes(pdfBytes)
 }
 
 const example5Generate = async () => {
@@ -1321,7 +1379,7 @@ const example5Generate = async () => {
   })
 
   const pdfBytes = await pdfDoc.save()
-  download(pdfBytes, 'rotated.pdf')
+  await printPdfBytes(pdfBytes)
 }
 
 const example6Generate = async () => {
@@ -1350,8 +1408,109 @@ const example6Generate = async () => {
   page.drawText(`Subject: ${docSubject.value}`, { x: 50, y: 250, size: 14, font })
 
   const pdfBytes = await pdfDoc.save()
-  download(pdfBytes, 'metadata.pdf')
+  await printPdfBytes(pdfBytes)
 }
+
+// 示例7: ECharts生成PDF
+const initPdflibChart = () => {
+  if (pdflibChartRef.value && !pdflibChart) {
+    pdflibChart = echarts.init(pdflibChartRef.value)
+    pdflibChart.setOption({
+      title: {
+        text: '月度销售趋势',
+        left: 'center',
+      },
+      tooltip: {
+        trigger: 'axis',
+      },
+      xAxis: {
+        type: 'category',
+        data: ['1月', '2月', '3月', '4月', '5月', '6月'],
+      },
+      yAxis: {
+        type: 'value',
+      },
+      series: [
+        {
+          name: '销售额',
+          type: 'line',
+          data: [120, 200, 150, 180, 220, 250],
+          smooth: true,
+          itemStyle: {
+            color: '#5470c6',
+          },
+          areaStyle: {
+            color: 'rgba(84, 112, 198, 0.3)',
+          },
+        },
+      ],
+    })
+  }
+}
+
+const example7Generate = async () => {
+  if (!pdflibChart) return
+
+  try {
+    // 等待图表完全渲染
+    await new Promise((resolve) => setTimeout(resolve, 500))
+
+    // 1. 从ECharts获取图片数据
+    const imageDataUrl = pdflibChart.getDataURL({
+      type: 'png',
+      pixelRatio: 3,
+      backgroundColor: '#fff',
+    })
+
+    // 2. 创建PDF（A4尺寸 595 x 842）
+    const pdfDoc = await PDFDocument.create()
+    const page = pdfDoc.addPage([595, 842])
+
+    // 3. 嵌入PNG图片
+    const pngImage = await pdfDoc.embedPng(imageDataUrl)
+
+    // 4. 计算合适的缩放比例，使图表占满大部分页面
+    const maxWidth = 500
+    const maxHeight = 400
+    const imgDims = pngImage.scale(1)
+    const scaleX = maxWidth / imgDims.width
+    const scaleY = maxHeight / imgDims.height
+    const scale = Math.min(scaleX, scaleY)
+    const scaledDims = pngImage.scale(scale)
+
+    // 5. 在PDF中绘制图表（居中）
+    page.drawImage(pngImage, {
+      x: (595 - scaledDims.width) / 2,
+      y: (842 - scaledDims.height) / 2 + 100,
+      width: scaledDims.width,
+      height: scaledDims.height,
+    })
+
+    // 6. 添加文字说明
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
+    page.drawText('ECharts Chart Export via PDF-LIB', {
+      x: 50,
+      y: 780,
+      size: 20,
+      font,
+      color: rgb(0.2, 0.2, 0.2),
+    })
+
+    const pdfBytes = await pdfDoc.save()
+    await printPdfBytes(pdfBytes)
+  } catch (error) {
+    console.error('生成PDF失败:', error)
+    alert('生成PDF失败: ' + error)
+  }
+}
+
+// Watch currentExample to initialize chart
+watch(currentExample, async (newVal) => {
+  if (newVal === 6) {
+    await nextTick()
+    initPdflibChart()
+  }
+})
 
 // ==================== 高级示例函数 ====================
 const advanced1Generate = async () => {
@@ -1444,7 +1603,7 @@ const advanced3Generate = async () => {
   page.drawText('I agree to terms', { x: 80, y: 575, size: 12, font })
 
   const pdfBytes = await pdfDoc.save()
-  download(pdfBytes, 'form.pdf')
+  await printPdfBytes(pdfBytes)
 }
 
 const advanced4Generate = async () => {
@@ -1473,7 +1632,7 @@ const advanced4Generate = async () => {
   })
 
   const pdfBytes = await pdfDoc.save()
-  download(pdfBytes, 'watermarked.pdf')
+  await printPdfBytes(pdfBytes)
 }
 
 const advanced5Generate = async () => {
@@ -2638,5 +2797,45 @@ const createComplexDoc = async () => {
     position: relative;
     top: 0;
   }
+}
+
+/* 框架特点说明样式 */
+.framework-highlight {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: #1a202c;
+  padding: 1.2rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  line-height: 2;
+  border: 2px solid #4facfe;
+}
+
+.framework-highlight strong {
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.framework-highlight .advantage {
+  color: #22543d;
+  font-weight: 700;
+  background: rgba(154, 230, 180, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.framework-highlight .disadvantage {
+  color: #742a2a;
+  font-weight: 700;
+  background: rgba(254, 178, 178, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.framework-highlight .comparison {
+  color: #2c5282;
+  font-weight: 600;
+  background: rgba(190, 227, 248, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 </style>

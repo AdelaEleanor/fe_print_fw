@@ -340,13 +340,13 @@ pdf.save('screenshot.pdf')</code></pre>
 canvas.toBlob((blob) =&gt; {
   // 创建 URL
   const url = URL.createObjectURL(blob)
-  
+
   // 下载文件
   const a = document.createElement('a')
   a.href = url
   a.download = 'screenshot.png'
   a.click()
-  
+
   // 或上传到服务器
   const formData = new FormData()
   formData.append('image', blob, 'screenshot.png')
@@ -362,6 +362,54 @@ canvas.toBlob((blob) =&gt; {
                     <p>当前格式: {{ imageFormat }}</p>
                     <p style="font-size: 0.8rem; color: #718096">适合上传或进一步处理</p>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 示例7: ECharts图表 -->
+            <div v-else-if="currentExample === 6">
+              <h3>示例 7: ECharts图表截图</h3>
+              <p class="framework-highlight">
+                📸 <strong>html2canvas特点：</strong>像素级精准截图，完美捕捉复杂CSS效果<br />
+                <span class="advantage">✅ 优势：</span
+                >无需转换，直接截取视觉外观；支持复杂CSS（渐变、阴影、动画）；高还原度<br />
+                <span class="disadvantage">⚠️ 对比：</span>vs jsPDF/pdfmake -
+                无需导出图片即可打印；vs html2pdf - 提供Canvas便于后处理
+              </p>
+
+              <div class="controls">
+                <button @click="example7Generate" class="btn btn-primary" :disabled="loading">
+                  {{ loading ? '⏳ 截图中...' : '📸 截图保存' }}
+                </button>
+              </div>
+
+              <div class="code-display">
+                <h4>代码示例:</h4>
+                <pre v-pre><code>// 1. 初始化ECharts
+const chart = echarts.init(chartRef.value)
+chart.setOption({
+  title: { text: '销售数据' },
+  series: [{ type: 'pie', data: [...] }]
+})
+
+// 2. 截图ECharts
+const canvas = await html2canvas(chartRef.value, {
+  scale: 2,  // 高清截图
+  backgroundColor: '#fff',
+  useCORS: true
+})
+
+// 3. 下载图片
+const link = document.createElement('a')
+link.download = 'chart.png'
+link.href = canvas.toDataURL()
+link.click()</code></pre>
+              </div>
+
+              <div class="demo-content">
+                <h4>📊 ECharts演示区域:</h4>
+                <div id="example7-area" style="padding: 20px; background: #fff; border-radius: 8px">
+                  <div ref="html2canvasChartRef" style="width: 100%; height: 400px"></div>
                 </div>
               </div>
             </div>
@@ -451,7 +499,7 @@ canvas.toBlob((blob) =&gt; {
   useCORS: true,      // 允许跨域图片
   allowTaint: false,  // 不允许污染canvas
   proxy: 'your-proxy-url', // 代理服务器
-  
+
   // 或使用 onclone 预处理
   onclone: (clonedDoc) =&gt; {
     // 可以在这里替换跨域图片
@@ -536,7 +584,7 @@ canvas.toBlob((blob) =&gt; {
                 <h4>代码示例:</h4>
                 <pre v-pre><code>const canvas = await html2canvas(element, {
   logging: true,  // 启用控制台日志
-  
+
   // 自定义日志函数
   onclone: (clonedDoc, element) =&gt; {
     console.log('克隆的元素:', element)
@@ -623,10 +671,10 @@ canvas.toBlob((blob) =&gt; {
   logging: false,     // 关闭日志提升性能
   imageTimeout: 5000, // 图片加载超时
   removeContainer: true, // 渲染后移除克隆容器
-  
+
   // 忽略不需要的元素
   ignoreElements: (el) =&gt; {
-    return el.tagName === 'SCRIPT' || 
+    return el.tagName === 'SCRIPT' ||
            el.tagName === 'NOSCRIPT' ||
            el.classList.contains('no-capture')
   }
@@ -854,9 +902,11 @@ html2canvas(element).then(canvas => {
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
+import * as echarts from 'echarts'
+import type { ECharts } from 'echarts'
 
 const capturedImage = ref('')
 const loading = ref(false)
@@ -865,31 +915,62 @@ const scaleValue = ref(2)
 const bgColor = ref('#ffffff')
 const imageFormat = ref('image/png')
 
+// ECharts refs
+const html2canvasChartRef = ref<HTMLDivElement>()
+let html2canvasChart: ECharts | null = null
+
 // 示例标签
-const examples = ['基础截图', '高清截图', '截图转PDF', '自定义背景', '过滤元素', '获取Blob']
+const examples = [
+  '基础截图',
+  '高清截图',
+  '截图转PDF',
+  '自定义背景',
+  '过滤元素',
+  '获取Blob',
+  'ECharts图表',
+]
 
 // ==================== 基础功能示例 ====================
 
-// 示例1: 基础截图
+// 示例1: 基础截图（打印预览）
 const example1Generate = async () => {
   const element = document.getElementById('example1-area')
   if (!element) return
 
   loading.value = true
   try {
+    // 等待DOM完全渲染
+    await new Promise((resolve) => setTimeout(resolve, 300))
+
     const canvas = await html2canvas(element, {
       backgroundColor: '#ffffff',
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
     })
 
     const imgData = canvas.toDataURL('image/png')
     capturedImage.value = imgData
 
-    const link = document.createElement('a')
-    link.href = imgData
-    link.download = 'basic-screenshot.png'
-    link.click()
-
-    alert('✅ 基础截图成功！')
+    // 创建打印窗口
+    const printWindow = window.open('', '_blank')
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>打印截图</title>
+            <style>
+              body { margin: 0; padding: 20px; text-align: center; }
+              img { max-width: 100%; height: auto; }
+            </style>
+          </head>
+          <body>
+            <img src="${imgData}" onload="window.print()" />
+          </body>
+        </html>
+      `)
+      printWindow.document.close()
+    }
   } catch (error) {
     console.error('截图失败:', error)
     alert('❌ 截图失败: ' + error)
@@ -905,20 +986,38 @@ const example2Generate = async () => {
 
   loading.value = true
   try {
+    // 等待DOM完全渲染
+    await new Promise((resolve) => setTimeout(resolve, 300))
+
     const canvas = await html2canvas(element, {
       scale: scaleValue.value,
       backgroundColor: null, // 保留渐变
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
     })
 
     const imgData = canvas.toDataURL('image/png')
     capturedImage.value = imgData
 
-    const link = document.createElement('a')
-    link.href = imgData
-    link.download = `hd-screenshot-${scaleValue.value}x.png`
-    link.click()
-
-    alert(`✅ ${scaleValue.value}x 高清截图成功！`)
+    const printWindow = window.open('', '_blank')
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>打印高清截图</title>
+            <style>
+              body { margin: 0; padding: 20px; text-align: center; }
+              img { max-width: 100%; height: auto; }
+            </style>
+          </head>
+          <body>
+            <img src="${imgData}" onload="window.print()" />
+          </body>
+        </html>
+      `)
+      printWindow.document.close()
+    }
   } catch (error) {
     console.error('截图失败:', error)
     alert('❌ 截图失败: ' + error)
@@ -934,9 +1033,15 @@ const example3Generate = async () => {
 
   loading.value = true
   try {
+    // 等待DOM完全渲染
+    await new Promise((resolve) => setTimeout(resolve, 300))
+
     const canvas = await html2canvas(element, {
       scale: 2,
       backgroundColor: '#ffffff',
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
     })
 
     const imgData = canvas.toDataURL('image/png')
@@ -946,10 +1051,36 @@ const example3Generate = async () => {
     const imgHeight = (canvas.height * imgWidth) / canvas.width
 
     pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight)
-    pdf.save('screenshot-to-pdf.pdf')
+
+    // 打印而非下载
+    const blob = pdf.output('blob')
+    const blobUrl = URL.createObjectURL(blob)
+    const iframe = document.createElement('iframe')
+    iframe.style.display = 'none'
+    iframe.src = blobUrl
+    document.body.appendChild(iframe)
+
+    iframe.onload = () => {
+      setTimeout(() => {
+        try {
+          iframe.contentWindow?.print()
+
+          const cleanup = () => {
+            setTimeout(() => {
+              document.body.removeChild(iframe)
+              URL.revokeObjectURL(blobUrl)
+            }, 500)
+          }
+
+          iframe.contentWindow?.addEventListener('afterprint', cleanup, { once: true })
+          setTimeout(cleanup, 300000)
+        } catch (e) {
+          console.error('打印失败:', e)
+        }
+      }, 200)
+    }
 
     capturedImage.value = imgData
-    alert('✅ 截图转PDF成功！')
   } catch (error) {
     console.error('生成PDF失败:', error)
     alert('❌ 生成PDF失败: ' + error)
@@ -958,26 +1089,44 @@ const example3Generate = async () => {
   }
 }
 
-// 示例4: 自定义背景色
+// 示例4: 自定义背景色（打印预览）
 const example4Generate = async () => {
   const element = document.getElementById('example4-area')
   if (!element) return
 
   loading.value = true
   try {
+    // 等待DOM完全渲染
+    await new Promise((resolve) => setTimeout(resolve, 300))
+
     const canvas = await html2canvas(element, {
       backgroundColor: bgColor.value,
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
     })
 
     const imgData = canvas.toDataURL('image/png')
     capturedImage.value = imgData
 
-    const link = document.createElement('a')
-    link.href = imgData
-    link.download = 'custom-bg-screenshot.png'
-    link.click()
-
-    alert('✅ 自定义背景截图成功！')
+    const printWindow = window.open('', '_blank')
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>打印自定义背景</title>
+            <style>
+              body { margin: 0; padding: 20px; text-align: center; background: ${bgColor.value}; }
+              img { max-width: 100%; height: auto; }
+            </style>
+          </head>
+          <body>
+            <img src="${imgData}" onload="window.print()" />
+          </body>
+        </html>
+      `)
+      printWindow.document.close()
+    }
   } catch (error) {
     console.error('截图失败:', error)
     alert('❌ 截图失败: ' + error)
@@ -1007,8 +1156,6 @@ const example5Generate = async () => {
     link.href = imgData
     link.download = 'filtered-screenshot.png'
     link.click()
-
-    alert('✅ 过滤元素截图成功！红色区域已被过滤')
   } catch (error) {
     console.error('截图失败:', error)
     alert('❌ 截图失败: ' + error)
@@ -1024,40 +1171,139 @@ const example6Generate = async () => {
 
   loading.value = true
   try {
+    // 等待DOM完全渲染
+    await new Promise((resolve) => setTimeout(resolve, 300))
+
     const canvas = await html2canvas(element, {
       backgroundColor: '#ffffff',
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
     })
 
-    canvas.toBlob(
-      (blob) => {
-        if (!blob) {
-          alert('❌ Blob生成失败')
-          return
-        }
+    const imgData = canvas.toDataURL(imageFormat.value, 0.9)
+    capturedImage.value = imgData
 
-        const url = URL.createObjectURL(blob)
-        capturedImage.value = url
-
-        const link = document.createElement('a')
-        link.href = url
-        const ext = imageFormat.value.split('/')[1]
-        link.download = `blob-screenshot.${ext}`
-        link.click()
-
-        alert(
-          `✅ Blob生成成功！格式: ${imageFormat.value}, 大小: ${(blob.size / 1024).toFixed(2)}KB`,
-        )
-      },
-      imageFormat.value,
-      0.9,
-    )
+    const printWindow = window.open('', '_blank')
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>打印Blob格式</title>
+            <style>
+              body { margin: 0; padding: 20px; text-align: center; }
+              img { max-width: 100%; height: auto; }
+            </style>
+          </head>
+          <body>
+            <img src="${imgData}" onload="window.print()" />
+          </body>
+        </html>
+      `)
+      printWindow.document.close()
+    }
   } catch (error) {
-    console.error('生成Blob失败:', error)
-    alert('❌ 生成Blob失败: ' + error)
+    console.error('生成失败:', error)
+    alert('❌ 生成失败: ' + error)
   } finally {
     loading.value = false
   }
 }
+
+// 示例7: ECharts截图
+const initHtml2canvasChart = () => {
+  if (html2canvasChartRef.value && !html2canvasChart) {
+    html2canvasChart = echarts.init(html2canvasChartRef.value)
+    html2canvasChart.setOption({
+      title: {
+        text: '销售数据分析',
+        left: 'center',
+      },
+      tooltip: {
+        trigger: 'item',
+      },
+      legend: {
+        orient: 'vertical',
+        left: 'left',
+      },
+      series: [
+        {
+          name: '销售额',
+          type: 'pie',
+          radius: '50%',
+          data: [
+            { value: 1048, name: '手机' },
+            { value: 735, name: '电脑' },
+            { value: 580, name: '平板' },
+            { value: 484, name: '手表' },
+            { value: 300, name: '耳机' },
+          ],
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.5)',
+            },
+          },
+        },
+      ],
+    })
+  }
+}
+
+const example7Generate = async () => {
+  const element = document.getElementById('example7-area')
+  if (!element) return
+
+  loading.value = true
+  try {
+    // 等待ECharts完全渲染
+    await new Promise((resolve) => setTimeout(resolve, 500))
+
+    const canvas = await html2canvas(element, {
+      backgroundColor: '#ffffff',
+      scale: 2,
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
+    })
+
+    const imgData = canvas.toDataURL('image/png')
+    capturedImage.value = imgData
+
+    const printWindow = window.open('', '_blank')
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>打印ECharts图表</title>
+            <style>
+              body { margin: 0; padding: 20px; text-align: center; }
+              img { max-width: 100%; height: auto; }
+            </style>
+          </head>
+          <body>
+            <img src="${imgData}" onload="window.print()" />
+          </body>
+        </html>
+      `)
+      printWindow.document.close()
+    }
+  } catch (error) {
+    console.error('截图失败:', error)
+    alert('❌ 截图失败: ' + error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Watch currentExample to initialize chart
+watch(currentExample, async (newVal) => {
+  if (newVal === 6) {
+    await nextTick()
+    initHtml2canvasChart()
+  }
+})
 
 // ==================== 高级功能示例 ====================
 
@@ -1068,6 +1314,7 @@ const cropX = ref(20)
 const cropY = ref(20)
 const enableLogging = ref(false)
 const windowWidth = ref(1024)
+const jpegQuality = ref(0.8)
 
 // 高级1: 长页面分页截图
 const advanced1Generate = async () => {
@@ -1100,9 +1347,33 @@ const advanced1Generate = async () => {
       heightLeft -= pageHeight
     }
 
-    pdf.save('long-page-capture.pdf')
+    // 打印PDF而非下载
+    const blob = pdf.output('blob')
+    const blobUrl = URL.createObjectURL(blob)
+    const iframe = document.createElement('iframe')
+    iframe.style.display = 'none'
+    iframe.src = blobUrl
+    document.body.appendChild(iframe)
+
+    iframe.onload = () => {
+      setTimeout(() => {
+        try {
+          iframe.contentWindow?.print()
+        } catch (e) {
+          console.error('打印失败:', e)
+        }
+      }, 100)
+    }
+
+    // 清理
+    setTimeout(() => {
+      try {
+        document.body.removeChild(iframe)
+        URL.revokeObjectURL(blobUrl)
+      } catch (e) {}
+    }, 3000)
+
     capturedImage.value = imgData
-    alert('✅ 长页面分页PDF生成成功！')
   } catch (error) {
     console.error('生成失败:', error)
     alert('❌ 生成失败: ' + error)
@@ -1118,22 +1389,38 @@ const advanced2Generate = async () => {
 
   loading.value = true
   try {
+    // 等待DOM完全渲染
+    await new Promise((resolve) => setTimeout(resolve, 300))
+
     const canvas = await html2canvas(element, {
       useCORS: true,
       allowTaint: false,
       backgroundColor: '#ffffff',
       scale: 2,
+      logging: false,
     })
 
     const imgData = canvas.toDataURL('image/png')
     capturedImage.value = imgData
 
-    const link = document.createElement('a')
-    link.href = imgData
-    link.download = 'cors-screenshot.png'
-    link.click()
-
-    alert('✅ 跨域截图成功！')
+    const printWindow = window.open('', '_blank')
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>打印跨域图片</title>
+            <style>
+              body { margin: 0; padding: 20px; text-align: center; }
+              img { max-width: 100%; height: auto; }
+            </style>
+          </head>
+          <body>
+            <img src="${imgData}" onload="window.print()" />
+          </body>
+        </html>
+      `)
+      printWindow.document.close()
+    }
   } catch (error) {
     console.error('截图失败:', error)
     alert('❌ 截图失败: ' + error)
@@ -1142,30 +1429,48 @@ const advanced2Generate = async () => {
   }
 }
 
-// 高级3: 自定义渲染区域
+// 高级3: 自定义渲染区域（打印预览）
 const advanced3Generate = async () => {
   const element = document.getElementById('advanced3-area')
   if (!element) return
 
   loading.value = true
   try {
+    // 等待DOM完全渲染
+    await new Promise((resolve) => setTimeout(resolve, 300))
+
     const canvas = await html2canvas(element, {
       x: cropX.value,
       y: cropY.value,
       width: 150,
       height: 100,
       backgroundColor: '#ffffff',
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
     })
 
     const imgData = canvas.toDataURL('image/png')
     capturedImage.value = imgData
 
-    const link = document.createElement('a')
-    link.href = imgData
-    link.download = 'cropped-screenshot.png'
-    link.click()
-
-    alert(`✅ 裁剪截图成功！从 (${cropX.value}, ${cropY.value}) 开始`)
+    const printWindow = window.open('', '_blank')
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>打印裁剪截图</title>
+            <style>
+              body { margin: 0; padding: 20px; text-align: center; }
+              img { max-width: 100%; height: auto; }
+            </style>
+          </head>
+          <body>
+            <img src="${imgData}" onload="window.print()" />
+          </body>
+        </html>
+      `)
+      printWindow.document.close()
+    }
   } catch (error) {
     console.error('截图失败:', error)
     alert('❌ 截图失败: ' + error)
@@ -1174,7 +1479,7 @@ const advanced3Generate = async () => {
   }
 }
 
-// 高级4: 日志和调试
+// 高级4: 日志和调试（打印预览）
 const advanced4Generate = async () => {
   const element = document.getElementById('capture-area')
   if (!element) return
@@ -1182,10 +1487,15 @@ const advanced4Generate = async () => {
   loading.value = true
   try {
     console.log('开始调试截图...')
+    // 等待DOM完全渨染
+    await new Promise((resolve) => setTimeout(resolve, 300))
+
     const canvas = await html2canvas(element, {
       logging: enableLogging.value,
       backgroundColor: '#ffffff',
       scale: 2,
+      useCORS: true,
+      allowTaint: false,
       onclone: (clonedDoc, el) => {
         if (enableLogging.value) {
           console.log('克隆的元素:', el)
@@ -1197,12 +1507,24 @@ const advanced4Generate = async () => {
     const imgData = canvas.toDataURL('image/png')
     capturedImage.value = imgData
 
-    const link = document.createElement('a')
-    link.href = imgData
-    link.download = 'debug-screenshot.png'
-    link.click()
-
-    alert('✅ 调试截图成功！' + (enableLogging.value ? '请查看控制台日志' : ''))
+    const printWindow = window.open('', '_blank')
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>打印调试截图</title>
+            <style>
+              body { margin: 0; padding: 20px; text-align: center; }
+              img { max-width: 100%; height: auto; }
+            </style>
+          </head>
+          <body>
+            <img src="${imgData}" onload="window.print()" />
+          </body>
+        </html>
+      `)
+      printWindow.document.close()
+    }
   } catch (error) {
     console.error('截图失败:', error)
     alert('❌ 截图失败: ' + error)
@@ -1218,22 +1540,40 @@ const advanced5Generate = async () => {
 
   loading.value = true
   try {
+    // 等待DOM完全渲染
+    await new Promise((resolve) => setTimeout(resolve, 300))
+
     const canvas = await html2canvas(element, {
       windowWidth: windowWidth.value,
       windowHeight: 800,
       backgroundColor: '#ffffff',
       scale: 2,
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
     })
 
     const imgData = canvas.toDataURL('image/png')
     capturedImage.value = imgData
 
-    const link = document.createElement('a')
-    link.href = imgData
-    link.download = `responsive-${windowWidth.value}px.png`
-    link.click()
-
-    alert(`✅ ${windowWidth.value}px 窗口宽度截图成功！`)
+    const printWindow = window.open('', '_blank')
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>打印响应式截图</title>
+            <style>
+              body { margin: 0; padding: 20px; text-align: center; }
+              img { max-width: 100%; height: auto; }
+            </style>
+          </head>
+          <body>
+            <img src="${imgData}" onload="window.print()" />
+          </body>
+        </html>
+      `)
+      printWindow.document.close()
+    }
   } catch (error) {
     console.error('截图失败:', error)
     alert('❌ 截图失败: ' + error)
@@ -1251,12 +1591,17 @@ const advanced6Generate = async () => {
   const startTime = performance.now()
 
   try {
+    // 等待DOM完全渲染
+    await new Promise((resolve) => setTimeout(resolve, 300))
+
     const canvas = await html2canvas(element, {
       scale: 1,
       logging: false,
       imageTimeout: 5000,
       removeContainer: true,
       backgroundColor: '#ffffff',
+      useCORS: true,
+      allowTaint: false,
       ignoreElements: (el) => {
         return (
           el.tagName === 'SCRIPT' ||
@@ -1267,17 +1612,31 @@ const advanced6Generate = async () => {
     })
 
     const endTime = performance.now()
-    const imgData = canvas.toDataURL('image/jpeg', 0.8)
+    const imgData = canvas.toDataURL('image/jpeg', jpegQuality.value)
     capturedImage.value = imgData
 
-    const link = document.createElement('a')
-    link.href = imgData
-    link.download = 'optimized-screenshot.jpg'
-    link.click()
+    const printWindow = window.open('', '_blank')
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>打印优化截图</title>
+            <style>
+              body { margin: 0; padding: 20px; text-align: center; }
+              img { max-width: 100%; height: auto; }
+            </style>
+          </head>
+          <body>
+            <img src="${imgData}" onload="window.print()" />
+          </body>
+        </html>
+      `)
+      printWindow.document.close()
+    }
 
     const fileSize = ((imgData.length * 0.75) / 1024).toFixed(2)
-    alert(
-      `✅ 优化截图成功！\n耗时: ${(endTime - startTime).toFixed(0)}ms\n文件大小: ~${fileSize}KB`,
+    console.log(
+      `优化截图打印预览成功！耗时: ${(endTime - startTime).toFixed(0)}ms，文件大小: ~${fileSize}KB`,
     )
   } catch (error) {
     console.error('截图失败:', error)
@@ -1954,5 +2313,37 @@ const captureWithOptions = async () => {
   border-radius: 4px;
   margin-top: 1rem;
   transition: max-width 0.3s ease;
+}
+
+/* 框架特点说明样式 */
+.framework-highlight {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: #1a202c;
+  padding: 1.2rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  line-height: 2;
+  border: 2px solid #4facfe;
+}
+
+.framework-highlight strong {
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.framework-highlight .advantage {
+  color: #22543d;
+  font-weight: 700;
+  background: rgba(154, 230, 180, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.framework-highlight .disadvantage {
+  color: #742a2a;
+  font-weight: 700;
+  background: rgba(254, 178, 178, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 </style>

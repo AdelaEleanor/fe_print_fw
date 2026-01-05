@@ -356,6 +356,166 @@ const handlePrint = () =&gt; {
               </table>
             </div>
           </div>
+
+          <!-- 示例7: ECharts图表 -->
+          <div v-else-if="currentExample === 6">
+            <h3>示例 7: ECharts图表打印</h3>
+            <p><strong>✨ vue3-print-nb优势：</strong>完美集成Vue 3生态，v-print指令一键打印。</p>
+            <p style="color: #e53e3e; font-size: 0.9rem">
+              <strong>⚠️ 注意：</strong>
+              浏览器打印引擎对<strong>canvas元素的尺寸和间距处理</strong>可能不一致，需要额外调整样式。
+            </p>
+
+            <div class="controls">
+              <button v-print="example7Config" class="btn btn-primary">📊 打印图表</button>
+            </div>
+
+            <div class="demo-content" id="example7-content">
+              <h2 style="text-align: center; margin-bottom: 25px">销售数据看板</h2>
+              <div style="padding: 10px 0">
+                <div
+                  ref="vueprintChartRef"
+                  style="
+                    height: 250px;
+                    width: 100%;
+                    border: 1px solid #e2e8f0;
+                    margin-bottom: 20px;
+                    display: block;
+                  "
+                ></div>
+                <p style="text-align: center; color: #718096; margin: 0; padding-top: 10px">
+                  月度销售数据
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 示例8: 优化后的ECharts图表 -->
+          <div v-else-if="currentExample === 7">
+            <h3>示例 8: ✅ 优化方案：解决打印问题</h3>
+            <p style="color: #48bb78; font-weight: 500">
+              <strong>✨ 终极方案：</strong>表格布局 + 空白占位 + 独立行，彻底解决重叠问题。
+            </p>
+
+            <div class="controls">
+              <button v-print="example8Config" class="btn btn-primary" style="background: #48bb78">
+                🎯 打印优化版
+              </button>
+            </div>
+
+            <div class="demo-content" id="example8-content">
+              <div style="background: #f7fafc; padding: 25px; border-radius: 8px">
+                <h2
+                  style="text-align: center; margin-bottom: 35px; color: #2d3748; font-size: 20px"
+                >
+                  📊 销售数据看板（优化版）
+                </h2>
+
+                <!-- 使用表格布局，图表和文字分别占一行 -->
+                <table
+                  style="
+                    width: 100%;
+                    border-collapse: collapse;
+                    background: white;
+                    border-radius: 8px;
+                  "
+                >
+                  <tr>
+                    <td style="padding: 25px 30px 0 -30px; vertical-align: top">
+                      <!-- 图表容器 -->
+                      <div
+                        ref="vueprintChartOptimizedRef"
+                        style="height: 280px; width: 100%; display: block"
+                      ></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="height: 80px; padding: 0">
+                      <!-- 空白占位行，确保图表和文字分离 -->
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 20px 25px 25px 25px; border-top: 3px solid #e2e8f0">
+                      <!-- 文字标题独立行 -->
+                      <p
+                        style="
+                          text-align: center;
+                          color: #2d3748;
+                          margin: 0;
+                          font-weight: 600;
+                          font-size: 15px;
+                        "
+                      >
+                        📈 月度销售数据分析
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+
+                <div
+                  style="
+                    margin-top: 25px;
+                    padding: 15px;
+                    background: white;
+                    border-radius: 8px;
+                    border-left: 4px solid #48bb78;
+                  "
+                >
+                  <p style="margin: 0; color: #2d3748; font-size: 14px">
+                    <strong>✅ 优化要点：</strong>
+                    表格布局 + 图表独立行（减少左侧空白20px）+ 80px空白占位行 + 文字独立行 +
+                    强化打印样式
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="code-display">
+              <h4>代码示例:</h4>
+              <pre><code>// ✅ 终极优化方案：使用表格分离图表和文字
+&lt;table style="width: 100%; border-collapse: collapse;"&gt;
+  &lt;tr&gt;
+    &lt;td style="padding: 25px 30px 0 20px;"&gt;
+      &lt;!-- 图表独占一行，减少左侧空白 --&gt;
+      &lt;div ref="chart" style="height: 280px;"&gt;&lt;/div&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td style="height: 80px;"&gt;
+      &lt;!-- 空白占位行：物理分隔，增加到80px --&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td style="padding: 20px 25px; border-top: 3px solid #000;"&gt;
+      &lt;!-- 文字独占一行 --&gt;
+      &lt;p&gt;月度销售数据分析&lt;/p&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+const printConfig = {
+  extraHead: `
+    &lt;style&gt;
+      @media print {
+        /* 表格行固定高度 */
+        #example8-content table tr:first-child td {
+          height: 340px !important;  /* 图表行 */
+          padding: 25px 30px 20px 20px !important;
+        }
+        #example8-content table tr:nth-child(2) td {
+          height: 80px !important;   /* 空白占位行 */
+        }
+        /* Canvas禁止浮动和定位 */
+        #example8-content canvas {
+          position: static !important;
+          float: none !important;
+        }
+      }
+    &lt;/style&gt;
+  `
+};</code></pre>
+            </div>
+          </div>
         </div>
 
         <!-- 高级场景演示 -->
@@ -870,13 +1030,30 @@ const handlePrint = () =&gt; {
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch, nextTick } from 'vue'
+import * as echarts from 'echarts'
+import type { ECharts } from 'echarts'
 
 const currentDate = ref(new Date().toLocaleDateString('zh-CN'))
 const currentExample = ref(0)
 
+// ECharts refs
+const vueprintChartRef = ref<HTMLDivElement>()
+const vueprintChartOptimizedRef = ref<HTMLDivElement>()
+let vueprintChart: ECharts | null = null
+let vueprintChartOptimized: ECharts | null = null
+
 // 示例标签
-const examples = ['基础指令', '编程式调用', '自定义样式', '隐藏元素', '预览功能', '自定义标题']
+const examples = [
+  '基础指令',
+  '编程式调用',
+  '自定义样式',
+  '隐藏元素',
+  '预览功能',
+  '自定义标题',
+  'ECharts图表',
+  '✅ 优化方案',
+]
 
 // 示例1: 基础指令配置
 const example1Config = {
@@ -1002,6 +1179,199 @@ const example5Config = {
 const example6Config = {
   id: 'example6-content',
   popTitle: '公司年度报告 - 2024',
+}
+
+// 示例7: ECharts图表配置
+const example7Config = {
+  id: 'example7-content',
+  popTitle: 'ECharts数据看板',
+  extraHead: `
+    <style>
+      @media print {
+        @page {
+          margin: 20mm;
+        }
+        body {
+          margin: 0;
+          padding: 0;
+        }
+        #example7-content {
+          page-break-inside: avoid;
+        }
+        #example7-content h2 {
+          margin-bottom: 25px !important;
+        }
+        #example7-content > div {
+          padding: 10px 0 !important;
+          min-height: 300px !important;
+        }
+        #example7-content canvas {
+          display: block !important;
+          margin-bottom: 20px !important;
+          page-break-inside: avoid !important;
+        }
+        #example7-content p {
+          margin-top: 20px !important;
+          padding-top: 10px !important;
+          page-break-before: avoid !important;
+        }
+      }
+    </style>
+  `,
+}
+
+// 监听示例切换
+watch(currentExample, async (newVal) => {
+  if (newVal === 6) {
+    await nextTick()
+    initVueprintChart()
+  } else if (newVal === 7) {
+    await nextTick()
+    initVueprintChartOptimized()
+  }
+})
+
+// 初始化vue3-print-nb的ECharts
+const initVueprintChart = () => {
+  if (vueprintChartRef.value && !vueprintChart) {
+    vueprintChart = echarts.init(vueprintChartRef.value)
+    vueprintChart.setOption({
+      title: { text: '销售数据', left: 'center', textStyle: { fontSize: 14 } },
+      xAxis: { type: 'category', data: ['1月', '2月', '3月', '4月', '5月', '6月'] },
+      yAxis: { type: 'value' },
+      series: [
+        {
+          data: [120, 200, 150, 80, 170, 210],
+          type: 'line',
+          smooth: true,
+          itemStyle: { color: '#667eea' },
+          areaStyle: { color: 'rgba(102, 126, 234, 0.2)' },
+        },
+      ],
+    })
+  }
+}
+
+// 初始化优化版ECharts
+const initVueprintChartOptimized = () => {
+  if (vueprintChartOptimizedRef.value && !vueprintChartOptimized) {
+    vueprintChartOptimized = echarts.init(vueprintChartOptimizedRef.value)
+    vueprintChartOptimized.setOption({
+      title: {
+        text: '月度销售趋势',
+        left: 'center',
+        textStyle: { fontSize: 16, fontWeight: 'bold' },
+      },
+      tooltip: { trigger: 'axis' },
+      grid: { left: '0%', right: '8%', bottom: '18%', top: '22%' },
+      xAxis: {
+        type: 'category',
+        data: ['1月', '2月', '3月', '4月', '5月', '6月'],
+        axisLabel: { fontSize: 13 },
+      },
+      yAxis: {
+        type: 'value',
+        name: '销售额(万)',
+        axisLabel: { fontSize: 13 },
+      },
+      series: [
+        {
+          data: [120, 200, 150, 80, 170, 210],
+          type: 'line',
+          smooth: true,
+          itemStyle: { color: '#667eea' },
+          areaStyle: { color: 'rgba(102, 126, 234, 0.2)' },
+          lineStyle: { width: 3 },
+          symbol: 'circle',
+          symbolSize: 8,
+        },
+      ],
+    })
+  }
+}
+
+// 示例8: 优化版配置（终极方案）
+const example8Config = {
+  id: 'example8-content',
+  popTitle: '优化版图表打印',
+  extraHead: `
+    <style>
+      @media print {
+        @page {
+          margin: 15mm;
+          size: A4;
+        }
+
+        body {
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+
+        #example8-content {
+          page-break-inside: avoid !important;
+        }
+
+        /* 表格布局强制 */
+        #example8-content table {
+          width: 100% !important;
+          border-collapse: collapse !important;
+          table-layout: fixed !important;
+        }
+
+        /* 第一行（图表行）固定高度 */
+        #example8-content table tr:first-child td {
+          height: 340px !important;
+          padding: 25px 30px 20px 20px !important;
+          vertical-align: top !important;
+        }
+
+        /* 第二行（空白占位行）固定高度 */
+        #example8-content table tr:nth-child(2) td {
+          height: 80px !important;
+          padding: 0 !important;
+        }
+
+        /* 第三行（文字行）固定高度和样式 */
+        #example8-content table tr:nth-child(3) td {
+          height: 60px !important;
+          padding: 20px 25px !important;
+          border-top: 3px solid #000 !important;
+          vertical-align: middle !important;
+        }
+
+        /* Canvas 强制静态定位，禁止浮动 */
+        #example8-content canvas {
+          display: block !important;
+          position: static !important;
+          float: none !important;
+          clear: both !important;
+          margin: 0 auto !important;
+          page-break-inside: avoid !important;
+        }
+
+        /* 图表容器强制高度 */
+        #example8-content [ref="vueprintChartOptimizedRef"],
+        #example8-content div[style*="height: 280px"] {
+          height: 280px !important;
+          min-height: 280px !important;
+          max-height: 280px !important;
+          display: block !important;
+        }
+
+        /* 文字段落强制样式 */
+        #example8-content table tr:last-child p {
+          margin: 0 !important;
+          padding: 0 !important;
+          line-height: 1.5 !important;
+        }
+
+        /* 提示框不打印 */
+        #example8-content > div > div[style*="border-left: 4px"] {
+          display: none !important;
+        }
+      }
+    </style>
+  `,
 }
 
 // 高级示例标签

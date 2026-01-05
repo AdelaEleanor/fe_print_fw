@@ -539,6 +539,164 @@ html2pdf().from(element).output('datauristring')
   .then(str =&gt; console.log(str));</code></pre>
             </div>
           </div>
+
+          <!-- 示例7: ECharts图表 -->
+          <div v-if="currentExample === 6" class="example-content">
+            <h4>7. ECharts图表转PDF</h4>
+            <p>
+              <strong>✨ html2pdf优势：</strong
+              >直接将DOM转为PDF，<strong>保留CSS样式</strong>和<strong>现代布局</strong>。
+            </p>
+            <p style="color: #e53e3e; font-size: 0.9rem">
+              <strong>⚠️ 框架局限：</strong>
+              html2canvas对<strong>Grid布局支持不佳</strong>，建议使用Flexbox/Table布局以确保打印效果。
+            </p>
+
+            <div class="demo-box">
+              <div id="html2pdf-chart-content" class="preview-box" style="padding: 20px">
+                <h3 style="text-align: center; color: #f59e0b; margin-bottom: 20px">
+                  销售数据报告
+                </h3>
+                <!-- 使用 flex 布局而非 grid，以确保打印时布局稳定 -->
+                <div style="display: flex; gap: 20px; align-items: stretch">
+                  <div style="flex: 1; min-width: 0">
+                    <div
+                      ref="html2pdfChartRef"
+                      style="
+                        height: 220px;
+                        width: 100%;
+                        border: 1px solid #e2e8f0;
+                        margin-bottom: 15px;
+                      "
+                    ></div>
+                    <p style="text-align: center; color: #718096; margin: 0; padding-top: 5px">
+                      月度趋势
+                    </p>
+                  </div>
+                  <div
+                    style="
+                      flex: 1;
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                      color: white;
+                      padding: 20px;
+                      border-radius: 8px;
+                      display: flex;
+                      flex-direction: column;
+                      justify-content: center;
+                    "
+                  >
+                    <h4 style="margin: 0 0 15px 0">关键数据</h4>
+                    <p style="margin: 8px 0">总额: ¥1,030万</p>
+                    <p style="margin: 8px 0">增长: +25%</p>
+                    <p style="margin: 8px 0 0 0">CSS渐变保留！</p>
+                  </div>
+                </div>
+              </div>
+              <button @click="example7Generate" class="btn btn-primary">生成图表PDF</button>
+            </div>
+            <div class="code-display">
+              <pre v-pre><code>// ⚠️ 打印最佳实践：使用 Flexbox 而非 Grid
+const chartContent = `
+  &lt;div style="display: flex; gap: 20px;"&gt;
+    &lt;div style="flex: 1;"&gt;
+      &lt;div style="height: 220px;"&gt;&lt;/div&gt;
+      &lt;p style="margin-top: 15px;"&gt;文字标题&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div style="flex: 1;"&gt;...&lt;/div&gt;
+  &lt;/div&gt;
+`;
+
+html2pdf().from(element).save();</code></pre>
+            </div>
+          </div>
+
+          <!-- 示例8: 优化后的ECharts图表 -->
+          <div v-if="currentExample === 7" class="example-content">
+            <h4>8. ✅ 优化方案：解决布局问题</h4>
+            <p style="color: #48bb78; font-weight: 500">
+              <strong>✨ 完美解决：</strong>使用Table布局 + 固定尺寸 + 充足间距，确保打印效果与预览一致。
+            </p>
+            
+            <div class="demo-box">
+              <div id="html2pdf-chart-optimized" class="preview-box" style="padding: 25px; background: #f7fafc">
+                <h3 style="text-align: center; color: #2d3748; margin-bottom: 30px; font-size: 18px">
+                  📊 销售数据报告（优化版）
+                </h3>
+                
+                <!-- 使用 table 布局确保最佳兼容性 -->
+                <table style="width: 100%; border-collapse: separate; border-spacing: 20px 0">
+                  <tr>
+                    <td style="width: 50%; vertical-align: top; padding: 0">
+                      <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1)">
+                        <div
+                          ref="html2pdfChartOptimizedRef"
+                          style="height: 240px; width: 100%; margin-bottom: 20px"
+                        ></div>
+                        <p style="text-align: center; color: #4a5568; margin: 0; padding: 10px 0; font-weight: 500; border-top: 2px solid #e2e8f0">
+                          月度销售趋势
+                        </p>
+                      </div>
+                    </td>
+                    <td style="width: 50%; vertical-align: top; padding: 0">
+                      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 8px; height: 240px; display: table; width: 100%">
+                        <div style="display: table-cell; vertical-align: middle">
+                          <h4 style="margin: 0 0 20px 0; font-size: 16px; border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 10px">📈 关键指标</h4>
+                          <p style="margin: 12px 0; font-size: 15px"><strong>总销售额:</strong> ¥1,030万</p>
+                          <p style="margin: 12px 0; font-size: 15px"><strong>同比增长:</strong> +25%</p>
+                          <p style="margin: 12px 0; font-size: 15px"><strong>环比增长:</strong> +8%</p>
+                          <p style="margin: 12px 0 0 0; font-size: 13px; opacity: 0.9">✓ CSS渐变完美保留</p>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+
+                <div style="margin-top: 25px; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #48bb78">
+                  <p style="margin: 0; color: #2d3748; font-size: 14px">
+                    <strong>✅ 优化要点：</strong>
+                    Table布局 + 固定高度(240px) + 充足间距(20px) + 独立容器 + 明确边距
+                  </p>
+                </div>
+              </div>
+              
+              <button @click="example8Generate" class="btn btn-primary" style="background: #48bb78">
+                🎯 生成优化版PDF
+              </button>
+            </div>
+
+            <div class="code-display">
+              <pre v-pre><code>// ✅ 优化方案核心代码
+const optimizedContent = `
+  &lt;table style="width: 100%; border-spacing: 20px 0"&gt;
+    &lt;tr&gt;
+      &lt;td style="width: 50%; vertical-align: top;"&gt;
+        &lt;div style="padding: 15px; background: white;"&gt;
+          &lt;!-- 图表容器：固定高度 + 充足底部间距 --&gt;
+          &lt;div style="height: 240px; margin-bottom: 20px;"&gt;&lt;/div&gt;
+          &lt;!-- 文字：独立容器 + 顶部边框分隔 --&gt;
+          &lt;p style="margin: 0; padding: 10px 0; 
+                     border-top: 2px solid #e2e8f0;"&gt;
+            月度销售趋势
+          &lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/td&gt;
+      &lt;td style="width: 50%;"&gt;...&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/table&gt;
+`;
+
+// 等待图表渲染 + 优化配置
+await new Promise(resolve =&gt; setTimeout(resolve, 500));
+html2pdf().set({
+  html2canvas: { 
+    scale: 2, 
+    useCORS: true,
+    logging: false,
+    backgroundColor: '#f7fafc'
+  }
+}).from(element).save();</code></pre>
+            </div>
+          </div>
         </div>
 
         <!-- ==================== 高级示例区域 ==================== -->
@@ -807,13 +965,21 @@ await worker.save();</code></pre>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
+import * as echarts from 'echarts'
+import type { ECharts } from 'echarts'
 import html2pdf from 'html2pdf.js'
 
 const currentDate = ref(new Date().toLocaleDateString('zh-CN'))
 
 // ==================== 基础示例状态 ====================
 const currentExample = ref(0)
+
+// ECharts refs
+const html2pdfChartRef = ref<HTMLDivElement>()
+const html2pdfChartOptimizedRef = ref<HTMLDivElement>()
+let html2pdfChart: ECharts | null = null
+let html2pdfChartOptimized: ECharts | null = null
 const examples = [
   { name: '基础转换' },
   { name: '配置选项' },
@@ -821,6 +987,8 @@ const examples = [
   { name: '页面尺寸' },
   { name: '边距设置' },
   { name: '文件名输出' },
+  { name: 'ECharts图表' },
+  { name: '✅ 优化方案' },
 ]
 
 // 配置选项
@@ -862,11 +1030,58 @@ const previewStyle = computed(() => ({
   height: `${customHeight.value * 0.5}px`,
 }))
 
+// 通用打印预览函数
+const printPdfBlob = (blob: Blob) => {
+  const url = URL.createObjectURL(blob)
+  const iframe = document.createElement('iframe')
+  iframe.style.display = 'none'
+  iframe.src = url
+  document.body.appendChild(iframe)
+
+  iframe.onload = () => {
+    setTimeout(() => {
+      try {
+        iframe.contentWindow?.print()
+
+        // 监听打印完成事件
+        const cleanup = () => {
+          setTimeout(() => {
+            try {
+              document.body.removeChild(iframe)
+              URL.revokeObjectURL(url)
+            } catch (e) {
+              console.error('Cleanup error:', e)
+            }
+          }, 500)
+        }
+
+        // 监听打印对话框关闭
+        if (iframe.contentWindow) {
+          iframe.contentWindow.addEventListener('afterprint', cleanup, { once: true })
+          // 备用超时清理（5分钟）
+          setTimeout(cleanup, 300000)
+        } else {
+          cleanup()
+        }
+      } catch (e) {
+        console.error('Print error:', e)
+      }
+    }, 200)
+  }
+}
+
 // ==================== 原有快捷功能 ====================
 const simplePDF = () => {
   const element = document.getElementById('pdf-content')
   if (!element) return
-  html2pdf().from(element).save('html2pdf-simple.pdf')
+  html2pdf()
+    .from(element)
+    .toPdf()
+    .get('pdf')
+    .then((pdf: any) => {
+      const blob = pdf.output('blob')
+      printPdfBlob(blob)
+    })
 }
 
 const configuredPDF = () => {
@@ -881,7 +1096,15 @@ const configuredPDF = () => {
     jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const },
   }
 
-  html2pdf().set(options).from(element).save()
+  html2pdf()
+    .set(options)
+    .from(element)
+    .toPdf()
+    .get('pdf')
+    .then((pdf: any) => {
+      const blob = pdf.output('blob')
+      printPdfBlob(blob)
+    })
 }
 
 const multiPagePDF = () => {
@@ -904,14 +1127,29 @@ const multiPagePDF = () => {
     },
   }
 
-  html2pdf().set(options).from(element).save()
+  html2pdf()
+    .set(options)
+    .from(element)
+    .toPdf()
+    .get('pdf')
+    .then((pdf: any) => {
+      const blob = pdf.output('blob')
+      printPdfBlob(blob)
+    })
 }
 
 // ==================== 基础示例函数 ====================
 const example1Generate = () => {
   const element = document.getElementById('basic-content-1')
   if (!element) return
-  html2pdf().from(element).save('basic.pdf')
+  html2pdf()
+    .from(element)
+    .toPdf()
+    .get('pdf')
+    .then((pdf: any) => {
+      const blob = pdf.output('blob')
+      printPdfBlob(blob)
+    })
 }
 
 const example2Generate = () => {
@@ -926,7 +1164,15 @@ const example2Generate = () => {
       orientation: orientation.value,
     },
   }
-  html2pdf().set(options).from(element).save()
+  html2pdf()
+    .set(options)
+    .from(element)
+    .toPdf()
+    .get('pdf')
+    .then((pdf: any) => {
+      const blob = pdf.output('blob')
+      printPdfBlob(blob)
+    })
 }
 
 const example3Generate = () => {
@@ -942,7 +1188,15 @@ const example3Generate = () => {
       scale: scaleValue.value,
     },
   }
-  html2pdf().set(options).from(element).save()
+  html2pdf()
+    .set(options)
+    .from(element)
+    .toPdf()
+    .get('pdf')
+    .then((pdf: any) => {
+      const blob = pdf.output('blob')
+      printPdfBlob(blob)
+    })
 }
 
 const example4Generate = () => {
@@ -956,7 +1210,15 @@ const example4Generate = () => {
       orientation: 'portrait' as const,
     },
   }
-  html2pdf().set(options).from(element).save()
+  html2pdf()
+    .set(options)
+    .from(element)
+    .toPdf()
+    .get('pdf')
+    .then((pdf: any) => {
+      const blob = pdf.output('blob')
+      printPdfBlob(blob)
+    })
 }
 
 const example5Generate = () => {
@@ -971,7 +1233,15 @@ const example5Generate = () => {
     ],
     filename: 'margins.pdf',
   }
-  html2pdf().set(options).from(element).save()
+  html2pdf()
+    .set(options)
+    .from(element)
+    .toPdf()
+    .get('pdf')
+    .then((pdf: any) => {
+      const blob = pdf.output('blob')
+      printPdfBlob(blob)
+    })
 }
 
 const example6Generate = async () => {
@@ -980,7 +1250,14 @@ const example6Generate = async () => {
   const fullFileName = `${fileName.value}.pdf`
 
   if (outputType.value === 'save') {
-    html2pdf().from(element).save(fullFileName)
+    html2pdf()
+      .from(element)
+      .toPdf()
+      .get('pdf')
+      .then((pdf: any) => {
+        const blob = pdf.output('blob')
+        printPdfBlob(blob)
+      })
   } else if (outputType.value === 'blob') {
     const blob = await html2pdf().from(element).output('blob')
     console.log('Blob:', blob)
@@ -991,6 +1268,206 @@ const example6Generate = async () => {
     const dataUri = await html2pdf().from(element).output('datauristring')
     console.log('DataURI:', dataUri.substring(0, 100) + '...')
     alert('Base64字符串已输出到控制台')
+  }
+}
+
+// 示例7: ECharts图表
+const example7Generate = async () => {
+  const element = document.getElementById('html2pdf-chart-content')
+  if (!element) return
+
+  try {
+    // 等待 ECharts 完全渲染
+    await new Promise((resolve) => setTimeout(resolve, 500))
+
+    const worker = html2pdf()
+      .from(element)
+      .set({
+        margin: 10,
+        filename: 'echarts-report.pdf',
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff',
+        },
+        jsPDF: { format: 'a4' as const, orientation: 'portrait' as const },
+      })
+      .toPdf()
+      .get('pdf')
+
+    const pdf = await worker
+    const blob = pdf.output('blob')
+
+    // 打开打印预览
+    const url = URL.createObjectURL(blob)
+    const iframe = document.createElement('iframe')
+    iframe.style.position = 'fixed'
+    iframe.style.right = '0'
+    iframe.style.bottom = '0'
+    iframe.style.width = '0'
+    iframe.style.height = '0'
+    iframe.style.border = '0'
+    iframe.src = url
+    document.body.appendChild(iframe)
+
+    iframe.onload = () => {
+      setTimeout(() => {
+        iframe.contentWindow?.focus()
+        iframe.contentWindow?.print()
+
+        const cleanup = () => {
+          setTimeout(() => {
+            document.body.removeChild(iframe)
+            URL.revokeObjectURL(url)
+          }, 100)
+        }
+
+        if (iframe.contentWindow) {
+          iframe.contentWindow.addEventListener('afterprint', cleanup, { once: true })
+          setTimeout(cleanup, 300000)
+        } else {
+          cleanup()
+        }
+      }, 200)
+    }
+  } catch (error) {
+    console.error('生成PDF失败:', error)
+    alert('生成PDF失败')
+  }
+}
+
+// 示例8: 优化版生成
+const example8Generate = async () => {
+  const element = document.getElementById('html2pdf-chart-optimized')
+  if (!element) return
+
+  try {
+    // 等待 ECharts 完全渲染
+    await new Promise((resolve) => setTimeout(resolve, 500))
+
+    const worker = html2pdf()
+      .from(element)
+      .set({
+        margin: 12,
+        filename: 'echarts-optimized.pdf',
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#f7fafc',
+          windowWidth: 1200,
+        },
+        jsPDF: { format: 'a4' as const, orientation: 'portrait' as const },
+      })
+      .toPdf()
+      .get('pdf')
+
+    const pdf = await worker
+    const blob = pdf.output('blob')
+
+    // 打开打印预览
+    const url = URL.createObjectURL(blob)
+    const iframe = document.createElement('iframe')
+    iframe.style.position = 'fixed'
+    iframe.style.right = '0'
+    iframe.style.bottom = '0'
+    iframe.style.width = '0'
+    iframe.style.height = '0'
+    iframe.style.border = '0'
+    iframe.src = url
+    document.body.appendChild(iframe)
+
+    iframe.onload = () => {
+      setTimeout(() => {
+        iframe.contentWindow?.focus()
+        iframe.contentWindow?.print()
+
+        const cleanup = () => {
+          setTimeout(() => {
+            document.body.removeChild(iframe)
+            URL.revokeObjectURL(url)
+          }, 100)
+        }
+
+        if (iframe.contentWindow) {
+          iframe.contentWindow.addEventListener('afterprint', cleanup, { once: true })
+          setTimeout(cleanup, 300000)
+        } else {
+          cleanup()
+        }
+      }, 200)
+    }
+  } catch (error) {
+    console.error('生成PDF失败:', error)
+    alert('生成PDF失败')
+  }
+}
+
+// Watch currentExample to initialize chart
+watch(currentExample, async (newVal) => {
+  if (newVal === 6) {
+    await nextTick()
+    initHtml2pdfChart()
+  } else if (newVal === 7) {
+    await nextTick()
+    initHtml2pdfChartOptimized()
+  }
+})
+
+// 初始化html2pdf的ECharts
+const initHtml2pdfChart = () => {
+  if (html2pdfChartRef.value && !html2pdfChart) {
+    html2pdfChart = echarts.init(html2pdfChartRef.value)
+    html2pdfChart.setOption({
+      title: { text: '月度销售', left: 'center', textStyle: { fontSize: 14 } },
+      tooltip: { trigger: 'axis' },
+      xAxis: { type: 'category', data: ['1月', '2月', '3月', '4月', '5月', '6月'] },
+      yAxis: { type: 'value', name: '销售额(万)' },
+      series: [
+        {
+          data: [120, 200, 150, 80, 170, 210],
+          type: 'line',
+          smooth: true,
+          areaStyle: { color: 'rgba(245, 158, 11, 0.2)' },
+          itemStyle: { color: '#f59e0b' },
+        },
+      ],
+    })
+  }
+}
+
+// 初始化优化版ECharts
+const initHtml2pdfChartOptimized = () => {
+  if (html2pdfChartOptimizedRef.value && !html2pdfChartOptimized) {
+    html2pdfChartOptimized = echarts.init(html2pdfChartOptimizedRef.value)
+    html2pdfChartOptimized.setOption({
+      title: { text: '月度销售额', left: 'center', textStyle: { fontSize: 15, fontWeight: 'bold' } },
+      tooltip: { trigger: 'axis' },
+      grid: { left: '10%', right: '10%', bottom: '15%', top: '20%' },
+      xAxis: {
+        type: 'category',
+        data: ['1月', '2月', '3月', '4月', '5月', '6月'],
+        axisLabel: { fontSize: 12 },
+      },
+      yAxis: {
+        type: 'value',
+        name: '销售额(万)',
+        axisLabel: { fontSize: 12 },
+      },
+      series: [
+        {
+          data: [120, 200, 150, 80, 170, 210],
+          type: 'line',
+          smooth: true,
+          areaStyle: { color: 'rgba(102, 126, 234, 0.15)' },
+          itemStyle: { color: '#667eea' },
+          lineStyle: { width: 3 },
+          symbol: 'circle',
+          symbolSize: 8,
+        },
+      ],
+    })
   }
 }
 
