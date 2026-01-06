@@ -150,44 +150,95 @@
       </div>
     </section>
 
+    <section class="core-insight">
+      <h2>🎓 核心洞察 - 三层架构模型</h2>
+      <p class="insight-desc">市面上虽有众多打印框架，但本质只有3种底层实现。</p>
+      <div class="architecture-grid">
+        <div class="arch-card native">
+          <h3>第一层：原生浏览器打印</h3>
+          <div class="arch-core">DOM → CSS布局引擎 → 打印渲染</div>
+          <div class="arch-detail">
+            <p><strong>包含框架：</strong> window.print、vue3-print-nb、print-html-element...</p>
+            <p><strong>核心优势：</strong> 100% 所见即所得，自动分页，表头重复</p>
+            <p><strong>主要限制：</strong> CSS 某些高级特性不支持（filter、mask等）</p>
+            <p><strong>推荐场景：</strong> 99% 的日常打印需求</p>
+            <p><strong>性能：</strong> ⭐⭐⭐⭐⭐ 最优</p>
+            <p><strong>技术债：</strong> ⭐ 最小</p>
+          </div>
+        </div>
+
+        <div class="arch-card canvas">
+          <h3>第二层：Canvas截图方案</h3>
+          <div class="arch-core">DOM → html2canvas → 图片 → 打印</div>
+          <div class="arch-detail">
+            <p><strong>包含框架：</strong> html2canvas、html2pdf.js...</p>
+            <p><strong>核心优势：</strong> CSS 样式 100% 还原（因为是截图），复杂样式完美</p>
+            <p><strong>主要限制：</strong> 布局重算可能有 1-3px 偏差，大数据量有卡顿</p>
+            <p><strong>推荐场景：</strong> 样式复杂的页面、图表、可视化</p>
+            <p><strong>性能：</strong> ⭐⭐⭐ 中等</p>
+            <p><strong>技术债：</strong> ⭐⭐ 中等</p>
+          </div>
+        </div>
+
+        <div class="arch-card pdf">
+          <h3>第三层：PDF代码生成</h3>
+          <div class="arch-core">代码定义 → PDF库计算坐标 → 生成PDF</div>
+          <div class="arch-detail">
+            <p><strong>包含框架：</strong> jsPDF、pdfmake、PDF-LIB...</p>
+            <p><strong>核心优势：</strong> 完全可编程，支持后端 Node.js，输出确定性强</p>
+            <p><strong>主要限制：</strong> 需手动编码，工作量是其他方案的 10 倍</p>
+            <p><strong>推荐场景：</strong> 后端自动化、批量生成、PDF编辑合并</p>
+            <p><strong>性能：</strong> ⭐⭐⭐ 中等</p>
+            <p><strong>技术债：</strong> ⭐⭐⭐⭐ 最高</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="recommendations">
-      <h2>💡 选型建议</h2>
+      <h2>💡 分场景选型建议</h2>
       <div class="recommendation-grid">
-        <div class="recommendation-card">
-          <h3>🎯 简单文档打印</h3>
-          <p><strong>推荐：window.print() + CSS</strong></p>
-          <p>优势：无依赖、高性能、用户可控</p>
-          <p>适用：文章、订单、简单报表</p>
+        <div class="recommendation-card simple">
+          <h3>🎯 场景1：用户交互式打印（70%用户）</h3>
+          <p><strong>选择：原生打印（第一层）</strong></p>
+          <p><strong>最优方案：</strong> window.print() + @media print CSS</p>
+          <p class="reason">
+            <strong>为什么：</strong> 现代电脑都有虚拟打印机，输出 PDF 效果与 pdfmake
+            无异，但代码简单 10 倍
+          </p>
+          <p><strong>实施成本：</strong> ⭐ 极低</p>
+          <p><strong>适用：</strong> 订单、发票、报表、简单文档</p>
         </div>
-        <div class="recommendation-card">
-          <h3>⚡ 轻量级快速打印</h3>
-          <p><strong>推荐：print-html-element / Print.js</strong></p>
-          <p>优势：超轻量、极速、简单</p>
-          <p>适用：快速打印、对体积敏感项目</p>
+
+        <div class="recommendation-card medium">
+          <h3>🎨 场景2：复杂样式打印（15%用户）</h3>
+          <p><strong>选择：Canvas方案（第二层）</strong></p>
+          <p><strong>最优方案：</strong> html2pdf.js 或 html2canvas + window.print()</p>
+          <p class="reason"><strong>为什么：</strong> 样式 100% 还原，解决渐变、阴影、圆角等问题</p>
+          <p><strong>实施成本：</strong> ⭐⭐ 低</p>
+          <p><strong>适用：</strong> 设计稿、可视化、ECharts 图表、品牌页面</p>
         </div>
-        <div class="recommendation-card">
-          <h3>💚 Vue项目集成</h3>
-          <p><strong>推荐：vue3-print-nb</strong></p>
-          <p>优势：Vue指令、开箱即用、API简单</p>
-          <p>适用：Vue 3项目的快速打印需求</p>
+
+        <div class="recommendation-card advanced">
+          <h3>🎯 场景3：复杂交互打印（10%用户）</h3>
+          <p><strong>选择：PDF代码生成（第三层）</strong></p>
+          <p><strong>最优方案：</strong> jsPDF / pdfmake</p>
+          <p class="reason">
+            <strong>为什么：</strong> 需要完全编程控制布局、样式、分页，原生和Canvas无法实现
+          </p>
+          <p><strong>实施成本：</strong> ⭐⭐⭐ 中等</p>
+          <p><strong>适用：</strong> 动态表单、条件判断打印、高度定制报表、多页面拼接</p>
         </div>
-        <div class="recommendation-card">
-          <h3>📝 复杂PDF生成</h3>
-          <p><strong>推荐：pdfmake / jsPDF</strong></p>
-          <p>优势：API友好、支持复杂布局、矢量输出</p>
-          <p>适用：发票、合同、正式文档</p>
-        </div>
-        <div class="recommendation-card">
-          <h3>📚 PDF编辑操作</h3>
-          <p><strong>推荐：PDF-LIB</strong></p>
-          <p>优势：可编辑现有PDF、合并、表单填充</p>
-          <p>适用：PDF修改、批量处理、文档合并</p>
-        </div>
-        <div class="recommendation-card">
-          <h3>🎨 所见即所得</h3>
-          <p><strong>推荐：html2pdf.js / html2canvas</strong></p>
-          <p>优势：样式完美还原、一站式方案</p>
-          <p>适用：图表、可视化、复杂样式</p>
+
+        <div class="recommendation-card special">
+          <h3>🔧 场景4：PDF编辑与处理（5%用户）</h3>
+          <p><strong>选择：PDF编辑库</strong></p>
+          <p><strong>最优方案：</strong> PDF-LIB</p>
+          <p class="reason">
+            <strong>为什么：</strong> 需要修改或合并现有PDF，在前端直接进行PDF操作
+          </p>
+          <p><strong>实施成本：</strong> ⭐⭐⭐ 中等</p>
+          <p><strong>适用：</strong> 填充表单、拼接文档、PDF签名、版本管理</p>
         </div>
       </div>
     </section>
@@ -552,9 +603,128 @@ tr:hover {
 .recommendation-card p {
   margin-bottom: 0.5rem;
   color: #4a5568;
+  line-height: 1.6;
 }
 
 .recommendation-card p strong {
+  color: #2d3748;
+}
+
+.recommendation-card.simple {
+  border-color: #48bb78;
+  background: linear-gradient(135deg, #48bb7815 0%, #38a16915 100%);
+}
+
+.recommendation-card.simple h3 {
+  color: #38a169;
+}
+
+.recommendation-card.medium {
+  border-color: #ed8936;
+  background: linear-gradient(135deg, #ed893615 0%, #dd6b2015 100%);
+}
+
+.recommendation-card.medium h3 {
+  color: #c05621;
+}
+
+.recommendation-card.advanced {
+  border-color: #4299e1;
+  background: linear-gradient(135deg, #4299e115 0%, #3182ce15 100%);
+}
+
+.recommendation-card.advanced h3 {
+  color: #2c5282;
+}
+
+.recommendation-card.special {
+  border-color: #9f7aea;
+  background: linear-gradient(135deg, #9f7aea15 0%, #805ad515 100%);
+}
+
+.recommendation-card.special h3 {
+  color: #6b46c1;
+}
+
+.reason {
+  background: rgba(255, 255, 255, 0.5);
+  padding: 0.75rem;
+  border-radius: 4px;
+  border-left: 3px solid currentColor;
+  margin-top: 0.5rem !important;
+}
+
+.core-insight {
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 3rem;
+}
+
+.insight-desc {
+  font-size: 1.05rem;
+  color: #4a5568;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.architecture-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.arch-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border-top: 4px solid;
+}
+
+.arch-card.native {
+  border-top-color: #48bb78;
+}
+
+.arch-card.canvas {
+  border-top-color: #ed8936;
+}
+
+.arch-card.pdf {
+  border-top-color: #4299e1;
+}
+
+.arch-card h3 {
+  margin-bottom: 1rem;
+  color: #2d3748;
+  font-size: 1.1rem;
+}
+
+.arch-core {
+  background: linear-gradient(90deg, #f7fafc 0%, #edf2f7 100%);
+  padding: 1rem;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 0.85rem;
+  color: #2d3748;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+.arch-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.arch-detail p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #4a5568;
+  line-height: 1.5;
+}
+
+.arch-detail strong {
   color: #2d3748;
 }
 </style>
