@@ -388,10 +388,19 @@ doc.save('file.pdf')  // ← 生成PDF文件
                           <tr>
                             <td><strong>问题来源</strong></td>
                             <td class="col-native">
-                              某些CSS打印不支持<br />（浏览器打印引擎限制）
+                              某些CSS打印不支持<br />（浏览器打印引擎限制，如渐变、阴影）
                             </td>
                             <td class="col-canvas">
-                              布局计算错误<br />（html2canvas自己计算的布局可能不准）
+                              布局计算错误<br />（html2canvas需要重新计算布局，可能不准确）
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><strong>布局是否准确</strong></td>
+                            <td class="col-native">
+                              ✅ 布局100%准确<br />（浏览器自己的布局引擎）
+                            </td>
+                            <td class="col-canvas">
+                              ⚠️ 布局可能有偏差<br />（html2canvas重新计算，非浏览器原生）
                             </td>
                           </tr>
                           <tr>
@@ -467,23 +476,184 @@ doc.save('file.pdf')  // ← 生成PDF文件
                             <span>html2canvas方案</span>
                           </div>
                         </button>
+                        <button class="print-button pdf" @click="printWithPDF">
+                          <span class="button-icon">🟣</span>
+                          <div class="button-content">
+                            <strong>PDF生成方案</strong>
+                            <span>jsPDF等方案</span>
+                          </div>
+                        </button>
                       </div>
 
                       <!-- 预期结果说明 -->
                       <div class="expected-results">
                         <div class="result-item">
-                          <h6>❌ 原生打印预期</h6>
-                          <p>渐变可能变成纯色，阴影可能消失（取决于浏览器打印引擎）</p>
+                          <h6>❌ 原生打印</h6>
+                          <p>直接打印HTML，渐变和阴影可能丢失（取决于浏览器打印引擎）</p>
                         </div>
                         <div class="result-item">
-                          <h6>✅ Canvas打印预期</h6>
-                          <p>所有样式完全保留，与网页显示完全一致</p>
+                          <h6>✅ Canvas转图</h6>
+                          <p>截图后打印PNG，所有样式完全保留，但文件较大</p>
+                        </div>
+                        <div class="result-item result-pdf">
+                          <h6>⚙️ PDF生成</h6>
+                          <p>
+                            用代码手动绘制每个元素（渐变用50个矩形模拟、阴影用半透明矩形、文字需指定坐标），可生成矢量PDF
+                          </p>
                         </div>
                       </div>
                     </div>
 
-                    <h4 style="margin-top: 2rem">📋 对比说明</h4>
-                    <div class="example-boxes">
+                    <h4 style="margin-top: 2rem">📋 三种方案的核心区别</h4>
+                    <div class="core-difference-box">
+                      <div class="difference-item">
+                        <h5>🔵 原生打印 & 🟢 Canvas转图</h5>
+                        <div class="difference-content">
+                          <p class="diff-highlight">✅ 基于现有的 HTML/CSS 元素</p>
+                          <ul>
+                            <li>你写好HTML和CSS，框架帮你处理打印</li>
+                            <li>原生打印：直接用浏览器打印引擎渲染HTML</li>
+                            <li>Canvas转图：把HTML截图成PNG再打印</li>
+                            <li><strong>关键：</strong>你不需要写额外代码描述样式</li>
+                          </ul>
+                        </div>
+                      </div>
+
+                      <div class="difference-item pdf-difference">
+                        <h5>🟣 PDF生成方案（jsPDF、pdfmake、PDF-LIB）</h5>
+                        <div class="difference-content">
+                          <p class="diff-highlight">❌ 不基于现有的 HTML/CSS 元素</p>
+                          <ul>
+                            <li>完全用代码描述内容：文字位置、颜色、大小等</li>
+                            <li>渐变背景 → 需要写循环绘制50个矩形</li>
+                            <li>阴影效果 → 需要手动绘制半透明矩形</li>
+                            <li>文字位置 → 每个都要指定 (x, y) 坐标</li>
+                            <li><strong>关键：</strong>无法自动从HTML/CSS转换，需要手动编程实现</li>
+                          </ul>
+                          <div class="code-example-box">
+                            <p><strong>例如显示"产品销售报告"：</strong></p>
+                            <pre><code>// 原生打印/Canvas转图：
+&lt;h1 class="title"&gt;产品销售报告&lt;/h1&gt;  // ← 直接用HTML
+
+// PDF生成方案：
+doc.setFont('SourceHanSansSC', 'bold')
+doc.setFontSize(18)
+doc.setTextColor(255, 255, 255)
+doc.text('产品销售报告', 30, 55)  // ← 手动指定坐标</code></pre>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <h4 style="margin-top: 2rem">💡 为什么要用PDF生成方案？</h4>
+                    <div class="why-pdf-box">
+                      <div class="reason-card">
+                        <span class="reason-icon">📥</span>
+                        <h6>可下载保存</h6>
+                        <p>生成独立的PDF文件，可以保存、分享、归档</p>
+                      </div>
+                      <div class="reason-card">
+                        <span class="reason-icon">📐</span>
+                        <h6>矢量格式</h6>
+                        <p>文字和图形是矢量的，放大不失真，文件小</p>
+                      </div>
+                      <div class="reason-card">
+                        <span class="reason-icon">🎯</span>
+                        <h6>精确控制</h6>
+                        <p>完全掌控每个元素的位置和样式，适合复杂报表</p>
+                      </div>
+                      <div class="reason-card">
+                        <span class="reason-icon">📄</span>
+                        <h6>跨平台兼容</h6>
+                        <p>PDF格式标准统一，在任何设备上显示一致</p>
+                      </div>
+                    </div>
+
+                    <h4 style="margin-top: 2rem">🤔 关于"布局计算错误"的疑问</h4>
+                    <div class="layout-question-box">
+                      <div class="question-card">
+                        <h5>❓ 原生打印方案也会有布局计算错误吗？</h5>
+                        <div class="answer-content">
+                          <div class="answer-highlight no-error">
+                            <strong>❌ 不会！原生打印方案不存在"布局计算错误"</strong>
+                          </div>
+
+                          <div class="explanation-section">
+                            <h6>🔵 原生打印方案（Print.js等）</h6>
+                            <ul>
+                              <li>
+                                <strong>布局引擎：</strong>使用浏览器自己的布局引擎（和网页显示用的是同一个）
+                              </li>
+                              <li>
+                                <strong>计算过程：</strong>浏览器直接把HTML/CSS渲染成打印格式，布局100%准确
+                              </li>
+                              <li>
+                                <strong>问题所在：</strong>只是某些CSS样式（渐变、阴影等）在打印时不支持
+                              </li>
+                              <li><strong>结论：</strong>✅ 布局准确，只是样式可能丢失</li>
+                            </ul>
+                          </div>
+
+                          <div class="explanation-section">
+                            <h6>🟢 Canvas转图方案（html2canvas）</h6>
+                            <ul>
+                              <li>
+                                <strong>布局引擎：</strong>html2canvas库自己重新实现了一套布局计算逻辑
+                              </li>
+                              <li>
+                                <strong>计算过程：</strong
+                                >读取DOM和CSS，重新计算每个元素的位置和大小，绘制到Canvas
+                              </li>
+                              <li>
+                                <strong>问题所在：</strong
+                                >html2canvas的布局计算可能和浏览器不完全一致（特别是复杂布局：flexbox、grid等）
+                              </li>
+                              <li><strong>结论：</strong>⚠️ 布局可能有偏差，但样式可以完整保留</li>
+                            </ul>
+                          </div>
+
+                          <div class="key-insight-box">
+                            <h6>💡 核心区别</h6>
+                            <div class="comparison-grid">
+                              <div class="comp-col">
+                                <strong>原生打印</strong>
+                                <p>浏览器自己算布局</p>
+                                <span class="status-badge success">布局100%准确</span>
+                                <span class="status-badge warning">样式可能丢失</span>
+                              </div>
+                              <div class="comp-col">
+                                <strong>Canvas转图</strong>
+                                <p>html2canvas重新算布局</p>
+                                <span class="status-badge warning">布局可能偏差</span>
+                                <span class="status-badge success">样式完整保留</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="real-example">
+                            <h6>📋 实际例子</h6>
+                            <p>
+                              假设你有一个复杂的flex布局：<code
+                                >display: flex; justify-content: space-between; align-items:
+                                center;</code
+                              >
+                            </p>
+                            <ul>
+                              <li>
+                                <strong>原生打印：</strong
+                                >浏览器完美计算布局，元素间距和对齐都准确（但可能渐变背景消失）
+                              </li>
+                              <li>
+                                <strong>Canvas转图：</strong
+                                >html2canvas在计算flex布局时可能略有偏差，元素间距可能不完全一致（但渐变背景完整）
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="example-boxes" style="margin-top: 2rem">
                       <div class="example-box">
                         <h5>❌ 原生打印的限制</h5>
                         <div class="example-content">
@@ -1170,6 +1340,8 @@ doc.rect(10, 25, 100, 50)     // ← 手动绘制</code></pre>
 <script setup lang="ts">
 import { ref } from 'vue'
 import html2canvas from 'html2canvas'
+import { jsPDF } from 'jspdf'
+import { loadJsPDFChineseFont } from '@/utils/fontLoader'
 
 // 架构分析选项卡
 const architectureTabs = ref(['架构层次图', '详细分类', '完整对比表', '性能深度分析', '核心理解'])
@@ -1338,6 +1510,166 @@ const printWithCanvas = async () => {
   } catch (error) {
     console.error('Canvas转换失败:', error)
     alert('转换失败，请查看控制台')
+  }
+}
+
+// PDF生成打印方法
+const printWithPDF = async () => {
+  try {
+    // 创建 jsPDF 实例
+    const doc = new jsPDF({
+      unit: 'mm',
+      format: 'a4',
+    })
+
+    // 加载中文字体
+    await loadJsPDFChineseFont(doc)
+    
+    // 确保使用中文字体
+    doc.setFont('SourceHanSansSC', 'normal')
+
+    const pageWidth = doc.internal.pageSize.getWidth()
+    const pageHeight = doc.internal.pageSize.getHeight()
+
+    // 1. 手动绘制渐变背景（用多个矩形模拟渐变）
+    // 从蓝色 #667eea 到紫色 #764ba2
+    const cardX = 20
+    const cardY = 40
+    const cardWidth = 170
+    const cardHeight = 100
+
+    // 绘制渐变背景 - 使用多个矩形叠加模拟渐变效果
+    const gradientSteps = 50
+    for (let i = 0; i < gradientSteps; i++) {
+      const ratio = i / gradientSteps
+      // 蓝色 RGB(102, 126, 234) 到 紫色 RGB(118, 75, 162)
+      const r = Math.round(102 + (118 - 102) * ratio)
+      const g = Math.round(126 + (75 - 126) * ratio)
+      const b = Math.round(234 + (162 - 234) * ratio)
+
+      doc.setFillColor(r, g, b)
+      const rectY = cardY + (cardHeight / gradientSteps) * i
+      const rectHeight = cardHeight / gradientSteps + 0.5 // 避免间隙
+      doc.rect(cardX, rectY, cardWidth, rectHeight, 'F')
+    }
+
+    // 2. 手动绘制阴影效果（用半透明黑色矩形模拟）
+    doc.setFillColor(0, 0, 0)
+    doc.setGState(new doc.GState({ opacity: 0.15 }))
+    doc.roundedRect(cardX + 2, cardY + 2, cardWidth, cardHeight, 3, 3, 'F')
+    doc.setGState(new doc.GState({ opacity: 1 }))
+
+    // 3. 绘制圆角卡片边框
+    doc.setDrawColor(102, 126, 234)
+    doc.setLineWidth(0.5)
+    doc.roundedRect(cardX, cardY, cardWidth, cardHeight, 3, 3, 'S')
+
+    // 4. 绘制标题（白色文字）
+    // 重置绘图状态并确保使用中文字体
+    doc.setGState(new doc.GState({ opacity: 1 }))
+    doc.setFont('SourceHanSansSC', 'bold')
+    doc.setFontSize(18)
+    doc.setTextColor(255, 255, 255)
+    doc.text('产品销售报告', cardX + cardWidth / 2, cardY + 15, { align: 'center' })
+
+    // 5. 绘制分隔线
+    doc.setDrawColor(255, 255, 255)
+    doc.setGState(new doc.GState({ opacity: 0.3 }))
+    doc.setLineWidth(0.3)
+    doc.line(cardX + 10, cardY + 20, cardX + cardWidth - 10, cardY + 20)
+    doc.setGState(new doc.GState({ opacity: 1 }))
+
+    // 6. 绘制内容（需要手动定位每一行）
+    // Q1销售额
+    doc.setFont('SourceHanSansSC', 'normal')
+    doc.setFontSize(12)
+    doc.setTextColor(255, 255, 255)
+    doc.text('Q1销售额', cardX + 10, cardY + 40)
+    doc.setFont('SourceHanSansSC', 'bold')
+    doc.setFontSize(14)
+    doc.text('¥ 1,234,567', cardX + cardWidth - 10, cardY + 40, { align: 'right' })
+
+    // 增长率
+    doc.setFont('SourceHanSansSC', 'normal')
+    doc.setFontSize(12)
+    doc.setTextColor(255, 255, 255)
+    doc.text('增长率', cardX + 10, cardY + 55)
+    doc.setFont('SourceHanSansSC', 'bold')
+    doc.setFontSize(14)
+    doc.setTextColor(72, 187, 120)
+    doc.text('+28.5%', cardX + cardWidth - 10, cardY + 55, { align: 'right' })
+
+    // 市场占有率
+    doc.setFont('SourceHanSansSC', 'normal')
+    doc.setFontSize(12)
+    doc.setTextColor(255, 255, 255)
+    doc.text('市场占有率', cardX + 10, cardY + 70)
+    doc.setFont('SourceHanSansSC', 'bold')
+    doc.setFontSize(14)
+    doc.text('42.3%', cardX + cardWidth - 10, cardY + 70, { align: 'right' })
+
+    // 7. 绘制底部分隔线
+    doc.setDrawColor(255, 255, 255)
+    doc.setGState(new doc.GState({ opacity: 0.3 }))
+    doc.setLineWidth(0.3)
+    doc.line(cardX + 10, cardY + 85, cardX + cardWidth - 10, cardY + 85)
+    doc.setGState(new doc.GState({ opacity: 1 }))
+
+    // 8. 绘制底部信息
+    // 绘制"优秀"徽章背景（圆角矩形）
+    doc.setFillColor(255, 255, 255)
+    doc.setGState(new doc.GState({ opacity: 0.2 }))
+    doc.roundedRect(cardX + 10, cardY + 92, 15, 6, 1.5, 1.5, 'F')
+    doc.setGState(new doc.GState({ opacity: 1 }))
+
+    doc.setFont('SourceHanSansSC', 'bold')
+    doc.setFontSize(9)
+    doc.setTextColor(255, 255, 255)
+    doc.text('优秀', cardX + 17.5, cardY + 97, { align: 'center' })
+    
+    doc.setFont('SourceHanSansSC', 'normal')
+    doc.setFontSize(9)
+    doc.text('2026-01-06', cardX + cardWidth - 10, cardY + 97, { align: 'right' })
+
+    // 9. 添加代码说明
+    doc.setFontSize(9)
+    doc.setTextColor(220, 38, 38)
+    doc.setFont('SourceHanSansSC', 'normal')
+    const explanationLines = [
+      '💡 以上效果均由代码手动绘制：',
+      '• 渐变：用50个矩形模拟（doc.rect循环绘制）',
+      '• 阴影：用半透明黑色矩形模拟（doc.setGState设置透明度）',
+      '• 圆角：使用 doc.roundedRect() API',
+      '• 文字定位：每个文本需手动指定 (x, y) 坐标',
+    ]
+
+    let textY = 160
+    explanationLines.forEach((line) => {
+      doc.text(line, 20, textY)
+      textY += 6
+    })
+
+    // 10. 在新窗口中打开PDF并触发打印
+    const pdfBlob = doc.output('blob')
+    const pdfUrl = URL.createObjectURL(pdfBlob)
+    const printWindow = window.open(pdfUrl, '_blank')
+
+    if (!printWindow) {
+      alert('请允许弹出窗口')
+      return
+    }
+
+    // 等待PDF加载后自动触发打印
+    setTimeout(() => {
+      printWindow.print()
+      // 清理URL对象
+      setTimeout(() => {
+        URL.revokeObjectURL(pdfUrl)
+      }, 1000)
+    }, 500)
+  } catch (error) {
+    console.error('PDF生成失败:', error)
+    alert('PDF生成失败，请查看控制台')
   }
 }
 
@@ -2795,7 +3127,7 @@ tr:hover {
 /* 打印按钮 */
 .demo-actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -2834,6 +3166,14 @@ tr:hover {
   background: #f3e5f5;
 }
 
+.print-button.pdf {
+  border-color: #c2185b;
+}
+
+.print-button.pdf:hover {
+  background: #fce4ec;
+}
+
 .button-icon {
   font-size: 2rem;
 }
@@ -2858,7 +3198,7 @@ tr:hover {
 /* 预期结果 */
 .expected-results {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
 }
 
@@ -2867,6 +3207,11 @@ tr:hover {
   padding: 1rem;
   border-radius: 8px;
   border-left: 4px solid #cbd5e0;
+}
+
+.result-item.result-pdf {
+  background: #fff5f5;
+  border-left-color: #c2185b;
 }
 
 .result-item h6 {
@@ -2879,6 +3224,304 @@ tr:hover {
   margin: 0;
   color: #4a5568;
   font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+/* 详细对比表 */
+.detailed-comparison {
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+/* 核心区别说明 */
+.core-difference-box {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.difference-item {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.difference-item.pdf-difference {
+  border-color: #c2185b;
+  background: linear-gradient(135deg, #fff5f5 0%, #fce4ec 100%);
+}
+
+.difference-item h5 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.difference-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.diff-highlight {
+  background: #dbeafe;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-weight: 600;
+  color: #1e40af;
+  margin: 0;
+  border-left: 4px solid #3b82f6;
+}
+
+.difference-item.pdf-difference .diff-highlight {
+  background: #fee2e2;
+  color: #991b1b;
+  border-left-color: #dc2626;
+}
+
+.difference-content ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.difference-content li {
+  color: #4a5568;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.code-example-box {
+  background: #1e293b;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.code-example-box p {
+  color: #e2e8f0;
+  margin-bottom: 0.75rem;
+}
+
+.code-example-box pre {
+  margin: 0;
+}
+
+.code-example-box code {
+  color: #68d391;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.85rem;
+  line-height: 1.8;
+}
+
+/* 为什么用PDF */
+.why-pdf-box {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.reason-card {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.reason-card:hover {
+  border-color: #c2185b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(194, 24, 91, 0.15);
+}
+
+.reason-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.reason-card h6 {
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.reason-card p {
+  margin: 0;
+  color: #718096;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+/* 布局计算错误说明 */
+.layout-question-box {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 2px solid #0ea5e9;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.question-card h5 {
+  color: #0c4a6e;
+  margin-bottom: 1.5rem;
+  font-size: 1.2rem;
+}
+
+.answer-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.answer-highlight {
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.answer-highlight.no-error {
+  background: #d1fae5;
+  border: 2px solid #10b981;
+  color: #065f46;
+}
+
+.explanation-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #3b82f6;
+}
+
+.explanation-section h6 {
+  color: #1e40af;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.explanation-section ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.explanation-section li {
+  color: #4a5568;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.explanation-section strong {
+  color: #2d3748;
+}
+
+.key-insight-box {
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.key-insight-box h6 {
+  color: #92400e;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.comp-col {
+  background: white;
+  padding: 1rem;
+  border-radius: 6px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.comp-col strong {
+  color: #2d3748;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.comp-col p {
+  margin: 0;
+  color: #718096;
+  font-size: 0.85rem;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-badge.success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.warning {
+  background: #fed7d7;
+  color: #742a2a;
+}
+
+.real-example {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #8b5cf6;
+}
+
+.real-example h6 {
+  color: #5b21b6;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.real-example p {
+  margin: 0 0 1rem 0;
+  color: #4a5568;
+  line-height: 1.6;
+}
+
+.real-example code {
+  background: #f3f4f6;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  color: #7c3aed;
+  font-size: 0.85rem;
+}
+
+.real-example ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.real-example li {
+  color: #4a5568;
+  font-size: 0.9rem;
   line-height: 1.6;
 }
 
