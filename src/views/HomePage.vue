@@ -582,13 +582,16 @@ doc.text('产品销售报告', 30, 55)  // ← 手动指定坐标</code></pre>
                             <h6>🔵 原生打印方案（Print.js等）</h6>
                             <ul>
                               <li>
-                                <strong>布局引擎：</strong>使用浏览器自己的布局引擎（和网页显示用的是同一个）
+                                <strong>布局引擎：</strong
+                                >使用浏览器自己的布局引擎（和网页显示用的是同一个）
                               </li>
                               <li>
-                                <strong>计算过程：</strong>浏览器直接把HTML/CSS渲染成打印格式，布局100%准确
+                                <strong>计算过程：</strong
+                                >浏览器直接把HTML/CSS渲染成打印格式，布局100%准确
                               </li>
                               <li>
-                                <strong>问题所在：</strong>只是某些CSS样式（渐变、阴影等）在打印时不支持
+                                <strong>问题所在：</strong
+                                >只是某些CSS样式（渐变、阴影等）在打印时不支持
                               </li>
                               <li><strong>结论：</strong>✅ 布局准确，只是样式可能丢失</li>
                             </ul>
@@ -598,7 +601,8 @@ doc.text('产品销售报告', 30, 55)  // ← 手动指定坐标</code></pre>
                             <h6>🟢 Canvas转图方案（html2canvas）</h6>
                             <ul>
                               <li>
-                                <strong>布局引擎：</strong>html2canvas库自己重新实现了一套布局计算逻辑
+                                <strong>布局引擎：</strong
+                                >html2canvas库自己重新实现了一套布局计算逻辑
                               </li>
                               <li>
                                 <strong>计算过程：</strong
@@ -1524,7 +1528,7 @@ const printWithPDF = async () => {
 
     // 加载中文字体
     await loadJsPDFChineseFont(doc)
-    
+
     // 确保使用中文字体
     doc.setFont('SourceHanSansSC', 'normal')
 
@@ -1626,7 +1630,7 @@ const printWithPDF = async () => {
     doc.setFontSize(9)
     doc.setTextColor(255, 255, 255)
     doc.text('优秀', cardX + 17.5, cardY + 97, { align: 'center' })
-    
+
     doc.setFont('SourceHanSansSC', 'normal')
     doc.setFontSize(9)
     doc.text('2026-01-06', cardX + cardWidth - 10, cardY + 97, { align: 'right' })
