@@ -351,6 +351,130 @@ doc.save('file.pdf')  // ← 生成PDF文件
                       </p>
                     </div>
                   </div>
+
+                  <!-- 原生 vs Canvas 对比 -->
+                  <div
+                    class="detailed-comparison"
+                    style="margin-top: 2rem; border-top: 2px solid #e2e8f0; padding-top: 2rem"
+                  >
+                    <h4>🔍 原生打印 vs Canvas转图：本质区别</h4>
+                    <div class="comparison-table-wrapper">
+                      <table class="comparison-table">
+                        <thead>
+                          <tr>
+                            <th>对比维度</th>
+                            <th class="col-native">原生打印方案</th>
+                            <th class="col-canvas">Canvas转图方案</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td><strong>打印的是什么</strong></td>
+                            <td class="col-native">HTML + CSS（向量格式）</td>
+                            <td class="col-canvas">PNG图片（光栅格式）</td>
+                          </tr>
+                          <tr>
+                            <td><strong>浏览器做什么</strong></td>
+                            <td class="col-native">解析HTML、应用CSS、排版</td>
+                            <td class="col-canvas">直接打印图片（无需排版）</td>
+                          </tr>
+                          <tr>
+                            <td><strong>样式处理</strong></td>
+                            <td class="col-native">
+                              只支持CSS打印样式<br />（@media print、color-adjust等）
+                            </td>
+                            <td class="col-canvas">完全还原网页样式<br />（因为是截图）</td>
+                          </tr>
+                          <tr>
+                            <td><strong>问题来源</strong></td>
+                            <td class="col-native">
+                              某些CSS打印不支持<br />（浏览器打印引擎限制）
+                            </td>
+                            <td class="col-canvas">
+                              布局计算错误<br />（html2canvas自己计算的布局可能不准）
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><strong>是否"所见即所得"</strong></td>
+                            <td class="col-native">❌ 不是<br />（看到的 ≠ 打印的）</td>
+                            <td class="col-canvas">✅ 是<br />（打印的 = 截图的）</td>
+                          </tr>
+                          <tr>
+                            <td><strong>文件大小</strong></td>
+                            <td class="col-native">极小（HTML+CSS文本）</td>
+                            <td class="col-canvas">很大（PNG图片）</td>
+                          </tr>
+                          <tr>
+                            <td><strong>转换耗时</strong></td>
+                            <td class="col-native">很快（直接写入）</td>
+                            <td class="col-canvas">很慢（计算布局+绘制）</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <h4 style="margin-top: 2rem">📌 具体例子说明</h4>
+                    <div class="example-boxes">
+                      <div class="example-box">
+                        <h5>❌ 原生打印的限制</h5>
+                        <div class="example-content">
+                          <p><strong>你的网页CSS：</strong></p>
+                          <div class="code-sample">
+                            <pre><code>.box {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}</code></pre>
+                          </div>
+                          <p><strong>网页显示：</strong>💎 漂亮的蓝紫渐变 + 阴影</p>
+                          <p><strong>打印结果：</strong>❌ 可能只有单色背景，没有阴影</p>
+                          <p style="color: #718096; font-size: 0.85rem">
+                            <em>原因：浏览器打印引擎不支持或限制了这些复杂样式</em>
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="example-box">
+                        <h5>✅ Canvas转图的优势</h5>
+                        <div class="example-content">
+                          <p><strong>同样的网页CSS：</strong></p>
+                          <div class="code-sample">
+                            <pre><code>.box {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}</code></pre>
+                          </div>
+                          <p><strong>html2canvas做的：</strong>把网页整个截图，像素级保存</p>
+                          <p><strong>打印结果：</strong>✅ 完全一样的蓝紫渐变 + 阴影</p>
+                          <p style="color: #718096; font-size: 0.85rem">
+                            <em>原因：打印的是图片，不依赖浏览器引擎的支持</em>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <h4 style="margin-top: 2rem">🎯 何时选择哪个方案</h4>
+                    <div class="selection-boxes">
+                      <div class="selection-box native-selection">
+                        <h5>选择 👉 原生打印</h5>
+                        <ul>
+                          <li>📄 简单的表格、表单、文本</li>
+                          <li>⚡ 追求极快的打印速度</li>
+                          <li>💾 文件大小要小</li>
+                          <li>🎨 样式都是浏览器支持的</li>
+                        </ul>
+                      </div>
+
+                      <div class="selection-box canvas-selection">
+                        <h5>选择 👉 Canvas转图</h5>
+                        <ul>
+                          <li>💎 复杂的样式（渐变、阴影、滤镜）</li>
+                          <li>📊 图表、可视化（ECharts等）</li>
+                          <li>🎨 必须"所见即所得"</li>
+                          <li>⏱️ 转换时间不是瓶颈</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2317,6 +2441,164 @@ tr:hover {
   color: #4a5568;
   font-size: 0.9rem;
   line-height: 1.6;
+}
+
+/* 详细对比表 */
+.detailed-comparison {
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.detailed-comparison h4 {
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+}
+
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 2rem;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.comparison-table thead {
+  background: #2d3748;
+}
+
+.comparison-table th {
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.comparison-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  color: #4a5568;
+  font-size: 0.9rem;
+}
+
+.comparison-table tr:last-child td {
+  border-bottom: none;
+}
+
+.comparison-table .col-native {
+  background: #e3f2fd;
+  border-right: 2px solid #90caf9;
+}
+
+.comparison-table .col-canvas {
+  background: #f3e5f5;
+  border-left: 2px solid #ce93d8;
+}
+
+.comparison-table th.col-native {
+  background: #1565c0;
+}
+
+.comparison-table th.col-canvas {
+  background: #6a1b9a;
+}
+
+/* 例子框 */
+.example-boxes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.example-box {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+}
+
+.example-box h5 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.example-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.example-content p {
+  margin: 0;
+  color: #4a5568;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.example-content .code-sample {
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.example-content .code-sample pre {
+  margin: 0;
+}
+
+.example-content .code-sample code {
+  color: #1e293b;
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+/* 选择框 */
+.selection-boxes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.selection-box {
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.selection-box.native-selection {
+  background: #e3f2fd;
+  border-left-color: #1565c0;
+}
+
+.selection-box.canvas-selection {
+  background: #f3e5f5;
+  border-left-color: #6a1b9a;
+}
+
+.selection-box h5 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.selection-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.selection-box li {
+  padding: 0.5rem 0;
+  color: #4a5568;
+  font-size: 0.9rem;
 }
 
 .best-practice {

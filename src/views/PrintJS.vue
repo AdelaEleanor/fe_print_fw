@@ -1026,7 +1026,7 @@ const initPrintjsChart = () => {
       printjsChart.dispose()
       printjsChart = null
     }
-    
+
     printjsChart = echarts.init(printjsChartRef.value)
     printjsChart.setOption({
       title: { text: '销售趋势', left: 'center', textStyle: { fontSize: 14 } },

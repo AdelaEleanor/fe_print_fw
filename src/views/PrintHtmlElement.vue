@@ -1011,7 +1011,7 @@ const initPrintElementChart = () => {
       printElementChart.dispose()
       printElementChart = null
     }
-    
+
     printElementChart = echarts.init(printElementChartRef.value)
     printElementChart.setOption({
       title: {

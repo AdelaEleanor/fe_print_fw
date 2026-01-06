@@ -1270,7 +1270,7 @@ const initCharts = () => {
       pieChart.dispose()
       pieChart = null
     }
-    
+
     pieChart = echarts.init(pieChartRef.value)
     pieChart.setOption({
       title: { text: '产品销售占比', left: 'center', textStyle: { fontSize: 14 } },
@@ -1302,7 +1302,7 @@ const initCharts = () => {
       lineChart.dispose()
       lineChart = null
     }
-    
+
     lineChart = echarts.init(lineChartRef.value)
     lineChart.setOption({
       title: { text: '月度销售趋势', left: 'center', textStyle: { fontSize: 14 } },
@@ -1328,7 +1328,7 @@ const initCharts = () => {
       barChart.dispose()
       barChart = null
     }
-    
+
     barChart = echarts.init(barChartRef.value)
     barChart.setOption({
       title: { text: '产品销量对比', left: 'center', textStyle: { fontSize: 14 } },
@@ -1357,7 +1357,7 @@ const initCharts = () => {
       radarChart.dispose()
       radarChart = null
     }
-    
+
     radarChart = echarts.init(radarChartRef.value)
     radarChart.setOption({
       title: { text: '产品综合评估', left: 'center', textStyle: { fontSize: 14 } },
@@ -1396,7 +1396,7 @@ const initCompareChart = () => {
       compareChart.dispose()
       compareChart = null
     }
-    
+
     compareChart = echarts.init(compareChartRef.value)
     compareChart.setOption({
       title: {

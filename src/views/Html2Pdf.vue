@@ -1540,7 +1540,7 @@ const initHtml2pdfChart = () => {
       html2pdfChart.dispose()
       html2pdfChart = null
     }
-    
+
     html2pdfChart = echarts.init(html2pdfChartRef.value)
     html2pdfChart.setOption({
       title: { text: '月度销售', left: 'center', textStyle: { fontSize: 14 } },
@@ -1568,7 +1568,7 @@ const initHtml2pdfChartOptimized = () => {
       html2pdfChartOptimized.dispose()
       html2pdfChartOptimized = null
     }
-    
+
     html2pdfChartOptimized = echarts.init(html2pdfChartOptimizedRef.value)
     html2pdfChartOptimized.setOption({
       title: {

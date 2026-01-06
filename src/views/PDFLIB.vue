@@ -1419,7 +1419,7 @@ const initPdflibChart = () => {
       pdflibChart.dispose()
       pdflibChart = null
     }
-    
+
     pdflibChart = echarts.init(pdflibChartRef.value)
     pdflibChart.setOption({
       title: {

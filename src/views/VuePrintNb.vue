@@ -1271,7 +1271,7 @@ const initVueprintChart = () => {
       vueprintChart.dispose()
       vueprintChart = null
     }
-    
+
     vueprintChart = echarts.init(vueprintChartRef.value)
     vueprintChart.setOption({
       title: { text: '销售数据', left: 'center', textStyle: { fontSize: 14 } },
@@ -1298,7 +1298,7 @@ const initVueprintChartOptimized = () => {
       vueprintChartOptimized.dispose()
       vueprintChartOptimized = null
     }
-    
+
     vueprintChartOptimized = echarts.init(vueprintChartOptimizedRef.value)
     vueprintChartOptimized.setOption({
       title: {

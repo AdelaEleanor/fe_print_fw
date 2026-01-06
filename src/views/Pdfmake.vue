@@ -1103,7 +1103,7 @@ const initPdfmakeCharts = () => {
       pdfmakePieChart.dispose()
       pdfmakePieChart = null
     }
-    
+
     pdfmakePieChart = echarts.init(pdfmakePieRef.value)
     pdfmakePieChart.setOption({
       title: { text: '销售占比', left: 'center', textStyle: { fontSize: 14 } },
@@ -1127,7 +1127,7 @@ const initPdfmakeCharts = () => {
       pdfmakeBarChart.dispose()
       pdfmakeBarChart = null
     }
-    
+
     pdfmakeBarChart = echarts.init(pdfmakeBarRef.value)
     pdfmakeBarChart.setOption({
       title: { text: '销量对比', left: 'center', textStyle: { fontSize: 14 } },

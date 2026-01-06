@@ -1218,7 +1218,7 @@ const initHtml2canvasChart = () => {
       html2canvasChart.dispose()
       html2canvasChart = null
     }
-    
+
     // 重新初始化图表
     html2canvasChart = echarts.init(html2canvasChartRef.value)
     html2canvasChart.setOption({
