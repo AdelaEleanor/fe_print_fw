@@ -138,6 +138,15 @@
                 <td>✅ 支持</td>
               </tr>
               <tr>
+                <td><strong>print-html-element</strong></td>
+                <td>✅ 1+</td>
+                <td>✅ 1+</td>
+                <td>✅ 1+</td>
+                <td>✅ All</td>
+                <td>✅ 5+</td>
+                <td>✅ 支持</td>
+              </tr>
+              <tr>
                 <td><strong>vue3-print-nb</strong></td>
                 <td>✅ 60+</td>
                 <td>✅ 55+</td>
@@ -165,10 +174,19 @@
                 <td>✅ 支持</td>
               </tr>
               <tr>
+                <td><strong>PDF-LIB</strong></td>
+                <td>✅ 60+</td>
+                <td>✅ 55+</td>
+                <td>✅ 11+</td>
+                <td>✅ 79+</td>
+                <td>❌ 不支持</td>
+                <td>✅ 支持</td>
+              </tr>
+              <tr>
                 <td><strong>html2canvas</strong></td>
                 <td>✅ 60+</td>
                 <td>✅ 55+</td>
-                <td>✅ 11.1+</td>
+                <td>⚠️ 11.1+</td>
                 <td>✅ 79+</td>
                 <td>❌ 不支持</td>
                 <td>⚠️ 部分</td>
@@ -177,51 +195,13 @@
                 <td><strong>html2pdf.js</strong></td>
                 <td>✅ 60+</td>
                 <td>✅ 55+</td>
-                <td>✅ 11.1+</td>
+                <td>⚠️ 11.1+</td>
                 <td>✅ 79+</td>
                 <td>❌ 不支持</td>
                 <td>⚠️ 部分</td>
               </tr>
             </tbody>
           </table>
-        </div>
-      </div>
-
-      <div class="feature-detection">
-        <h2>🔬 特性检测</h2>
-        <div class="feature-grid">
-          <div class="feature-card" :class="{ supported: features.printAPI }">
-            <h3>Print API</h3>
-            <p>{{ features.printAPI ? '✅ 支持' : '❌ 不支持' }}</p>
-          </div>
-          <div class="feature-card" :class="{ supported: features.canvas }">
-            <h3>Canvas API</h3>
-            <p>{{ features.canvas ? '✅ 支持' : '❌ 不支持' }}</p>
-          </div>
-          <div class="feature-card" :class="{ supported: features.blob }">
-            <h3>Blob API</h3>
-            <p>{{ features.blob ? '✅ 支持' : '❌ 不支持' }}</p>
-          </div>
-          <div class="feature-card" :class="{ supported: features.download }">
-            <h3>Download Attribute</h3>
-            <p>{{ features.download ? '✅ 支持' : '❌ 不支持' }}</p>
-          </div>
-          <div class="feature-card" :class="{ supported: features.es6 }">
-            <h3>ES6 Modules</h3>
-            <p>{{ features.es6 ? '✅ 支持' : '❌ 不支持' }}</p>
-          </div>
-          <div class="feature-card" :class="{ supported: features.promises }">
-            <h3>Promises</h3>
-            <p>{{ features.promises ? '✅ 支持' : '❌ 不支持' }}</p>
-          </div>
-          <div class="feature-card" :class="{ supported: features.fetch }">
-            <h3>Fetch API</h3>
-            <p>{{ features.fetch ? '✅ 支持' : '❌ 不支持' }}</p>
-          </div>
-          <div class="feature-card" :class="{ supported: features.webworker }">
-            <h3>Web Worker</h3>
-            <p>{{ features.webworker ? '✅ 支持' : '❌ 不支持' }}</p>
-          </div>
         </div>
       </div>
 
@@ -397,78 +377,121 @@ const runCompatibilityTests = async () => {
 
   await new Promise((resolve) => setTimeout(resolve, 500))
 
+  // 获取检测到的浏览器和功能信息
+  const browser = browserInfo.value
+  const feats = features.value
+
+  // 基于框架真实依赖生成兼容性测试
+  // 依赖映射说明：
+  // - window.print()：需要 printAPI（原生）
+  // - Print.js：需要 printAPI（基于 window.print）
+  // - vue3-print-nb：需要 ES6 + Promise（Vue3）
+  // - jsPDF：需要 ES6 + Promise + Blob（PDF 生成、现代 JS）
+  // - pdfmake：需要 ES6 + Promise + Blob（同上）
+  // - html2canvas：需要 Canvas + Promise（DOM 转图）
+  // - html2pdf.js：需要 Canvas + ES6 + Promise + Blob（html2canvas + jsPDF）
+  // - PDF-LIB：需要 ES6 + Promise + Blob（PDF 操作）
+  // - print-html-element：需要 printAPI（原生）
+  //
+  // 区分标准：
+  // - "完全兼容"：框架无已知问题，可直接使用
+  // - "兼容良好"：框架有已知限制，但仍可正常使用
+
   const results: TestResult[] = [
     {
       name: 'window.print()',
-      status: 'success',
-      statusText: '✅ 完全兼容',
-      features: ['所有现代浏览器', 'IE 5+', '移动端浏览器'],
-      issues: [],
-      rating: '⭐⭐⭐⭐⭐',
+      status: feats.printAPI ? 'success' : 'error',
+      statusText: feats.printAPI ? '✅ 完全兼容' : '❌ 不支持',
+      features: [feats.printAPI ? '✅ Print API' : '❌ 缺少 Print API'],
+      issues: feats.printAPI ? [] : ['此浏览器不支持 window.print()'],
+      rating: feats.printAPI ? '⭐⭐⭐⭐⭐' : '❌',
     },
     {
       name: 'Print.js',
-      status: 'success',
-      statusText: '✅ 兼容良好',
-      features: ['Chrome 49+', 'Firefox 52+', 'Safari 10+', 'Edge 14+'],
-      issues: ['IE 11 部分功能受限'],
-      rating: '⭐⭐⭐⭐',
+      status: feats.printAPI ? 'success' : 'error',
+      statusText: feats.printAPI ? '✅ 完全兼容' : '❌ 不支持',
+      features: [feats.printAPI ? '✅ Print API' : '❌ 缺少 Print API'],
+      issues: feats.printAPI ? [] : ['依赖 window.print()'],
+      rating: feats.printAPI ? '⭐⭐⭐⭐' : '❌',
     },
     {
       name: 'vue3-print-nb',
-      status: browserInfo.value.name === 'Chrome' ? 'success' : 'warning',
-      statusText: browserInfo.value.name === 'Chrome' ? '✅ 兼容良好' : '⚠️ 部分兼容',
-      features: ['Vue 3', 'Chrome 60+', 'Firefox 55+'],
-      issues: ['不支持 IE', '移动端可能有限制'],
-      rating: '⭐⭐⭐⭐',
+      status: feats.es6 && feats.promises ? 'success' : 'warning',
+      statusText: feats.es6 && feats.promises ? '✅ 兼容良好' : '⚠️ 部分兼容',
+      features: [
+        feats.es6 ? '✅ ES6 Module' : '❌ 缺少 ES6',
+        feats.promises ? '✅ Promise' : '❌ 缺少 Promise',
+      ].filter((f) => f),
+      issues: !feats.es6 ? ['需要 ES6 支持'] : ['某些浏览器可能有兼容性差异'],
+      rating: feats.es6 && feats.promises ? '⭐⭐⭐⭐' : '⭐⭐',
     },
     {
       name: 'jsPDF',
-      status: 'success',
-      statusText: '✅ 兼容良好',
-      features: ['Chrome 60+', 'Firefox 55+', 'Safari 11+', 'ES6+'],
-      issues: ['不支持 IE', '中文需配置字体'],
-      rating: '⭐⭐⭐⭐',
+      status: feats.es6 && feats.promises && feats.blob ? 'success' : 'warning',
+      statusText: feats.es6 && feats.promises && feats.blob ? '✅ 兼容良好' : '⚠️ 部分兼容',
+      features: [
+        feats.es6 ? '✅ ES6 Module' : '❌ 缺少 ES6',
+        feats.promises ? '✅ Promise' : '❌ 缺少 Promise',
+        feats.blob ? '✅ Blob API' : '❌ 缺少 Blob',
+      ].filter((f) => f),
+      issues: feats.es6 && feats.promises && feats.blob ? ['中文需要配置字体', '跨域图片需要 CORS'] : [],
+      rating: feats.es6 && feats.promises && feats.blob ? '⭐⭐⭐⭐' : '⭐⭐',
     },
     {
       name: 'pdfmake',
-      status: 'success',
-      statusText: '✅ 兼容良好',
-      features: ['Chrome 60+', 'Firefox 55+', 'Safari 11+', 'Node.js'],
-      issues: ['体积较大', '首次加载慢'],
-      rating: '⭐⭐⭐⭐',
+      status: feats.es6 && feats.promises && feats.blob ? 'success' : 'warning',
+      statusText: feats.es6 && feats.promises && feats.blob ? '✅ 兼容良好' : '⚠️ 部分兼容',
+      features: [
+        feats.es6 ? '✅ ES6 Module' : '❌ 缺少 ES6',
+        feats.promises ? '✅ Promise' : '❌ 缺少 Promise',
+        feats.blob ? '✅ Blob API' : '❌ 缺少 Blob',
+      ].filter((f) => f),
+      issues: feats.es6 && feats.promises && feats.blob ? ['体积较大', '首次加载可能较慢'] : [],
+      rating: feats.es6 && feats.promises && feats.blob ? '⭐⭐⭐⭐' : '⭐⭐',
     },
     {
       name: 'html2canvas',
-      status: 'warning',
-      statusText: '⚠️ 部分兼容',
-      features: ['Chrome 60+', 'Firefox 55+', 'Safari 11.1+'],
-      issues: ['Safari CSS3 支持受限', '跨域图片问题', '移动端性能差'],
-      rating: '⭐⭐⭐',
+      status: feats.canvas && feats.promises ? 'success' : 'warning',
+      statusText: feats.canvas && feats.promises ? '✅ 兼容良好' : '⚠️ 部分兼容',
+      features: [
+        feats.canvas ? '✅ Canvas API' : '❌ 缺少 Canvas',
+        feats.promises ? '✅ Promise' : '❌ 缺少 Promise',
+      ].filter((f) => f),
+      issues: feats.canvas ? ['某些 CSS3 特性不支持', 'CORS 图片需特殊处理', '移动端性能有限'] : ['不支持 Canvas'],
+      rating: feats.canvas ? '⭐⭐⭐' : '❌',
     },
     {
       name: 'html2pdf.js',
-      status: 'warning',
-      statusText: '⚠️ 部分兼容',
-      features: ['现代浏览器', 'ES6+'],
-      issues: ['继承 html2canvas 的问题', '性能开销大', '移动端支持有限'],
-      rating: '⭐⭐⭐',
+      status: feats.canvas && feats.es6 && feats.promises && feats.blob ? 'success' : 'warning',
+      statusText: feats.canvas && feats.es6 && feats.promises && feats.blob ? '✅ 兼容良好' : '⚠️ 部分兼容',
+      features: [
+        feats.canvas ? '✅ Canvas API' : '❌ 缺少 Canvas',
+        feats.es6 ? '✅ ES6 Module' : '❌ 缺少 ES6',
+        feats.promises ? '✅ Promise' : '❌ 缺少 Promise',
+        feats.blob ? '✅ Blob API' : '❌ 缺少 Blob',
+      ].filter((f) => f),
+      issues: feats.canvas && feats.es6 ? ['继承 html2canvas 的限制', '性能开销大'] : ['缺少必要的 Canvas/ES6 支持'],
+      rating: feats.canvas && feats.es6 ? '⭐⭐⭐' : '⭐',
     },
     {
       name: 'PDF-LIB',
-      status: 'success',
-      statusText: '✅ 兼容良好',
-      features: ['Chrome 60+', 'Firefox 55+', 'Safari 11+', 'ES6+', 'PDF编辑'],
-      issues: ['不支持 IE', '体积较大'],
-      rating: '⭐⭐⭐⭐',
+      status: feats.es6 && feats.promises && feats.blob ? 'success' : 'warning',
+      statusText: feats.es6 && feats.promises && feats.blob ? '✅ 兼容良好' : '⚠️ 部分兼容',
+      features: [
+        feats.es6 ? '✅ ES6 Module' : '❌ 缺少 ES6',
+        feats.promises ? '✅ Promise' : '❌ 缺少 Promise',
+        feats.blob ? '✅ Blob API' : '❌ 缺少 Blob',
+      ].filter((f) => f),
+      issues: feats.es6 && feats.promises && feats.blob ? ['体积较大', '用于 PDF 编辑场景'] : [],
+      rating: feats.es6 && feats.promises && feats.blob ? '⭐⭐⭐⭐' : '⭐⭐',
     },
     {
       name: 'print-html-element',
-      status: 'success',
-      statusText: '✅ 完全兼容',
-      features: ['所有现代浏览器', 'IE11+', '移动端', '超轻量'],
-      issues: [],
-      rating: '⭐⭐⭐⭐⭐',
+      status: feats.printAPI ? 'success' : 'error',
+      statusText: feats.printAPI ? '✅ 完全兼容' : '❌ 不支持',
+      features: [feats.printAPI ? '✅ Print API' : '❌ 缺少 Print API', '✅ 无其他依赖'],
+      issues: feats.printAPI ? [] : ['需要 window.print() 支持'],
+      rating: feats.printAPI ? '⭐⭐⭐⭐⭐' : '❌',
     },
   ]
 
