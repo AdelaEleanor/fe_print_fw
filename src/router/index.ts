@@ -44,6 +44,11 @@ const router = createRouter({
       component: () => import('../views/Html2Pdf.vue'),
     },
     {
+      path: '/architecture',
+      name: 'architecture',
+      component: () => import('../views/ArchitectureAnalysis.vue'),
+    },
+    {
       path: '/performance',
       name: 'performance',
       component: () => import('../views/PerformanceTest.vue'),
