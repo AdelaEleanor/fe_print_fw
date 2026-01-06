@@ -413,7 +413,76 @@ doc.save('file.pdf')  // ← 生成PDF文件
                       </table>
                     </div>
 
-                    <h4 style="margin-top: 2rem">📌 具体例子说明</h4>
+                    <h4 style="margin-top: 2rem">📌 实际打印效果对比演示</h4>
+                    <p style="color: #4a5568; margin-bottom: 1.5rem">
+                      点击下方按钮，真实触发打印预览，亲自体验两种方案的差异！
+                    </p>
+
+                    <!-- 交互式演示区域 -->
+                    <div class="interactive-demo">
+                      <!-- 演示卡片 -->
+                      <div class="demo-section">
+                        <h5>演示卡片（复杂样式）</h5>
+                        <div id="print-demo-card" ref="printDemoCard" class="demo-card actual">
+                          <div class="card-header">产品销售报告</div>
+                          <div class="card-content">
+                            <div class="stat-item">
+                              <span class="stat-label">Q1销售额</span>
+                              <span class="stat-value">¥ 1,234,567</span>
+                            </div>
+                            <div class="stat-item">
+                              <span class="stat-label">增长率</span>
+                              <span class="stat-value highlight">+28.5%</span>
+                            </div>
+                            <div class="stat-item">
+                              <span class="stat-label">市场占有率</span>
+                              <span class="stat-value">42.3%</span>
+                            </div>
+                          </div>
+                          <div class="card-footer">
+                            <span class="badge">优秀</span>
+                            <span class="time">2026-01-06</span>
+                          </div>
+                        </div>
+                        <div class="effect-labels">
+                          <span class="label-tag">✨ 蓝紫渐变</span>
+                          <span class="label-tag">🌑 阴影效果</span>
+                          <span class="label-tag">💎 圆角边框</span>
+                        </div>
+                      </div>
+
+                      <!-- 打印按钮 -->
+                      <div class="demo-actions">
+                        <button class="print-button native" @click="printWithNative">
+                          <span class="button-icon">🔵</span>
+                          <div class="button-content">
+                            <strong>原生打印</strong>
+                            <span>Print.js等方案</span>
+                          </div>
+                        </button>
+                        <button class="print-button canvas" @click="printWithCanvas">
+                          <span class="button-icon">🟢</span>
+                          <div class="button-content">
+                            <strong>Canvas转图打印</strong>
+                            <span>html2canvas方案</span>
+                          </div>
+                        </button>
+                      </div>
+
+                      <!-- 预期结果说明 -->
+                      <div class="expected-results">
+                        <div class="result-item">
+                          <h6>❌ 原生打印预期</h6>
+                          <p>渐变可能变成纯色，阴影可能消失（取决于浏览器打印引擎）</p>
+                        </div>
+                        <div class="result-item">
+                          <h6>✅ Canvas打印预期</h6>
+                          <p>所有样式完全保留，与网页显示完全一致</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <h4 style="margin-top: 2rem">📋 对比说明</h4>
                     <div class="example-boxes">
                       <div class="example-box">
                         <h5>❌ 原生打印的限制</h5>
@@ -1100,10 +1169,177 @@ doc.rect(10, 25, 100, 50)     // ← 手动绘制</code></pre>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import html2canvas from 'html2canvas'
 
 // 架构分析选项卡
 const architectureTabs = ref(['架构层次图', '详细分类', '完整对比表', '性能深度分析', '核心理解'])
 const currentArchTab = ref(0)
+
+// 打印演示卡片引用
+const printDemoCard = ref<HTMLElement | null>(null)
+
+// 原生打印方法
+const printWithNative = () => {
+  if (!printDemoCard.value) return
+
+  const printWindow = window.open('', '_blank')
+  if (!printWindow) {
+    alert('请允许弹出窗口')
+    return
+  }
+
+  // 获取原始HTML和样式
+  const cardHTML = printDemoCard.value.outerHTML
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>原生打印演示</title>
+      <style>
+        body {
+          margin: 20px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+        }
+        .demo-card {
+          width: 400px;
+          border-radius: 12px;
+          padding: 1.5rem;
+          /* 注意：这里使用了原生打印，渐变和阴影可能不会显示 */
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+          color: white;
+        }
+        .card-header {
+          font-size: 1.1rem;
+          font-weight: 600;
+          margin-bottom: 1rem;
+          padding-bottom: 0.75rem;
+          border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        .card-content {
+          margin-bottom: 1rem;
+        }
+        .stat-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.75rem 0;
+        }
+        .stat-label {
+          font-size: 0.9rem;
+          opacity: 0.9;
+        }
+        .stat-value {
+          font-size: 1.2rem;
+          font-weight: 700;
+        }
+        .stat-value.highlight {
+          color: #48bb78;
+        }
+        .card-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding-top: 0.75rem;
+          border-top: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        .badge {
+          background: rgba(255, 255, 255, 0.2);
+          padding: 0.25rem 0.75rem;
+          border-radius: 12px;
+          font-size: 0.8rem;
+          font-weight: 600;
+        }
+        .time {
+          font-size: 0.85rem;
+          opacity: 0.8;
+        }
+        @media print {
+          body {
+            margin: 0;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      ${cardHTML}
+    </body>
+    </html>
+  `)
+
+  printWindow.document.close()
+  setTimeout(() => {
+    printWindow.print()
+  }, 250)
+}
+
+// Canvas转图打印方法
+const printWithCanvas = async () => {
+  if (!printDemoCard.value) return
+
+  try {
+    // 使用html2canvas截图
+    const canvas = await html2canvas(printDemoCard.value, {
+      scale: 2, // 提高清晰度
+      backgroundColor: null,
+      logging: false,
+    })
+
+    // 转换为图片
+    const imgData = canvas.toDataURL('image/png')
+
+    // 创建新窗口打印
+    const printWindow = window.open('', '_blank')
+    if (!printWindow) {
+      alert('请允许弹出窗口')
+      return
+    }
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Canvas转图打印演示</title>
+        <style>
+          body {
+            margin: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+          }
+          img {
+            max-width: 100%;
+            height: auto;
+          }
+          @media print {
+            body {
+              margin: 0;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <img src="${imgData}" alt="打印内容" />
+      </body>
+      </html>
+    `)
+
+    printWindow.document.close()
+    setTimeout(() => {
+      printWindow.print()
+    }, 250)
+  } catch (error) {
+    console.error('Canvas转换失败:', error)
+    alert('转换失败，请查看控制台')
+  }
+}
 
 const demos = [
   {
@@ -2443,6 +2679,209 @@ tr:hover {
   line-height: 1.6;
 }
 
+/* 交互式演示区域 */
+.interactive-demo {
+  background: white;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.demo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.demo-section h5 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+/* 演示卡片样式 */
+.demo-card {
+  width: 100%;
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.demo-card.actual {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+  color: white;
+}
+
+#print-demo-card {
+  max-width: 400px;
+}
+
+.card-header {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.card-content {
+  margin-bottom: 1rem;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.stat-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.stat-value.highlight {
+  color: #48bb78;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.time {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+/* 效果标签 */
+.effect-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.label-tag {
+  padding: 0.35rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #f7fafc;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+}
+
+/* 打印按钮 */
+.demo-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.print-button {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.print-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.print-button.native {
+  border-color: #1565c0;
+}
+
+.print-button.native:hover {
+  background: #e3f2fd;
+}
+
+.print-button.canvas {
+  border-color: #6a1b9a;
+}
+
+.print-button.canvas:hover {
+  background: #f3e5f5;
+}
+
+.button-icon {
+  font-size: 2rem;
+}
+
+.button-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.button-content strong {
+  color: #2d3748;
+  font-size: 1rem;
+}
+
+.button-content span {
+  color: #718096;
+  font-size: 0.85rem;
+}
+
+/* 预期结果 */
+.expected-results {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.result-item {
+  background: #f7fafc;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #cbd5e0;
+}
+
+.result-item h6 {
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.result-item p {
+  margin: 0;
+  color: #4a5568;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
 /* 详细对比表 */
 .detailed-comparison {
   background: #f8fafc;
@@ -2560,6 +2999,173 @@ tr:hover {
   line-height: 1.6;
 }
 
+/* 实际案例可视化对比 */
+.visual-comparison {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+}
+
+.comparison-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.comparison-item h5 {
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.comparison-desc {
+  color: #718096;
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* 演示卡片 */
+.demo-card {
+  width: 100%;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.demo-card.actual {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+  color: white;
+}
+
+.demo-card.print-native {
+  background: #e2e8f0;
+  box-shadow: none;
+  color: #2d3748;
+  border: 2px dashed #cbd5e0;
+}
+
+.card-header {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.demo-card.print-native .card-header {
+  border-bottom-color: #cbd5e0;
+}
+
+.card-content {
+  margin-bottom: 1rem;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.stat-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.stat-value.highlight {
+  color: #48bb78;
+}
+
+.demo-card.print-native .stat-value.highlight {
+  color: #38a169;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.demo-card.print-native .card-footer {
+  border-top-color: #cbd5e0;
+}
+
+.badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.demo-card.print-native .badge {
+  background: #cbd5e0;
+  color: #2d3748;
+}
+
+.time {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+/* 效果标签 */
+.effect-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.label-tag {
+  padding: 0.35rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #f7fafc;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+}
+
+.label-tag.loss {
+  background: #fed7d7;
+  color: #742a2a;
+  border-color: #fc8181;
+}
+
+.label-tag.success {
+  background: #d1fae5;
+  color: #065f46;
+  border-color: #48bb78;
+}
+
+.note {
+  background: #f7fafc;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #4a5568;
+  line-height: 1.6;
+  text-align: center;
+  border: 1px solid #e2e8f0;
+}
+
 /* 选择框 */
 .selection-boxes {
   display: grid;
@@ -2655,7 +3261,9 @@ tr:hover {
   .class-pros-cons,
   .code-comparison,
   .code-comparison-box,
-  .cost-levels {
+  .cost-levels,
+  .demo-actions,
+  .expected-results {
     grid-template-columns: 1fr;
   }
 
@@ -2668,6 +3276,14 @@ tr:hover {
   .step-arrow,
   .flow-arrow {
     transform: rotate(90deg);
+  }
+
+  .demo-card {
+    font-size: 0.9rem;
+  }
+
+  .print-button {
+    padding: 1rem;
   }
 }
 </style>
