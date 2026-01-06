@@ -1212,7 +1212,14 @@ const example6Generate = async () => {
 
 // 示例7: ECharts截图
 const initHtml2canvasChart = () => {
-  if (html2canvasChartRef.value && !html2canvasChart) {
+  if (html2canvasChartRef.value) {
+    // 如果图表已存在，先销毁
+    if (html2canvasChart) {
+      html2canvasChart.dispose()
+      html2canvasChart = null
+    }
+    
+    // 重新初始化图表
     html2canvasChart = echarts.init(html2canvasChartRef.value)
     html2canvasChart.setOption({
       title: {

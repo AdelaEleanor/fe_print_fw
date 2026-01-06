@@ -1265,7 +1265,13 @@ watch(currentExample, async (newVal) => {
 
 // 初始化vue3-print-nb的ECharts
 const initVueprintChart = () => {
-  if (vueprintChartRef.value && !vueprintChart) {
+  if (vueprintChartRef.value) {
+    // 如果图表已存在，先销毁
+    if (vueprintChart) {
+      vueprintChart.dispose()
+      vueprintChart = null
+    }
+    
     vueprintChart = echarts.init(vueprintChartRef.value)
     vueprintChart.setOption({
       title: { text: '销售数据', left: 'center', textStyle: { fontSize: 14 } },
@@ -1286,7 +1292,13 @@ const initVueprintChart = () => {
 
 // 初始化优化版ECharts
 const initVueprintChartOptimized = () => {
-  if (vueprintChartOptimizedRef.value && !vueprintChartOptimized) {
+  if (vueprintChartOptimizedRef.value) {
+    // 如果图表已存在，先销毁
+    if (vueprintChartOptimized) {
+      vueprintChartOptimized.dispose()
+      vueprintChartOptimized = null
+    }
+    
     vueprintChartOptimized = echarts.init(vueprintChartOptimizedRef.value)
     vueprintChartOptimized.setOption({
       title: {

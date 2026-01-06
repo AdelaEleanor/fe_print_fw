@@ -1264,7 +1264,13 @@ watch(currentExample, async (newVal) => {
 // 初始化ECharts图表
 const initCharts = () => {
   // 饼图 - 销售占比
-  if (pieChartRef.value && !pieChart) {
+  if (pieChartRef.value) {
+    // 如果图表已存在，先销毁
+    if (pieChart) {
+      pieChart.dispose()
+      pieChart = null
+    }
+    
     pieChart = echarts.init(pieChartRef.value)
     pieChart.setOption({
       title: { text: '产品销售占比', left: 'center', textStyle: { fontSize: 14 } },
@@ -1290,7 +1296,13 @@ const initCharts = () => {
   }
 
   // 折线图 - 月度趋势
-  if (lineChartRef.value && !lineChart) {
+  if (lineChartRef.value) {
+    // 如果图表已存在，先销毁
+    if (lineChart) {
+      lineChart.dispose()
+      lineChart = null
+    }
+    
     lineChart = echarts.init(lineChartRef.value)
     lineChart.setOption({
       title: { text: '月度销售趋势', left: 'center', textStyle: { fontSize: 14 } },
@@ -1310,7 +1322,13 @@ const initCharts = () => {
   }
 
   // 柱状图 - 产品对比
-  if (barChartRef.value && !barChart) {
+  if (barChartRef.value) {
+    // 如果图表已存在，先销毁
+    if (barChart) {
+      barChart.dispose()
+      barChart = null
+    }
+    
     barChart = echarts.init(barChartRef.value)
     barChart.setOption({
       title: { text: '产品销量对比', left: 'center', textStyle: { fontSize: 14 } },
@@ -1333,7 +1351,13 @@ const initCharts = () => {
   }
 
   // 雷达图 - 综合评估
-  if (radarChartRef.value && !radarChart) {
+  if (radarChartRef.value) {
+    // 如果图表已存在，先销毁
+    if (radarChart) {
+      radarChart.dispose()
+      radarChart = null
+    }
+    
     radarChart = echarts.init(radarChartRef.value)
     radarChart.setOption({
       title: { text: '产品综合评估', left: 'center', textStyle: { fontSize: 14 } },
@@ -1366,7 +1390,13 @@ const initCharts = () => {
 
 // 初始化对比测试图表（与VuePrintNb示例8完全相同的配置）
 const initCompareChart = () => {
-  if (compareChartRef.value && !compareChart) {
+  if (compareChartRef.value) {
+    // 如果图表已存在，先销毁
+    if (compareChart) {
+      compareChart.dispose()
+      compareChart = null
+    }
+    
     compareChart = echarts.init(compareChartRef.value)
     compareChart.setOption({
       title: {

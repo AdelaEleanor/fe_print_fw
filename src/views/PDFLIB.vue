@@ -1413,7 +1413,13 @@ const example6Generate = async () => {
 
 // 示例7: ECharts生成PDF
 const initPdflibChart = () => {
-  if (pdflibChartRef.value && !pdflibChart) {
+  if (pdflibChartRef.value) {
+    // 如果图表已存在，先销毁
+    if (pdflibChart) {
+      pdflibChart.dispose()
+      pdflibChart = null
+    }
+    
     pdflibChart = echarts.init(pdflibChartRef.value)
     pdflibChart.setOption({
       title: {

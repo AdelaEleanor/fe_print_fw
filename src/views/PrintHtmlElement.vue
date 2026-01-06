@@ -1005,7 +1005,13 @@ const example6Print = () => {
 
 // 示例7: ECharts打印
 const initPrintElementChart = () => {
-  if (printElementChartRef.value && !printElementChart) {
+  if (printElementChartRef.value) {
+    // 如果图表已存在，先销毁
+    if (printElementChart) {
+      printElementChart.dispose()
+      printElementChart = null
+    }
+    
     printElementChart = echarts.init(printElementChartRef.value)
     printElementChart.setOption({
       title: {

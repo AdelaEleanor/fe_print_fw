@@ -1020,7 +1020,13 @@ watch(currentExample, async (newVal) => {
 
 // 初始化Print.js的ECharts
 const initPrintjsChart = () => {
-  if (printjsChartRef.value && !printjsChart) {
+  if (printjsChartRef.value) {
+    // 如果图表已存在，先销毁
+    if (printjsChart) {
+      printjsChart.dispose()
+      printjsChart = null
+    }
+    
     printjsChart = echarts.init(printjsChartRef.value)
     printjsChart.setOption({
       title: { text: '销售趋势', left: 'center', textStyle: { fontSize: 14 } },

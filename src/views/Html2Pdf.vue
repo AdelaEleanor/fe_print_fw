@@ -1534,7 +1534,13 @@ watch(currentExample, async (newVal) => {
 
 // 初始化html2pdf的ECharts
 const initHtml2pdfChart = () => {
-  if (html2pdfChartRef.value && !html2pdfChart) {
+  if (html2pdfChartRef.value) {
+    // 如果图表已存在，先销毁
+    if (html2pdfChart) {
+      html2pdfChart.dispose()
+      html2pdfChart = null
+    }
+    
     html2pdfChart = echarts.init(html2pdfChartRef.value)
     html2pdfChart.setOption({
       title: { text: '月度销售', left: 'center', textStyle: { fontSize: 14 } },
@@ -1556,7 +1562,13 @@ const initHtml2pdfChart = () => {
 
 // 初始化优化版ECharts
 const initHtml2pdfChartOptimized = () => {
-  if (html2pdfChartOptimizedRef.value && !html2pdfChartOptimized) {
+  if (html2pdfChartOptimizedRef.value) {
+    // 如果图表已存在，先销毁
+    if (html2pdfChartOptimized) {
+      html2pdfChartOptimized.dispose()
+      html2pdfChartOptimized = null
+    }
+    
     html2pdfChartOptimized = echarts.init(html2pdfChartOptimizedRef.value)
     html2pdfChartOptimized.setOption({
       title: {

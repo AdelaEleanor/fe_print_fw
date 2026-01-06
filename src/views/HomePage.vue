@@ -152,11 +152,11 @@
 
     <section class="architecture">
       <h2>🏗️ 底层架构分析对比</h2>
-      
+
       <!-- 选项卡切换 -->
       <div class="tabs">
-        <button 
-          v-for="(tab, index) in architectureTabs" 
+        <button
+          v-for="(tab, index) in architectureTabs"
           :key="index"
           :class="['tab-button', { active: currentArchTab === index }]"
           @click="currentArchTab = index"
@@ -176,14 +176,24 @@
                 <div class="arch-box">
                   <strong>1️⃣ 原生打印</strong>
                   <code>window.print()</code>
+                  <p class="arch-explain">
+                    浏览器内置的打印API，直接调用系统打印对话框。无需任何第三方库，通过CSS @media
+                    print控制打印样式，是最轻量的方案。
+                  </p>
                 </div>
                 <div class="arch-box">
                   <strong>2️⃣ Canvas API</strong>
                   <code>canvas.toDataURL()</code>
+                  <p class="arch-explain">
+                    将HTML元素渲染为Canvas画布，再导出为PNG/JPEG图片。核心是html2canvas库，能够将DOM结构和CSS样式转换为像素数据，实现"所见即所得"的截图效果。
+                  </p>
                 </div>
                 <div class="arch-box">
                   <strong>3️⃣ DOM/CSS渲染</strong>
                   <code>document.write()</code>
+                  <p class="arch-explain">
+                    通过动态创建iframe或新窗口，将HTML内容写入其中并触发打印。保留完整的DOM结构和交互能力，常用于打印指定区域内容。
+                  </p>
                 </div>
               </div>
             </div>
@@ -222,6 +232,127 @@
                   <span class="tech-badge">PDF字节流</span>
                 </div>
               </div>
+
+              <!-- 打印流程详解 -->
+              <div class="print-flow-explanation">
+                <h3>🔄 三类框架的完整打印流程</h3>
+                <div class="flow-comparison-container">
+                  <!-- 原生打印方案 -->
+                  <div class="flow-path">
+                    <h4>🔵 原生打印方案</h4>
+                    <p class="flow-description">Print.js、vue3-print-nb、print-html-element</p>
+                    <div class="flow-diagram">
+                      <div class="flow-item">原始HTML</div>
+                      <div class="flow-connector">↓</div>
+                      <div class="flow-item">document.write()</div>
+                      <div class="flow-connector">↓</div>
+                      <div class="flow-item">iframe/新窗口</div>
+                      <div class="flow-connector">↓</div>
+                      <div class="flow-item highlight-success">window.print()</div>
+                      <div class="flow-connector">↓</div>
+                      <div class="flow-item">浏览器打印引擎</div>
+                    </div>
+                    <div class="flow-code-sample">
+                      <pre><code>const printWindow = window.open('', '_blank')
+printWindow.document.write(htmlContent)  // ← 写入HTML
+printWindow.print()                      // ← 触发打印</code></pre>
+                    </div>
+                    <div class="flow-feature">
+                      <span class="feature-badge success">最快</span>
+                      <span class="feature-badge success">极轻</span>
+                      <span class="feature-badge warning">只能打印</span>
+                    </div>
+                  </div>
+
+                  <!-- Canvas转图方案 -->
+                  <div class="flow-path">
+                    <h4>🟢 Canvas转图方案</h4>
+                    <p class="flow-description">html2canvas、html2pdf.js、ChartComparison</p>
+                    <div class="flow-diagram">
+                      <div class="flow-item">DOM元素</div>
+                      <div class="flow-connector">↓</div>
+                      <div class="flow-item">html2canvas</div>
+                      <div class="flow-connector">↓</div>
+                      <div class="flow-item">Canvas绘制</div>
+                      <div class="flow-connector">↓</div>
+                      <div class="flow-item">toDataURL()</div>
+                      <div class="flow-connector">↓</div>
+                      <div class="flow-item">PNG图片</div>
+                      <div class="flow-connector">↓</div>
+                      <div class="flow-item highlight-info">&lt;img&gt;标签</div>
+                      <div class="flow-connector">↓</div>
+                      <div class="flow-item highlight-success">window.print()</div>
+                    </div>
+                    <div class="flow-code-sample">
+                      <pre><code>const canvas = await html2canvas(element)
+const imgData = canvas.toDataURL('image/png')
+const printWindow = window.open('', '_blank')
+printWindow.document.write(\`&lt;img src="\${imgData}"&gt;\`)
+printWindow.print()  // ← 打印PNG图片</code></pre>
+                    </div>
+                    <div class="flow-feature">
+                      <span class="feature-badge">所见即所得</span>
+                      <span class="feature-badge warning">转换耗时</span>
+                      <span class="feature-badge warning">文件大</span>
+                    </div>
+                  </div>
+
+                  <!-- PDF生成方案 -->
+                  <div class="flow-path">
+                    <h4>🟣 PDF生成方案</h4>
+                    <p class="flow-description">jsPDF、pdfmake、PDF-LIB</p>
+                    <div class="flow-diagram">
+                      <div class="flow-item">代码描述</div>
+                      <div class="flow-connector">↓</div>
+                      <div class="flow-item">API调用</div>
+                      <div class="flow-connector">↓</div>
+                      <div class="flow-item">PDF字节流</div>
+                      <div class="flow-connector">↓</div>
+                      <div class="flow-item">Blob对象</div>
+                      <div class="flow-connector">↓</div>
+                      <div class="flow-item highlight-info">PDF文件</div>
+                      <div class="flow-connector">↓</div>
+                      <div class="flow-item highlight-success">download()或打印</div>
+                    </div>
+                    <div class="flow-code-sample">
+                      <pre><code>const doc = new jsPDF()
+doc.text('Hello', 10, 10)
+doc.save('file.pdf')  // ← 生成PDF文件
+// 或用iframe打印PDF</code></pre>
+                    </div>
+                    <div class="flow-feature">
+                      <span class="feature-badge success">可下载</span>
+                      <span class="feature-badge success">矢量</span>
+                      <span class="feature-badge">控制复杂</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 关键理解 -->
+                <div class="flow-key-insight">
+                  <h4>💡 关键理解</h4>
+                  <div class="insight-boxes">
+                    <div class="insight-box">
+                      <strong>window.print() 是所有打印的终点</strong>
+                      <p>
+                        无论用哪个框架，最后都要调用浏览器的打印API。框架的区别只是"打印什么内容"和"转换方式"。
+                      </p>
+                    </div>
+                    <div class="insight-box">
+                      <strong>转换成本决定框架选择</strong>
+                      <p>
+                        原生方案→直接用DOM；Canvas方案→需要计算布局；PDF方案→需要代码描述。转换成本越低，性能越好。
+                      </p>
+                    </div>
+                    <div class="insight-box">
+                      <strong>三类方案各有妥协</strong>
+                      <p>
+                        原生方案快但功能弱；Canvas方案所见即所得但有布局问题；PDF方案功能强但用法复杂。
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -235,7 +366,7 @@
                 <p><strong>核心技术：</strong>直接使用 <code>window.print()</code></p>
                 <p><strong>包含框架：</strong>Print.js, vue3-print-nb, print-html-element</p>
               </div>
-              
+
               <div class="class-workflow">
                 <h4>底层流程：</h4>
                 <div class="workflow-steps">
@@ -284,10 +415,16 @@ iframe.contentWindow.print()         // ← 原生打印</code></pre>
             <h3>🟢 第2类：Canvas截图 + PDF生成</h3>
             <div class="class-content">
               <div class="class-info">
-                <p><strong>核心技术：</strong><code>html2canvas</code> / <code>canvas.toDataURL()</code></p>
-                <p><strong>包含框架：</strong>html2canvas, html2pdf.js, jsPDF(部分), pdfmake(部分), PDF-LIB</p>
+                <p>
+                  <strong>核心技术：</strong><code>html2canvas</code> /
+                  <code>canvas.toDataURL()</code>
+                </p>
+                <p>
+                  <strong>包含框架：</strong>html2canvas, html2pdf.js, jsPDF(部分), pdfmake(部分),
+                  PDF-LIB
+                </p>
               </div>
-              
+
               <div class="class-workflow">
                 <h4>底层流程：</h4>
                 <div class="workflow-steps">
@@ -395,7 +532,7 @@ pdf.download()                           // ← 保存/打印</code></pre>
                 <p><strong>核心技术：</strong>直接使用PDF二进制格式规范</p>
                 <p><strong>包含框架：</strong>jsPDF, pdfmake, PDF-LIB</p>
               </div>
-              
+
               <div class="class-workflow">
                 <h4>底层流程：</h4>
                 <div class="workflow-steps">
@@ -583,7 +720,7 @@ pdfMake.createPdf(docDef).download()</code></pre>
                 </div>
                 <p class="flow-result">速度：⚡ 极快（直接用已渲染的DOM）</p>
               </div>
-              
+
               <div class="perf-flow">
                 <h4>jsPDF流程：</h4>
                 <div class="flow-steps slow">
@@ -610,7 +747,7 @@ doc.setFontSize(12)
 doc.text('Title', 10, 20)     // ← 手动定位
 doc.rect(10, 25, 100, 50)     // ← 手动绘制</code></pre>
               </div>
-              
+
               <div class="code-sample">
                 <h4>pdfmake（声明式，自动布局）</h4>
                 <pre><code>{
@@ -659,7 +796,7 @@ doc.rect(10, 25, 100, 50)     // ← 手动绘制</code></pre>
                   </div>
                 </div>
               </div>
-              
+
               <div class="problem-reasons">
                 <h4>问题原因：</h4>
                 <ul>
@@ -677,7 +814,7 @@ doc.rect(10, 25, 100, 50)     // ← 手动绘制</code></pre>
         <div v-if="currentArchTab === 4" class="arch-understanding">
           <div class="understanding-box">
             <h3>💡 核心理解：所有框架本质上都在做3件事</h3>
-            
+
             <div class="three-things">
               <div class="thing-card">
                 <div class="thing-num">1️⃣</div>
@@ -742,10 +879,10 @@ doc.rect(10, 25, 100, 50)     // ← 手动绘制</code></pre>
             <h3>🎯 选择框架的本质</h3>
             <div class="guide-content">
               <p class="guide-principle">
-                选A还是B <strong>不在于"哪个更强"</strong>，<br>
+                选A还是B <strong>不在于"哪个更强"</strong>，<br />
                 而在于 <strong>"你的转换成本多高"</strong>
               </p>
-              
+
               <div class="cost-levels">
                 <div class="cost-card low">
                   <h4>成本低 ✅</h4>
@@ -1286,6 +1423,34 @@ tr:hover {
 
 .arch-box strong {
   display: block;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.arch-box code {
+  display: block;
+  background: #1a202c;
+  color: #68d391;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
+}
+
+.arch-explain {
+  text-align: left;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: #4a5568;
+  margin: 0;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.arch-box strong {
+  display: block;
   margin-bottom: 0.5rem;
   color: #2d3748;
 }
@@ -1420,14 +1585,16 @@ tr:hover {
 }
 
 .class-code {
-  background: #1a202c;
+  background: #f8fafc;
   padding: 1.5rem;
   border-radius: 8px;
+  border: 1px solid #e2e8f0;
 }
 
 .class-code h4 {
-  color: white;
+  color: #1e293b;
   margin-bottom: 1rem;
+  font-weight: 600;
 }
 
 .class-code pre {
@@ -1436,10 +1603,10 @@ tr:hover {
 }
 
 .class-code code {
-  color: #68d391;
+  color: #1e293b;
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: 0.9rem;
-  line-height: 1.6;
+  line-height: 1.8;
 }
 
 .class-pros-cons {
@@ -1448,7 +1615,8 @@ tr:hover {
   gap: 1.5rem;
 }
 
-.pros, .cons {
+.pros,
+.cons {
   padding: 1.5rem;
   border-radius: 8px;
 }
@@ -1463,17 +1631,20 @@ tr:hover {
   border: 2px solid #e53e3e;
 }
 
-.pros h4, .cons h4 {
+.pros h4,
+.cons h4 {
   margin-bottom: 1rem;
 }
 
-.pros ul, .cons ul {
+.pros ul,
+.cons ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.pros li, .cons li {
+.pros li,
+.cons li {
   padding: 0.5rem 0;
   color: #2d3748;
 }
@@ -1721,14 +1892,16 @@ tr:hover {
 }
 
 .code-sample {
-  background: #1a202c;
+  background: #f8fafc;
   padding: 1.5rem;
   border-radius: 8px;
+  border: 1px solid #e2e8f0;
 }
 
 .code-sample h4 {
-  color: white;
+  color: #1e293b;
   margin-bottom: 1rem;
+  font-weight: 600;
 }
 
 .code-sample pre {
@@ -1736,10 +1909,10 @@ tr:hover {
 }
 
 .code-sample code {
-  color: #68d391;
+  color: #1e293b;
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: 0.85rem;
-  line-height: 1.6;
+  line-height: 1.8;
 }
 
 .conclusion {
@@ -1972,6 +2145,180 @@ tr:hover {
   font-weight: 600;
 }
 
+/* 打印流程详解 */
+.print-flow-explanation {
+  margin-top: 2rem;
+  border-top: 2px solid #e2e8f0;
+  padding-top: 2rem;
+}
+
+.print-flow-explanation h3 {
+  color: #2d3748;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.flow-comparison-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.flow-path {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.flow-path:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.flow-path h4 {
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.flow-description {
+  color: #718096;
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+}
+
+.flow-diagram {
+  background: #f7fafc;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.flow-item {
+  background: white;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  border: 2px solid #e2e8f0;
+  text-align: center;
+  font-weight: 500;
+  color: #2d3748;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.flow-item.highlight-success {
+  background: #d1fae5;
+  border-color: #48bb78;
+  color: #065f46;
+  font-weight: 600;
+}
+
+.flow-item.highlight-info {
+  background: #dbeafe;
+  border-color: #3b82f6;
+  color: #1e40af;
+  font-weight: 600;
+}
+
+.flow-connector {
+  text-align: center;
+  color: #667eea;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.75rem;
+}
+
+.flow-code-sample {
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.flow-code-sample pre {
+  margin: 0;
+}
+
+.flow-code-sample code {
+  color: #1e293b;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  display: block;
+  overflow-x: auto;
+}
+
+.flow-feature {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.feature-badge {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #f7fafc;
+  color: #2d3748;
+  border: 1px solid #e2e8f0;
+}
+
+.feature-badge.success {
+  background: #d1fae5;
+  color: #065f46;
+  border-color: #48bb78;
+}
+
+.feature-badge.warning {
+  background: #fed7d7;
+  color: #742a2a;
+  border-color: #e53e3e;
+}
+
+/* 关键理解 */
+.flow-key-insight {
+  margin-top: 2rem;
+  border-top: 2px solid #e2e8f0;
+  padding-top: 2rem;
+}
+
+.flow-key-insight h4 {
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.insight-boxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.insight-box {
+  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.insight-box strong {
+  display: block;
+  color: #667eea;
+  margin-bottom: 0.75rem;
+}
+
+.insight-box p {
+  margin: 0;
+  color: #4a5568;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
 .best-practice {
   background: linear-gradient(135deg, #48bb7815 0%, #10b98115 100%);
   border: 2px solid #48bb78;
@@ -2022,20 +2369,20 @@ tr:hover {
     flex-wrap: nowrap;
     overflow-x: auto;
   }
-  
+
   .class-pros-cons,
   .code-comparison,
   .code-comparison-box,
   .cost-levels {
     grid-template-columns: 1fr;
   }
-  
+
   .workflow-steps,
   .flow-steps {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .step-arrow,
   .flow-arrow {
     transform: rotate(90deg);
